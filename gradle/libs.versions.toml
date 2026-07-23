@@ -9,6 +9,8 @@ vanniktech = "0.36.0"
 detekt = "1.23.8"
 ktlint = "14.2.0"
 kotlinxBenchmark = "0.4.17"
+serdeKotlin = "0.1.10"
+indexmapKotlin = "0.1.4"
 
 [plugins]
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
@@ -27,6 +29,8 @@ kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serializa
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "datetime" }
 collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "collectionsImmutable" }
 kotlinx-benchmark-runtime = { module = "org.jetbrains.kotlinx:kotlinx-benchmark-runtime", version.ref = "kotlinxBenchmark" }
+serde-kotlin = { module = "io.github.kotlinmania:serde-kotlin", version.ref = "serdeKotlin" }
+indexmap-kotlin = { module = "io.github.kotlinmania:indexmap-kotlin", version.ref = "indexmapKotlin" }
 
 [bundles]
 serde-json-commonMain = [
@@ -35,4 +39,6 @@ serde-json-commonMain = [
   "kotlinx-serialization-json",
   "kotlinx-datetime",
   "collections-immutable",
+  "serde-kotlin",
+  "indexmap-kotlin",
 ]
