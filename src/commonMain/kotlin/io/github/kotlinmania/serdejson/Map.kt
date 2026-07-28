@@ -36,7 +36,7 @@ class JsonMap<K, V>(
     fun remove(key: K): V? = map.remove(key)
 
     /** Returns a mutable reference to the value corresponding to the key. */
-    fun getMut(key: K): V? = map.getMut(key)
+    fun getMut(key: K): V? = map.get(key)
 
     /** Returns the key-value pair matching the given key. */
     fun getKeyValue(key: K): Pair<K, V>? = map.getKeyValue(key)
@@ -54,13 +54,13 @@ class JsonMap<K, V>(
     override fun iterator(): Iterator<Pair<K, V>> = map.iterator()
 
     /** Returns an iterator over the map's keys. */
-    fun keys(): Iterable<K> = map.keys()
+    fun keys(): List<K> = map.keys()
 
     /** Returns an iterator over the map's values. */
-    fun values(): Iterable<V> = map.values()
+    fun values(): List<V> = map.values()
 
-    /** Returns an iterator over the map's entries. */
-    fun entries(): Iterable<Pair<K, V>> = map.entries()
+    /** Returns the list of key-value pairs in this map. */
+    fun entries(): List<Pair<K, V>> = map.entries().toList()
 
     /** Insert a key-value pair in the map at the given index. */
     fun shiftInsert(index: Int, k: K, v: V): V? = map.shiftInsert(index, k, v)

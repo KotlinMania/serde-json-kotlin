@@ -2,6 +2,7 @@
 package io.github.kotlinmania.serdejson
 
 import io.github.kotlinmania.serde.SerdeError
+import io.github.kotlinmania.serde.SerdeException
 import io.github.kotlinmania.serde.SerdeResult
 import io.github.kotlinmania.serde.serdeCatching
 import io.github.kotlinmania.serdecore.de.Deserializer
@@ -283,9 +284,9 @@ class JsonDeserializer(private val parser: JsonParser) : Deserializer {
 
     private fun parseNumberValue(): NumberValue {
         val v = parser.parseValue().getOrThrow()
-        val n = (v as Value.Number).value
+        val n: Number = (v as Value.Number).value
         return when {
-            n.isI64() && n.asI64()!! >= 0 -> NumberValue.U64(n.asU64()!!)
+            n.isI64() && (n.asI64() ?: 0L) >= 0 -> NumberValue.U64(n.asU64()!!)
             n.isI64() -> NumberValue.I64(n.asI64()!!)
             else -> NumberValue.F64(n.asF64()!!)
         }

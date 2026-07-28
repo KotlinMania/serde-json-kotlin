@@ -2,6 +2,7 @@
 package io.github.kotlinmania.serdejson
 
 import io.github.kotlinmania.serde.SerdeError
+import io.github.kotlinmania.serde.SerdeException
 import io.github.kotlinmania.serde.SerdeResult
 import io.github.kotlinmania.serde.serdeCatching
 import io.github.kotlinmania.serdecore.ser.Serialize
@@ -11,8 +12,50 @@ import io.github.kotlinmania.serdecore.ser.SerializeStruct
 import io.github.kotlinmania.serdecore.ser.SerializeStructVariant
 import io.github.kotlinmania.serdecore.ser.SerializeTuple
 import io.github.kotlinmania.serdecore.ser.SerializeTupleStruct
-import io.github.kotlin.kotlinmania.serdecore.ser.SerializeTupleVariant
+import io.github.kotlinmania.serdecore.ser.SerializeTupleVariant
 import io.github.kotlinmania.serdecore.ser.Serializer
+
+private val QUOTE = byteArrayOf('"'.code.toByte())
+private val ESC_QUOTE = "\\\"".encodeToByteArray()
+private val ESC_BACKSLASH = "\\\\".encodeToByteArray()
+private val ESC_NEWLINE = "\\n".encodeToByteArray()
+private val ESC_CR = "\\r".encodeToByteArray()
+private val ESC_TAB = "\\t".encodeToByteArray()
+private val ESC_BS = "\\b".encodeToByteArray()
+private val ESC_FF = "\\f".encodeToByteArray()
+private val TRUE_BYTES = "true".encodeToByteArray()
+private val FALSE_BYTES = "false".encodeToByteArray()
+private val NULL_BYTES = "null".encodeToByteArray()
+private val OPEN_BRACKET = byteArrayOf('['.code.toByte())
+private val CLOSE_BRACKET = byteArrayOf(']'.code.toByte())
+private val OPEN_BRACE = byteArrayOf('{'.code.toByte())
+private val CLOSE_BRACE = byteArrayOf('}'.code.toByte())
+private val COMMA = ",".encodeToByteArray()
+private val COLON = ":".encodeToByteArray()
+private val SPACE = " ".encodeToByteArray()
+private val NEWLINE = "\n".encodeToByteArray()
+private val TWO_SPACES = "  ".encodeToByteArray()
+
+private fun escapeStringToWriter(writer: IoWrite, s: String) {
+    for (ch in s) {
+        when (ch) {
+            '"' -> writer.writeAll(ESC_QUOTE)
+            '\\' -> writer.writeAll(ESC_BACKSLASH)
+            '\n' -> writer.writeAll(ESC_NEWLINE)
+            '\r' -> writer.writeAll(ESC_CR)
+            '\t' -> writer.writeAll(ESC_TAB)
+            '\b' -> writer.writeAll(ESC_BS)
+            '\u000C' -> writer.writeAll(ESC_FF)
+            else -> {
+                if (ch.code < 0x20) {
+                    writer.writeAll("\\u${ch.code.toString(16).padStart(4, '0')}".encodeToByteArray())
+                } else {
+                    writer.writeAll(ch.toString().encodeToByteArray())
+                }
+            }
+        }
+    }
+}
 
 /**
  * A serializer that writes JSON to an [IoWrite].
@@ -23,45 +66,20 @@ class JsonSerializer(
     private val indent: Int = 0,
 ) : Serializer<Unit> {
     private fun writeString(s: String) {
-        writer.writeAll(quoteByte)
-        escapeString(s)
-        writer.writeAll(quoteByte)
+        writer.writeAll(QUOTE)
+        escapeStringToWriter(writer, s)
+        writer.writeAll(QUOTE)
     }
 
-    private fun escapeString(s: String) {
-        for (ch in s) {
-            when (ch) {
-                '"' -> writer.writeAll(escapeQuote)
-                '\\' -> writer.writeAll(escapeBackslash)
-                '\n' -> writer.writeAll(escapeNewline)
-                '\r' -> writer.writeAll(escapeCarriageReturn)
-                '\t' -> writer.writeAll(escapeTab)
-                '\b' -> writer.writeAll(escapeBackspace)
-                '\u000C' -> writer.writeAll(escapeFormFeed)
-                else -> {
-                    if (ch.code < 0x20) {
-                        writer.writeAll("\\u${ch.code.toString(16).padStart(4, '0')}".encodeToByteArray())
-                    } else {
-                        writer.writeAll(ch.toString().encodeToByteArray())
-                    }
-                }
-            }
-        }
-    }
-
-    private fun writeIndent() {
+    private fun writeIndent(level: Int) {
         if (pretty) {
-            writer.writeAll(newline)
-            repeat(indent) { writer.writeAll(twoSpaces) }
+            writer.writeAll(NEWLINE)
+            repeat(level) { writer.writeAll(TWO_SPACES) }
         }
-    }
-
-    private fun beforeEntry() {
-        if (pretty) writer.writeAll(space)
     }
 
     override fun serializeBool(v: Boolean): SerdeResult<Unit> = serdeCatching {
-        writer.writeAll(if (v) trueBytes else falseBytes)
+        writer.writeAll(if (v) TRUE_BYTES else FALSE_BYTES)
     }
 
     override fun serializeI8(v: Byte): SerdeResult<Unit> = serializeI64(v.toLong())
@@ -86,7 +104,7 @@ class JsonSerializer(
         if (v.isFinite()) {
             writer.writeAll(formatFinite(v).encodeToByteArray())
         } else {
-            SerdeResult.failure(SerdeError.custom("cannot serialize non-finite float"))
+            throw SerdeException(SerdeError.custom("cannot serialize non-finite float"))
         }
     }
 
@@ -99,23 +117,22 @@ class JsonSerializer(
     }
 
     override fun serializeBytes(v: ByteArray): SerdeResult<Unit> = serdeCatching {
-        // Serialize as array of u8
         val seq = serializeSeq(v.size).getOrThrow()
         for (b in v) {
-            seq.serializeElement(b).getOrThrow()
+            seq.serializeElement(Number.fromI64(b.toLong())).getOrThrow()
         }
         seq.end()
     }
 
     override fun serializeNone(): SerdeResult<Unit> = serdeCatching {
-        writer.writeAll(nullBytes)
+        writer.writeAll(NULL_BYTES)
     }
 
     override fun <T> serializeSome(value: T): SerdeResult<Unit>
         where T : Serialize = value.serialize(this)
 
     override fun serializeUnit(): SerdeResult<Unit> = serdeCatching {
-        writer.writeAll(nullBytes)
+        writer.writeAll(NULL_BYTES)
     }
 
     override fun serializeUnitStruct(name: String): SerdeResult<Unit> = serializeUnit()
@@ -141,23 +158,26 @@ class JsonSerializer(
         value: T,
     ): SerdeResult<Unit>
         where T : Serialize = serdeCatching {
-            // Serialize as { "variant": value }
             val s = serializeStruct(name, 1).getOrThrow()
             s.serializeField(variant, value).getOrThrow()
             s.end()
         }
 
     override fun serializeSeq(len: Int?): SerdeResult<SerializeSeq<Unit>> = serdeCatching {
-        writer.writeAll(openBracket)
-        JsonSeqSerialize(this, writer, pretty, indent)
+        writer.writeAll(OPEN_BRACKET)
+        JsonSeqSerialize(writer, pretty, indent)
     }
 
-    override fun serializeTuple(len: Int): SerdeResult<SerializeTuple<Unit>> = serializeSeq(len)
+    override fun serializeTuple(len: Int): SerdeResult<SerializeTuple<Unit>> = serdeCatching {
+        writer.writeAll(OPEN_BRACKET)
+        JsonSeqSerialize(writer, pretty, indent)
+    }
 
     override fun serializeTupleStruct(
         name: String,
         len: Int,
-    ): SerdeResult<SerializeTupleStruct<Unit>> = serializeSeq(len) as SerdeResult<SerializeTupleStruct<Unit>>
+    ): SerdeResult<SerializeTupleStruct<Unit>> =
+        serializeSeq(len) as SerdeResult<SerializeTupleStruct<Unit>>
 
     override fun serializeTupleVariant(
         name: String,
@@ -165,20 +185,24 @@ class JsonSerializer(
         variant: String,
         len: Int,
     ): SerdeResult<SerializeTupleVariant<Unit>> = serdeCatching {
-        val s = serializeStruct(name, 1).getOrThrow()
-        s.serializeField(variant, Unit).getOrThrow()
-        s.end()
-    } as SerdeResult<SerializeTupleVariant<Unit>>
+        writer.writeAll(OPEN_BRACE)
+        writeString(variant)
+        writer.writeAll(COLON)
+        if (pretty) writer.writeAll(SPACE)
+        writer.writeAll(OPEN_BRACKET)
+        JsonTupleVariantSerialize(writer, pretty, indent)
+    }
 
     override fun serializeMap(len: Int?): SerdeResult<SerializeMap<Unit>> = serdeCatching {
-        writer.writeAll(openBrace)
-        JsonMapSerialize(this, writer, pretty, indent)
+        writer.writeAll(OPEN_BRACE)
+        JsonMapSerialize(writer, pretty, indent)
     }
 
     override fun serializeStruct(
         name: String,
         len: Int,
-    ): SerdeResult<SerializeStruct<Unit>> = serializeMap(len) as SerdeResult<SerializeStruct<Unit>>
+    ): SerdeResult<SerializeStruct<Unit>> =
+        serializeMap(len) as SerdeResult<SerializeStruct<Unit>>
 
     override fun serializeStructVariant(
         name: String,
@@ -186,33 +210,10 @@ class JsonSerializer(
         variant: String,
         len: Int,
     ): SerdeResult<SerializeStructVariant<Unit>> = serdeCatching {
-        writer.writeAll(openBrace)
-        val map = JsonMapSerialize(this, writer, pretty, indent)
+        writer.writeAll(OPEN_BRACE)
+        val map = JsonMapSerialize(writer, pretty, indent)
         map.serializeEntry(variant, Unit).getOrThrow()
         map as SerializeStructVariant<Unit>
-    }
-
-    companion object {
-        private val quoteByte = byteArrayOf('"'.code.toByte())
-        private val escapeQuote = "\\\"".encodeToByteArray()
-        private val escapeBackslash = "\\\\".encodeToByteArray()
-        private val escapeNewline = "\\n".encodeToByteArray()
-        private val escapeCarriageReturn = "\\r".encodeToByteArray()
-        private val escapeTab = "\\t".encodeToByteArray()
-        private val escapeBackspace = "\\b".encodeToByteArray()
-        private val escapeFormFeed = "\\f".encodeToByteArray()
-        private val trueBytes = "true".encodeToByteArray()
-        private val falseBytes = "false".encodeToByteArray()
-        private val nullBytes = "null".encodeToByteArray()
-        private val openBracket = byteArrayOf('['.code.toByte())
-        private val closeBracket = byteArrayOf(']'.code.toByte())
-        private val openBrace = byteArrayOf('{'.code.toByte())
-        private val closeBrace = byteArrayOf('}'.code.toByte())
-        private val comma = ",".encodeToByteArray()
-        private val colon = ":".encodeToByteArray()
-        private val space = " ".encodeToByteArray()
-        private val newline = "\n".encodeToByteArray()
-        private val twoSpaces = "  ".encodeToByteArray()
     }
 }
 
@@ -220,27 +221,34 @@ class JsonSerializer(
  * Serializer for a JSON sequence (array).
  */
 private class JsonSeqSerialize(
-    private val parent: JsonSerializer,
     private val writer: IoWrite,
     private val pretty: Boolean,
     private val indent: Int,
-) : SerializeSeq<Unit> {
+) : SerializeSeq<Unit>, SerializeTuple<Unit>, SerializeTupleStruct<Unit>, SerializeTupleVariant<Unit> {
     private var first = true
     private val childIndent = indent + 1
 
     override fun <T> serializeElement(value: T): SerdeResult<Unit>
         where T : Serialize = serdeCatching {
-            if (!first) writer.writeAll(parent.companion.comma)
+            if (!first) writer.writeAll(COMMA)
             first = false
-            parent.writeIndent(childIndent)
+            if (pretty) {
+                writer.writeAll(NEWLINE)
+                repeat(childIndent) { writer.writeAll(TWO_SPACES) }
+            }
             value.serialize(JsonSerializer(writer, pretty, childIndent))
         }
 
+    @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
+    override fun <T> serializeField(value: T): SerdeResult<Unit>
+        where T : Serialize = serializeElement(value)
+
     override fun end(): SerdeResult<Unit> = serdeCatching {
         if (pretty && !first) {
-            parent.writeIndent(indent)
+            writer.writeAll(NEWLINE)
+            repeat(indent) { writer.writeAll(TWO_SPACES) }
         }
-        writer.writeAll(parent.companion.closeBracket)
+        writer.writeAll(CLOSE_BRACKET)
     }
 }
 
@@ -248,30 +256,71 @@ private class JsonSeqSerialize(
  * Serializer for a JSON map (object).
  */
 private class JsonMapSerialize(
-    private val parent: JsonSerializer,
     private val writer: IoWrite,
     private val pretty: Boolean,
     private val indent: Int,
-) : SerializeMap<Unit> {
+) : SerializeMap<Unit>, SerializeStruct<Unit>, SerializeStructVariant<Unit> {
     private var first = true
     private val childIndent = indent + 1
+
+    private fun writeKey(key: String) {
+        if (!first) writer.writeAll(COMMA)
+        first = false
+        if (pretty) {
+            writer.writeAll(NEWLINE)
+            repeat(childIndent) { writer.writeAll(TWO_SPACES) }
+        }
+        writer.writeAll(QUOTE)
+        escapeStringToWriter(writer, key)
+        writer.writeAll(QUOTE)
+        writer.writeAll(COLON)
+        if (pretty) writer.writeAll(SPACE)
+    }
+
+    override fun <T> serializeKey(key: T): SerdeResult<Unit>
+        where T : Serialize = serdeCatching {
+            if (!first) writer.writeAll(COMMA)
+            first = false
+            if (pretty) {
+                writer.writeAll(NEWLINE)
+                repeat(childIndent) { writer.writeAll(TWO_SPACES) }
+            }
+            key.serialize(JsonSerializer(writer, pretty, childIndent))
+        }
+
+    override fun <T> serializeValue(value: T): SerdeResult<Unit>
+        where T : Serialize = serdeCatching {
+            writer.writeAll(COLON)
+            if (pretty) writer.writeAll(SPACE)
+            value.serialize(JsonSerializer(writer, pretty, childIndent))
+        }
 
     override fun <K, V> serializeEntry(key: K, value: V): SerdeResult<Unit>
         where K : Serialize,
               V : Serialize = serdeCatching {
-            if (!first) writer.writeAll(parent.companion.comma)
+            if (!first) writer.writeAll(COMMA)
             first = false
-            parent.writeIndent(childIndent)
+            if (pretty) {
+                writer.writeAll(NEWLINE)
+                repeat(childIndent) { writer.writeAll(TWO_SPACES) }
+            }
             key.serialize(JsonSerializer(writer, pretty, childIndent))
-            writer.writeAll(parent.companion.colon)
-            parent.beforeEntry()
+            writer.writeAll(COLON)
+            if (pretty) writer.writeAll(SPACE)
+            value.serialize(JsonSerializer(writer, pretty, childIndent))
+        }
+
+    override fun <T> serializeField(key: String, value: T): SerdeResult<Unit>
+        where T : Serialize = serdeCatching {
+            writeKey(key)
             value.serialize(JsonSerializer(writer, pretty, childIndent))
         }
 
     override fun end(): SerdeResult<Unit> = serdeCatching {
         if (pretty && !first) {
-            parent.writeIndent(indent)
+            writer.writeAll(NEWLINE)
+            repeat(indent) { writer.writeAll(TWO_SPACES) }
         }
-        writer.writeAll(parent.companion.closeBrace)
+        writer.writeAll(CLOSE_BRACE)
     }
 }
