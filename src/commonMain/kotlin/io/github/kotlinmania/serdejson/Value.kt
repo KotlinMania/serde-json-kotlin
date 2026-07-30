@@ -2,7 +2,7 @@
 package io.github.kotlinmania.serdejson
 
 import io.github.kotlinmania.serde.SerdeResult
-import io.github.kotlinmania.serde.serdeCatching
+import io.github.kotlinmania.serdecore.de.Deserialize
 import io.github.kotlinmania.serdecore.ser.Serialize
 import io.github.kotlinmania.serdecore.ser.Serializer
 
@@ -17,7 +17,7 @@ sealed class Value : Serialize {
     class Bool(val value: Boolean) : Value()
 
     /** Represents a JSON number, whether integer or floating point. */
-    class Number(val value: serdejson.Number) : Value()
+    class Number(val value: io.github.kotlinmania.serdejson.JsonNumber) : Value()
 
     /** Represents a JSON string. */
     class Str(val value: String) : Value()
@@ -64,7 +64,7 @@ sealed class Value : Serialize {
     fun isNumber(): Boolean = this is Number
 
     /** If the [Value] is a Number, returns the associated [Number]. Returns null otherwise. */
-    fun asNumber(): serdejson.Number? = (this as? Number)?.value
+    fun asNumber(): io.github.kotlinmania.serdejson.JsonNumber? = (this as? Number)?.value
 
     /** Returns true if the [Value] is an integer between [Long.MIN_VALUE] and [Long.MAX_VALUE]. */
     fun isI64(): Boolean = (this as? Number)?.value?.isI64() ?: false
@@ -137,7 +137,7 @@ sealed class Value : Serialize {
             is Object -> {
                 val map = serializer.serializeMap(value.len()).getOrThrow()
                 for ((k, v) in value) {
-                    map.serializeEntry(k, v).getOrThrow()
+                    map.serializeEntry(Value.Str(k), v).getOrThrow()
                 }
                 map.end()
             }
@@ -178,5 +178,7 @@ fun toValue(value: Serialize): SerdeResult<Value> {
 /**
  * Interpret a [Value] as an instance of type T.
  */
-fun <T> fromValue(value: Value, deserialize: io.github.kotlinmania.serdecore.de.Deserialize<T>): SerdeResult<T> =
-    value.deserialize(deserialize)
+fun <T> fromValue(value: Value, deserialize: Deserialize<T>): SerdeResult<T> {
+    val json = valueToStr(value)
+    return fromStr(json, deserialize)
+}

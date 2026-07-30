@@ -60,7 +60,7 @@ class JsonMap<K, V>(
     fun values(): List<V> = map.values()
 
     /** Returns the list of key-value pairs in this map. */
-    fun entries(): List<Pair<K, V>> = map.entries().toList()
+    fun entries(): List<Pair<K, V>> = map.asEntries()
 
     /** Insert a key-value pair in the map at the given index. */
     fun shiftInsert(index: Int, k: K, v: V): V? = map.shiftInsert(index, k, v)

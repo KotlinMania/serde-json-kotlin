@@ -133,14 +133,17 @@ sealed class ErrorCode {
  */
 class JsonError(
     val code: ErrorCode,
-    val line: Int = 0,
-    val column: Int = 0,
+    lineNumber: Int = 0,
+    columnNumber: Int = 0,
 ) {
+    private val _line = lineNumber
+    private val _column = columnNumber
+
     /** One-based line number at which the error was detected. */
-    fun line(): Int = line
+    fun line(): Int = _line
 
     /** One-based column number at which the error was detected. */
-    fun column(): Int = column
+    fun column(): Int = _column
 
     /** Categorizes the cause of this error. */
     fun classify(): Category =
@@ -187,16 +190,16 @@ class JsonError(
     fun isEof(): Boolean = classify() == Category.EOF
 
     override fun toString(): String =
-        if (line == 0) {
+        if (line() == 0) {
             code.toString()
         } else {
-            "$code at line $line column $column"
+            "$code at line ${line()} column ${column()}"
         }
 
     override fun equals(other: Any?): Boolean =
-        other is JsonError && other.code == code && other.line == line && other.column == column
+        other is JsonError && other.code == code && other.line() == line() && other.column() == column()
 
-    override fun hashCode(): Int = code.hashCode() * 31 + line * 7 + column
+    override fun hashCode(): Int = code.hashCode() * 31 + line() * 7 + column()
 
     companion object {
         /** Creates a syntax error at the given position. */
@@ -213,7 +216,7 @@ class JsonError(
 
         /** Fix the position of this error if it doesn't already have one. */
         fun fixPosition(error: JsonError, f: (ErrorCode) -> JsonError): JsonError =
-            if (error.line == 0) {
+            if (error.line() == 0) {
                 f(error.code)
             } else {
                 error

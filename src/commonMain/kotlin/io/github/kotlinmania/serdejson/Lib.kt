@@ -2,6 +2,7 @@
 package io.github.kotlinmania.serdejson
 
 import io.github.kotlinmania.serde.SerdeResult
+import io.github.kotlinmania.serde.serdeCatching
 import io.github.kotlinmania.serdecore.de.Deserialize
 import io.github.kotlinmania.serdecore.ser.Serialize
 

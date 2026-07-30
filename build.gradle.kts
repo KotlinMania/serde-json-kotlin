@@ -101,6 +101,11 @@ configurations.configureEach {
             ),
         )
     }
+    // proc-macro-kotlin-android bundles org.jetbrains:annotations classes, which
+    // duplicate the ones resolved transitively from Kotlin stdlib on Android.
+    if (name.contains("Android", ignoreCase = true) && name.endsWith("RuntimeClasspath")) {
+        exclude(group = "org.jetbrains", module = "annotations")
+    }
 }
 
 // Opt-ins shared across Kotlin targets.
@@ -425,10 +430,8 @@ kotlin {
     linuxArm64 { configureBenchmarkCompilation() }
     mingwX64 { configureBenchmarkCompilation() }
 
-    // Android NDK — always built (full target surface, no opt-in gate).
-    androidNativeArm32 { configureBenchmarkCompilation() }
+    // Android NDK — current 64-bit target surface, no opt-in gate.
     androidNativeArm64 { configureBenchmarkCompilation() }
-    androidNativeX86 { configureBenchmarkCompilation() }
     androidNativeX64 { configureBenchmarkCompilation() }
 
     // Web
@@ -822,10 +825,8 @@ tasks.register("swiftExportSmokeTest") {
 // ============================================================================
 val nativeTargetNames =
     listOf(
-        "androidNativeArm32",
         "androidNativeArm64",
         "androidNativeX64",
-        "androidNativeX86",
         "iosArm64",
         "iosSimulatorArm64",
         "iosX64",

@@ -119,7 +119,7 @@ class JsonSerializer(
     override fun serializeBytes(v: ByteArray): SerdeResult<Unit> = serdeCatching {
         val seq = serializeSeq(v.size).getOrThrow()
         for (b in v) {
-            seq.serializeElement(Number.fromI64(b.toLong())).getOrThrow()
+            seq.serializeElement(JsonNumber.fromI64(b.toLong())).getOrThrow()
         }
         seq.end()
     }
@@ -176,8 +176,10 @@ class JsonSerializer(
     override fun serializeTupleStruct(
         name: String,
         len: Int,
-    ): SerdeResult<SerializeTupleStruct<Unit>> =
-        serializeSeq(len) as SerdeResult<SerializeTupleStruct<Unit>>
+    ): SerdeResult<SerializeTupleStruct<Unit>> = serdeCatching {
+        writer.writeAll(OPEN_BRACKET)
+        JsonSeqSerialize(writer, pretty, indent)
+    }
 
     override fun serializeTupleVariant(
         name: String,
@@ -190,7 +192,7 @@ class JsonSerializer(
         writer.writeAll(COLON)
         if (pretty) writer.writeAll(SPACE)
         writer.writeAll(OPEN_BRACKET)
-        JsonTupleVariantSerialize(writer, pretty, indent)
+        JsonSeqSerialize(writer, pretty, indent)
     }
 
     override fun serializeMap(len: Int?): SerdeResult<SerializeMap<Unit>> = serdeCatching {
@@ -201,8 +203,10 @@ class JsonSerializer(
     override fun serializeStruct(
         name: String,
         len: Int,
-    ): SerdeResult<SerializeStruct<Unit>> =
-        serializeMap(len) as SerdeResult<SerializeStruct<Unit>>
+    ): SerdeResult<SerializeStruct<Unit>> = serdeCatching {
+        writer.writeAll(OPEN_BRACE)
+        JsonMapSerialize(writer, pretty, indent)
+    }
 
     override fun serializeStructVariant(
         name: String,
@@ -211,9 +215,12 @@ class JsonSerializer(
         len: Int,
     ): SerdeResult<SerializeStructVariant<Unit>> = serdeCatching {
         writer.writeAll(OPEN_BRACE)
-        val map = JsonMapSerialize(writer, pretty, indent)
-        map.serializeEntry(variant, Unit).getOrThrow()
-        map as SerializeStructVariant<Unit>
+        writeString(variant)
+        writer.writeAll(COLON)
+        if (pretty) writer.writeAll(SPACE)
+        val inner = JsonMapSerialize(writer, pretty, indent + 1)
+        writer.writeAll(OPEN_BRACE)
+        JsonStructVariantSerialize(inner, writer, pretty, indent)
     }
 }
 
@@ -239,7 +246,6 @@ private class JsonSeqSerialize(
             value.serialize(JsonSerializer(writer, pretty, childIndent))
         }
 
-    @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
     override fun <T> serializeField(value: T): SerdeResult<Unit>
         where T : Serialize = serializeElement(value)
 
@@ -316,6 +322,8 @@ private class JsonMapSerialize(
             value.serialize(JsonSerializer(writer, pretty, childIndent))
         }
 
+    override fun skipField(key: String): SerdeResult<Unit> = SerdeResult.success(Unit)
+
     override fun end(): SerdeResult<Unit> = serdeCatching {
         if (pretty && !first) {
             writer.writeAll(NEWLINE)
@@ -323,4 +331,38 @@ private class JsonMapSerialize(
         }
         writer.writeAll(CLOSE_BRACE)
     }
+}
+
+/**
+ * Wrapper for struct variant serialization. Delegates field serialization to the inner
+ * [JsonMapSerialize], and writes an extra closing brace on [end] to close the outer object.
+ */
+private class JsonStructVariantSerialize(
+    private val inner: JsonMapSerialize,
+    private val writer: IoWrite,
+    private val pretty: Boolean,
+    private val indent: Int,
+) : SerializeStructVariant<Unit> {
+    override fun <T> serializeField(key: String, value: T): SerdeResult<Unit>
+        where T : Serialize = inner.serializeField(key, value)
+
+    override fun skipField(key: String): SerdeResult<Unit> = inner.skipField(key)
+
+    override fun end(): SerdeResult<Unit> = serdeCatching {
+        inner.end().getOrThrow()
+        if (pretty) {
+            writer.writeAll(NEWLINE)
+            repeat(indent) { writer.writeAll(TWO_SPACES) }
+        }
+        writer.writeAll(CLOSE_BRACE)
+    }
+}
+
+/**
+ * A [Serialize] wrapper for a [String], used when a plain string needs to be passed
+ * where a [Serialize] is expected.
+ */
+private class StrValue(private val s: String) : Serialize {
+    override fun <Ok> serialize(serializer: Serializer<Ok>): SerdeResult<Ok> =
+        serializer.serializeStr(s)
 }

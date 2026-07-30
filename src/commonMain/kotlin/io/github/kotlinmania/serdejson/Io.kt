@@ -57,6 +57,11 @@ sealed class Result<out E, out T> {
             is Ok -> this
             is Err -> Err(transform(error))
         }
+
+    companion object {
+        fun <T> ok(value: T): Result<Nothing, T> = Ok(value)
+        fun <E> err(error: E): Result<E, Nothing> = Err(error)
+    }
 }
 
 /**
@@ -67,7 +72,7 @@ fun interface IoWrite {
 
     fun writeAll(buf: ByteArray): IoResult<Unit> = write(buf)
 
-    fun flush(): IoResult<Unit> = IoResult.Ok(Unit)
+    fun flush(): IoResult<Unit> = Result.ok(Unit)
 }
 
 /**
@@ -81,10 +86,10 @@ class VecIoWrite : IoWrite {
 
     override fun write(buf: ByteArray): IoResult<Unit> {
         buffer.addAll(buf.toList())
-        return IoResult.Ok(Unit)
+        return Result.ok(Unit)
     }
 
     override fun writeAll(buf: ByteArray): IoResult<Unit> = write(buf)
 
-    override fun flush(): IoResult<Unit> = IoResult.Ok(Unit)
+    override fun flush(): IoResult<Unit> = Result.ok(Unit)
 }

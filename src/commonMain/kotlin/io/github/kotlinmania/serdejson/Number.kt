@@ -14,7 +14,7 @@ import io.github.kotlinmania.serdecore.ser.Serializer
 /**
  * Represents a JSON number, whether integer or floating point.
  */
-class Number private constructor(
+class JsonNumber private constructor(
     private val n: N,
 ) : Serialize {
     /**
@@ -27,25 +27,25 @@ class Number private constructor(
     }
 
     companion object {
-        /** Converts a finite [Double] to a [Number]. Infinite or NaN values are not JSON numbers. */
-        fun fromF64(f: Double): Number? =
+        /** Converts a finite [Double] to a [JsonNumber]. Infinite or NaN values are not JSON numbers. */
+        fun fromF64(f: Double): JsonNumber? =
             if (f.isFinite()) {
-                Number(N.Float(f))
+                JsonNumber(N.Float(f))
             } else {
                 null
             }
 
-        /** Converts a finite [Float] to a [Number]. */
-        fun fromF32(f: Float): Number? =
+        /** Converts a finite [Float] to a [JsonNumber]. */
+        fun fromF32(f: Float): JsonNumber? =
             if (f.isFinite()) {
-                Number(N.Float(f.toDouble()))
+                JsonNumber(N.Float(f.toDouble()))
             } else {
                 null
             }
 
-        /** Converts a [Long] to a [Number]. */
-        fun fromI64(i: Long): Number =
-            Number(
+        /** Converts a [Long] to a [JsonNumber]. */
+        fun fromI64(i: Long): JsonNumber =
+            JsonNumber(
                 if (i < 0) {
                     N.NegInt(i)
                 } else {
@@ -53,25 +53,25 @@ class Number private constructor(
                 },
             )
 
-        /** Converts a [ULong] to a [Number]. */
-        fun fromU64(u: ULong): Number = Number(N.PosInt(u))
+        /** Converts a [ULong] to a [JsonNumber]. */
+        fun fromU64(u: ULong): JsonNumber = JsonNumber(N.PosInt(u))
 
-        /** Converts an [Int] to a [Number]. */
-        fun fromI32(i: Int): Number = fromI64(i.toLong())
+        /** Converts an [Int] to a [JsonNumber]. */
+        fun fromI32(i: Int): JsonNumber = fromI64(i.toLong())
 
-        /** Converts a [UInt] to a [Number]. */
-        fun fromU32(u: UInt): Number = fromU64(u.toULong())
+        /** Converts a [UInt] to a [JsonNumber]. */
+        fun fromU32(u: UInt): JsonNumber = fromU64(u.toULong())
 
-        /** Creates a [Number] from a [ParserNumber]. */
-        internal fun fromParserNumber(value: ParserNumber): Number =
+        /** Creates a [JsonNumber] from a [ParserNumber]. */
+        internal fun fromParserNumber(value: ParserNumber): JsonNumber =
             when (value) {
-                is ParserNumber.F64 -> Number(N.Float(value.value))
-                is ParserNumber.U64 -> Number(N.PosInt(value.value))
-                is ParserNumber.I64 -> Number(N.NegInt(value.value))
+                is ParserNumber.F64 -> JsonNumber(N.Float(value.value))
+                is ParserNumber.U64 -> JsonNumber(N.PosInt(value.value))
+                is ParserNumber.I64 -> JsonNumber(N.NegInt(value.value))
             }
 
         /** Returns the [Unexpected] representation of this number. */
-        internal fun unexpected(n: Number): Unexpected =
+        internal fun unexpected(n: JsonNumber): Unexpected =
             when (val inner = n.n) {
                 is N.PosInt -> Unexpected.Unsigned(inner.value)
                 is N.NegInt -> Unexpected.Signed(inner.value)
@@ -140,7 +140,7 @@ class Number private constructor(
         }
 
     override fun equals(other: Any?): Boolean =
-        other is Number && other.n == this.n
+        other is JsonNumber && other.n == this.n
 
     override fun hashCode(): Int =
         when (n) {
@@ -179,17 +179,17 @@ internal fun formatFinite(f: Double): String {
     return s
 }
 
-/** Converts an [Int] to a [Number]. */
-fun Number.Companion.from(i: Int): Number = fromI64(i.toLong())
+/** Converts an [Int] to a [JsonNumber]. */
+fun JsonNumber.Companion.from(i: Int): JsonNumber = fromI64(i.toLong())
 
-/** Converts a [Long] to a [Number]. */
-fun Number.Companion.from(i: Long): Number = fromI64(i)
+/** Converts a [Long] to a [JsonNumber]. */
+fun JsonNumber.Companion.from(i: Long): JsonNumber = fromI64(i)
 
-/** Converts a [ULong] to a [Number]. */
-fun Number.Companion.from(u: ULong): Number = fromU64(u)
+/** Converts a [ULong] to a [JsonNumber]. */
+fun JsonNumber.Companion.from(u: ULong): JsonNumber = fromU64(u)
 
-/** Converts a [Double] to a [Number], or null if not finite. */
-fun Number.Companion.from(f: Double): Number? = fromF64(f)
+/** Converts a [Double] to a [JsonNumber], or null if not finite. */
+fun JsonNumber.Companion.from(f: Double): JsonNumber? = fromF64(f)
 
-/** Converts a [Float] to a [Number], or null if not finite. */
-fun Number.Companion.from(f: Float): Number? = fromF32(f)
+/** Converts a [Float] to a [JsonNumber], or null if not finite. */
+fun JsonNumber.Companion.from(f: Float): JsonNumber? = fromF32(f)
