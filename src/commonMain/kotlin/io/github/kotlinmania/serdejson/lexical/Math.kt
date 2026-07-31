@@ -60,28 +60,46 @@ private object Scalar {
     /**
      * Multiply two small integers with carry and return the (low, high) components.
      *
-     * Kotlin has no native 128-bit type, so we use [ULong.times] with overflow
-     * detection via [java.math.BigInteger] for correctness on all platforms.
+     * Kotlin has no native 128-bit type, so we split each 64-bit value into
+     * 32-bit halves and perform four 32x32→64 multiplications, then combine
+     * with carries. This is equivalent to the Rust `Wide = u128` path.
      */
     fun mul(x: Limb, y: Limb, carry: Limb): Pair<Limb, Limb> {
-        val result = x.toBigInteger() * y.toBigInteger() + carry.toBigInteger()
-        val low = result.and(BIGINT_MASK).toLong().toULong()
-        val high = result.shiftRight(64).toLong().toULong()
+        // Split into 32-bit halves.
+        val xLo = x and 0xFFFF_FFFFU
+        val xHi = x shr 32
+        val yLo = y and 0xFFFF_FFFFU
+        val yHi = y shr 32
+
+        // Four partial products (each fits in 64 bits).
+        val ll = xLo * yLo
+        val lh = xLo * yHi
+        val hl = xHi * yLo
+        val hh = xHi * yHi
+
+        // mid = lh + hl (may overflow into a 65th bit).
+        val mid = lh + hl
+        val midCarry = if (mid < lh) 1UL else 0UL
+
+        // Low 64 = ll + (mid << 32).  The upper 32 bits of mid shift out.
+        val midShl32Lo = mid shl 32
+        val midShl32Hi = mid shr 32
+
+        val s1 = ll + midShl32Lo
+        val s1Carry = if (s1 < ll) 1UL else 0UL
+
+        // Add the external carry to the low word.
+        val low = s1 + carry
+        val s2Carry = if (low < s1) 1UL else 0UL
+
+        // High 64 = hh + midCarry << 32 + midShl32Hi + s1Carry + s2Carry.
+        val high = hh + (midCarry shl 32) + midShl32Hi + s1Carry + s2Carry
+
         return Pair(low, high)
     }
 
     /** Multiply two small integers with carry and return the overflow contribution. */
     fun imul(x: Limb, y: Limb, carry: Limb): Pair<Limb, Limb> = mul(x, y, carry)
-}
-
-private val BIGINT_MASK = java.math.BigInteger.valueOf(2).pow(64).subtract(java.math.BigInteger.ONE)
-
-private fun ULong.toBigInteger(): java.math.BigInteger =
-    java.math.BigInteger(this.toString(10))
-
-private fun java.math.BigInteger.toULong(): ULong {
-    val str = this.toString(10)
-    return str.toULong()
 }
 
 // HI64
