@@ -23,10 +23,14 @@ enum class Category {
  */
 sealed class ErrorCode {
     /** Catchall for syntax error messages. */
-    class Message(val msg: String) : ErrorCode()
+    class Message(
+        val msg: String,
+    ) : ErrorCode()
 
     /** Some I/O error occurred while serializing or deserializing. */
-    class Io(val message: String) : ErrorCode()
+    class Io(
+        val message: String,
+    ) : ErrorCode()
 
     /** EOF while parsing a list. */
     object EofWhileParsingList : ErrorCode()
@@ -136,14 +140,14 @@ class JsonError(
     lineNumber: Int = 0,
     columnNumber: Int = 0,
 ) {
-    private val _line = lineNumber
-    private val _column = columnNumber
+    private val errorLine: Int = lineNumber
+    private val errorColumn: Int = columnNumber
 
     /** One-based line number at which the error was detected. */
-    fun line(): Int = _line
+    fun line(): Int = errorLine
 
     /** One-based column number at which the error was detected. */
-    fun column(): Int = _column
+    fun column(): Int = errorColumn
 
     /** Categorizes the cause of this error. */
     fun classify(): Category =

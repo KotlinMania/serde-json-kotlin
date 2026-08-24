@@ -1,11 +1,9 @@
 // port-lint: source src/raw.rs
 package io.github.kotlinmania.serdejson
 
-import io.github.kotlinmania.serde.SerdeError
 import io.github.kotlinmania.serde.SerdeResult
 import io.github.kotlinmania.serde.serdeCatching
 import io.github.kotlinmania.serdecore.ser.Serialize
-import io.github.kotlinmania.serdecore.ser.SerializeStruct
 import io.github.kotlinmania.serdecore.ser.Serializer
 
 /**
@@ -55,7 +53,9 @@ class RawValue(
 /**
  * A [Serialize] wrapper that writes the raw JSON string directly.
  */
-private class RawValueSerialize(private val raw: RawValue) : Serialize {
+private class RawValueSerialize(
+    private val raw: RawValue,
+) : Serialize {
     override fun <Ok> serialize(serializer: Serializer<Ok>): SerdeResult<Ok> =
         serializer.serializeStr(raw.json)
 }
@@ -65,8 +65,9 @@ private class RawValueSerialize(private val raw: RawValue) : Serialize {
  *
  * This function validates that the string is valid JSON.
  */
-fun rawValueFromString(json: String): SerdeResult<RawValue> = serdeCatching {
-    // Validate by parsing
-    fromStr(json).getOrThrow()
-    RawValue(json)
-}
+fun rawValueFromString(json: String): SerdeResult<RawValue> =
+    serdeCatching {
+        // Validate by parsing
+        fromStr(json).getOrThrow()
+        RawValue(json)
+    }

@@ -1,13 +1,8 @@
 // port-lint: source src/number.rs
 package io.github.kotlinmania.serdejson
 
-import io.github.kotlinmania.serde.SerdeError
 import io.github.kotlinmania.serde.SerdeResult
-import io.github.kotlinmania.serde.serdeCatching
-import io.github.kotlinmania.serdecore.de.Deserializer
-import io.github.kotlinmania.serdecore.de.Expected
 import io.github.kotlinmania.serdecore.de.Unexpected
-import io.github.kotlinmania.serdecore.de.Visitor
 import io.github.kotlinmania.serdecore.ser.Serialize
 import io.github.kotlinmania.serdecore.ser.Serializer
 
@@ -21,9 +16,17 @@ class JsonNumber private constructor(
      * The internal representation of a JSON number.
      */
     private sealed class N {
-        class PosInt(val value: ULong) : N()
-        class NegInt(val value: Long) : N()
-        class Float(val value: Double) : N()
+        class PosInt(
+            val value: ULong,
+        ) : N()
+
+        class NegInt(
+            val value: Long,
+        ) : N()
+
+        class Float(
+            val value: Double,
+        ) : N()
     }
 
     companion object {
@@ -139,8 +142,37 @@ class JsonNumber private constructor(
             is N.Float -> formatFinite(n.value)
         }
 
-    override fun equals(other: Any?): Boolean =
-        other is JsonNumber && other.n == this.n
+    override fun <Ok> serialize(serializer: Serializer<Ok>): SerdeResult<Ok> =
+        when (n) {
+            is N.PosInt -> serializer.serializeU64(n.value)
+            is N.NegInt -> serializer.serializeI64(n.value)
+            is N.Float -> serializer.serializeF64(n.value)
+        }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is JsonNumber) return false
+        return when (val thisN = n) {
+            is N.PosInt ->
+                when (val otherN = other.n) {
+                    is N.PosInt -> thisN.value == otherN.value
+                    is N.NegInt -> false
+                    is N.Float -> thisN.value.toDouble() == otherN.value
+                }
+            is N.NegInt ->
+                when (val otherN = other.n) {
+                    is N.NegInt -> thisN.value == otherN.value
+                    is N.PosInt -> false
+                    is N.Float -> thisN.value.toDouble() == otherN.value
+                }
+            is N.Float ->
+                when (val otherN = other.n) {
+                    is N.Float -> thisN.value == otherN.value
+                    is N.PosInt -> thisN.value == otherN.value.toDouble()
+                    is N.NegInt -> thisN.value == otherN.value.toDouble()
+                }
+        }
+    }
 
     override fun hashCode(): Int =
         when (n) {
@@ -148,22 +180,23 @@ class JsonNumber private constructor(
             is N.NegInt -> n.value.hashCode()
             is N.Float -> if (n.value == 0.0) 0.0.toBits().hashCode() else n.value.toBits().hashCode()
         }
-
-    override fun <Ok> serialize(serializer: Serializer<Ok>): SerdeResult<Ok> =
-        when (n) {
-            is N.PosInt -> serializer.serializeU64(n.value)
-            is N.NegInt -> serializer.serializeI64(n.value)
-            is N.Float -> serializer.serializeF64(n.value)
-        }
 }
 
 /**
  * A number as parsed by the JSON deserializer.
  */
 sealed class ParserNumber {
-    class F64(val value: Double) : ParserNumber()
-    class U64(val value: ULong) : ParserNumber()
-    class I64(val value: Long) : ParserNumber()
+    class F64(
+        val value: Double,
+    ) : ParserNumber()
+
+    class U64(
+        val value: ULong,
+    ) : ParserNumber()
+
+    class I64(
+        val value: Long,
+    ) : ParserNumber()
 }
 
 /**
@@ -175,8 +208,11 @@ internal fun formatFinite(f: Double): String {
     if (f == Double.NEGATIVE_INFINITY) return "-9e999"
     if (f.isNaN()) return "0"
     val s = f.toString()
-    // Kotlin may produce "1.0" for integers-as-doubles; that's fine for JSON.
-    return s
+    return if (!s.contains('.') && !s.contains('e') && !s.contains('E')) {
+        "$s.0"
+    } else {
+        s
+    }
 }
 
 /** Converts an [Int] to a [JsonNumber]. */

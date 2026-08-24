@@ -56,16 +56,17 @@ private fun nearestErrorIsAccurate(errors: ULong, fp: ExtendedFloat, extrabits: 
 internal fun errorIsAccurate(
     floatTraits: FloatTraits,
     count: UInt,
-    fp: ExtendedFloat
+    fp: ExtendedFloat,
 ): Boolean {
     val bias = -(floatTraits.exponentBias - floatTraits.mantissaSize)
     val denormalExp = bias - 63
 
-    val extrabits: Long = if (fp.exp <= denormalExp) {
-        64L - floatTraits.mantissaSize + denormalExp - fp.exp
-    } else {
-        63L - floatTraits.mantissaSize
-    }
+    val extrabits: Long =
+        if (fp.exp <= denormalExp) {
+            64L - floatTraits.mantissaSize + denormalExp - fp.exp
+        } else {
+            63L - floatTraits.mantissaSize
+        }
 
     val extrabitsU = extrabits.toULong()
     val errors = count.toULong()
@@ -88,6 +89,7 @@ internal object ULongFloatErrors : FloatErrors {
 
     override fun errorIsAccurate(count: UInt, fp: ExtendedFloat): Boolean {
         // Delegate to the generic implementation using f64 traits.
-        return io.github.kotlinmania.serdejson.lexical.errorIsAccurate(F64Float, count, fp)
+        return io.github.kotlinmania.serdejson.lexical
+            .errorIsAccurate(F64Float, count, fp)
     }
 }

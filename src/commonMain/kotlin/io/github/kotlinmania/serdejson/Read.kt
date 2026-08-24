@@ -23,7 +23,9 @@ data class Position(
  * and handles all input reading. This class provides a bridge for callers that
  * have a [ByteArray] input.
  */
-class SliceRead(private val slice: ByteArray) {
+class SliceRead(
+    private val slice: ByteArray,
+) {
     private var index: Int = 0
 
     /** Returns the next byte, or null at end of input. */
@@ -48,7 +50,10 @@ class SliceRead(private val slice: ByteArray) {
         var col = 1
         for (i in 0 until index) {
             when (slice[i]) {
-                '\n'.code.toByte() -> { line++; col = 1 }
+                '\n'.code.toByte() -> {
+                    line++
+                    col = 1
+                }
                 '\r'.code.toByte() -> { /* handled by \n */ }
                 else -> col++
             }
@@ -97,7 +102,9 @@ class SliceRead(private val slice: ByteArray) {
  * This is the Kotlin equivalent of the upstream `StrRead`. The primary
  * implementation used by [JsonParser] internally.
  */
-class StrRead(private val source: String) {
+class StrRead(
+    private val source: String,
+) {
     private var index: Int = 0
 
     /** Returns the next character code, or -1 at end of input. */
@@ -122,7 +129,10 @@ class StrRead(private val source: String) {
         var col = 1
         for (i in 0 until index) {
             when (source[i]) {
-                '\n' -> { line++; col = 1 }
+                '\n' -> {
+                    line++
+                    col = 1
+                }
                 '\r' -> { /* handled by \n */ }
                 else -> col++
             }

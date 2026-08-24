@@ -6,16 +6,16 @@ import io.github.kotlinmania.serde.SerdeException
 import io.github.kotlinmania.serde.SerdeResult
 import io.github.kotlinmania.serde.serdeCatching
 import io.github.kotlinmania.serdecore.de.Deserializer
-import io.github.kotlinmania.serdecore.de.EnumAccess
 import io.github.kotlinmania.serdecore.de.MapAccess
 import io.github.kotlinmania.serdecore.de.SeqAccess
-import io.github.kotlinmania.serdecore.de.VariantAccess
 import io.github.kotlinmania.serdecore.de.Visitor
 
 /**
  * A JSON parser that reads from a string.
  */
-class JsonParser(private val input: String) {
+class JsonParser(
+    private val input: String,
+) {
     private var pos: Int = 0
     private var line: Int = 1
     private var col: Int = 0
@@ -58,27 +58,28 @@ class JsonParser(private val input: String) {
     }
 
     /** Parses a JSON value. */
-    fun parseValue(): SerdeResult<Value> = serdeCatching {
-        skipWhitespace()
-        if (pos >= input.length) {
-            throw SerdeException(SerdeError.custom(JsonError.syntax(ErrorCode.EofWhileParsingValue, line, col).toString()))
-        }
-        when (val c = input[pos]) {
-            'n' -> parseNull()
-            't' -> parseTrue()
-            'f' -> parseFalse()
-            '"' -> parseString()
-            '[' -> parseArray()
-            '{' -> parseObject()
-            else -> {
-                if (c == '-' || c.isDigit()) {
-                    parseNumber()
-                } else {
-                    throw SerdeException(SerdeError.custom(JsonError.syntax(ErrorCode.ExpectedSomeValue, line, col).toString()))
+    fun parseValue(): SerdeResult<Value> =
+        serdeCatching {
+            skipWhitespace()
+            if (pos >= input.length) {
+                throw SerdeException(SerdeError.custom(JsonError.syntax(ErrorCode.EofWhileParsingValue, line, col).toString()))
+            }
+            when (val c = input[pos]) {
+                'n' -> parseNull()
+                't' -> parseTrue()
+                'f' -> parseFalse()
+                '"' -> parseString()
+                '[' -> parseArray()
+                '{' -> parseObject()
+                else -> {
+                    if (c == '-' || c.isDigit()) {
+                        parseNumber()
+                    } else {
+                        throw SerdeException(SerdeError.custom(JsonError.syntax(ErrorCode.ExpectedSomeValue, line, col).toString()))
+                    }
                 }
             }
         }
-    }
 
     private fun parseNull(): Value {
         expect("null")
@@ -147,17 +148,21 @@ class JsonParser(private val input: String) {
             while (pos < input.length && input[pos].isDigit()) pos++
         }
         val numStr = input.substring(start, pos)
-        val number = if (isFloat) {
-            JsonNumber.fromF64(numStr.toDouble())
-        } else {
-            val longVal = numStr.toLongOrNull()
-            if (longVal != null) {
-                if (longVal >= 0) JsonNumber.fromU64(longVal.toULong())
-                else JsonNumber.fromI64(longVal)
-            } else {
+        val number =
+            if (isFloat) {
                 JsonNumber.fromF64(numStr.toDouble())
+            } else {
+                val longVal = numStr.toLongOrNull()
+                if (longVal != null) {
+                    if (longVal >= 0) {
+                        JsonNumber.fromU64(longVal.toULong())
+                    } else {
+                        JsonNumber.fromI64(longVal)
+                    }
+                } else {
+                    JsonNumber.fromF64(numStr.toDouble())
+                }
             }
-        }
         return number?.let { Value.Number(it) } ?: Value.Str(numStr)
     }
 
@@ -175,8 +180,14 @@ class JsonParser(private val input: String) {
             skipWhitespace()
             if (pos >= input.length) throw SerdeException(SerdeError.custom(JsonError.syntax(ErrorCode.EofWhileParsingList, line, col).toString()))
             when (input[pos]) {
-                ',' -> { pos++; skipWhitespace() }
-                ']' -> { pos++; return Value.Array(list) }
+                ',' -> {
+                    pos++
+                    skipWhitespace()
+                }
+                ']' -> {
+                    pos++
+                    return Value.Array(list)
+                }
                 else -> throw SerdeException(SerdeError.custom(JsonError.syntax(ErrorCode.ExpectedListCommaOrEnd, line, col).toString()))
             }
         }
@@ -206,8 +217,14 @@ class JsonParser(private val input: String) {
             skipWhitespace()
             if (pos >= input.length) throw SerdeException(SerdeError.custom(JsonError.syntax(ErrorCode.EofWhileParsingObject, line, col).toString()))
             when (input[pos]) {
-                ',' -> { pos++; skipWhitespace() }
-                '}' -> { pos++; return Value.Object(map) }
+                ',' -> {
+                    pos++
+                    skipWhitespace()
+                }
+                '}' -> {
+                    pos++
+                    return Value.Object(map)
+                }
                 else -> throw SerdeException(SerdeError.custom(JsonError.syntax(ErrorCode.ExpectedObjectCommaOrEnd, line, col).toString()))
             }
         }
@@ -239,29 +256,43 @@ class JsonParser(private val input: String) {
 /**
  * A JSON deserializer that wraps a [JsonParser] and implements the serde [Deserializer] interface.
  */
-class JsonDeserializer(private val parser: JsonParser) : Deserializer {
+class JsonDeserializer(
+    private val parser: JsonParser,
+) : Deserializer {
     override fun isHumanReadable(): Boolean = true
 
-    override fun <V> deserializeAny(visitor: Visitor<V>): SerdeResult<V> = serdeCatching {
-        val c = parser.peek()
-        when {
-            c < 0 -> throw SerdeException(SerdeError.custom(JsonError.syntax(ErrorCode.EofWhileParsingValue, parser.position().first, parser.position().second).toString()))
-            c == 'n'.code -> { parser.next(); visitor.visitUnit() }
-            c == 't'.code -> { parser.next(); expectIdent("true"); visitor.visitBool(true) }
-            c == 'f'.code -> { parser.next(); expectIdent("false"); visitor.visitBool(false) }
-            c == '"'.code -> visitor.visitStr(parseStringValue())
-            c == '['.code -> visitor.visitSeq(JsonSeqAccess(parser))
-            c == '{'.code -> visitor.visitMap(JsonMapAccess(parser))
-            else -> {
-                val num = parseNumberValue()
-                when (num) {
-                    is NumberValue.F64 -> visitor.visitF64(num.value)
-                    is NumberValue.U64 -> visitor.visitU64(num.value)
-                    is NumberValue.I64 -> visitor.visitI64(num.value)
+    override fun <V> deserializeAny(visitor: Visitor<V>): SerdeResult<V> =
+        serdeCatching {
+            val c = parser.peek()
+            when {
+                c < 0 -> throw SerdeException(SerdeError.custom(JsonError.syntax(ErrorCode.EofWhileParsingValue, parser.position().first, parser.position().second).toString()))
+                c == 'n'.code -> {
+                    parser.next()
+                    visitor.visitUnit()
+                }
+                c == 't'.code -> {
+                    parser.next()
+                    expectIdent("true")
+                    visitor.visitBool(true)
+                }
+                c == 'f'.code -> {
+                    parser.next()
+                    expectIdent("false")
+                    visitor.visitBool(false)
+                }
+                c == '"'.code -> visitor.visitStr(parseStringValue())
+                c == '['.code -> visitor.visitSeq(JsonSeqAccess(parser))
+                c == '{'.code -> visitor.visitMap(JsonMapAccess(parser))
+                else -> {
+                    val num = parseNumberValue()
+                    when (num) {
+                        is NumberValue.F64 -> visitor.visitF64(num.value)
+                        is NumberValue.U64 -> visitor.visitU64(num.value)
+                        is NumberValue.I64 -> visitor.visitI64(num.value)
+                    }
                 }
             }
-        }
-    }.flatMap { it }
+        }.flatMap { it }
 
     private fun expectIdent(s: String) {
         for (c in s) {
@@ -285,23 +316,41 @@ class JsonDeserializer(private val parser: JsonParser) : Deserializer {
     }
 
     private sealed class NumberValue {
-        class F64(val value: Double) : NumberValue()
-        class U64(val value: ULong) : NumberValue()
-        class I64(val value: Long) : NumberValue()
+        class F64(
+            val value: Double,
+        ) : NumberValue()
+
+        class U64(
+            val value: ULong,
+        ) : NumberValue()
+
+        class I64(
+            val value: Long,
+        ) : NumberValue()
     }
 
     override fun <V> deserializeBool(visitor: Visitor<V>): SerdeResult<V> =
         serdeCatching {
             val c = parser.peek()
             when (c) {
-                't'.code -> { parser.next(); expectIdent("true"); true }
-                'f'.code -> { parser.next(); expectIdent("false"); false }
+                't'.code -> {
+                    parser.next()
+                    expectIdent("true")
+                    true
+                }
+                'f'.code -> {
+                    parser.next()
+                    expectIdent("false")
+                    false
+                }
                 else -> throw SerdeException(SerdeError.custom(JsonError.syntax(ErrorCode.ExpectedSomeValue, parser.position().first, parser.position().second).toString()))
             }
         }.flatMap { visitor.visitBool(it) }
 
     override fun <V> deserializeI8(visitor: Visitor<V>): SerdeResult<V> = deserializeI64(visitor)
+
     override fun <V> deserializeI16(visitor: Visitor<V>): SerdeResult<V> = deserializeI64(visitor)
+
     override fun <V> deserializeI32(visitor: Visitor<V>): SerdeResult<V> = deserializeI64(visitor)
 
     override fun <V> deserializeI64(visitor: Visitor<V>): SerdeResult<V> =
@@ -312,7 +361,9 @@ class JsonDeserializer(private val parser: JsonParser) : Deserializer {
         }.flatMap { visitor.visitI64(it) }
 
     override fun <V> deserializeU8(visitor: Visitor<V>): SerdeResult<V> = deserializeU64(visitor)
+
     override fun <V> deserializeU16(visitor: Visitor<V>): SerdeResult<V> = deserializeU64(visitor)
+
     override fun <V> deserializeU32(visitor: Visitor<V>): SerdeResult<V> = deserializeU64(visitor)
 
     override fun <V> deserializeU64(visitor: Visitor<V>): SerdeResult<V> =
@@ -411,70 +462,77 @@ class JsonDeserializer(private val parser: JsonParser) : Deserializer {
 /**
  * Sequence access for JSON arrays.
  */
-private class JsonSeqAccess(private val parser: JsonParser) : SeqAccess {
+private class JsonSeqAccess(
+    private val parser: JsonParser,
+) : SeqAccess {
     private var first = true
 
-    override fun <T> nextElementSeed(seed: io.github.kotlinmania.serdecore.de.DeserializeSeed<T>): SerdeResult<T?> = serdeCatching {
-        if (first) {
-            parser.next() // consume '['
-            first = false
+    override fun <T> nextElementSeed(seed: io.github.kotlinmania.serdecore.de.DeserializeSeed<T>): SerdeResult<T?> =
+        serdeCatching {
+            if (first) {
+                parser.next() // consume '['
+                first = false
+                parser.peek()
+                if (parser.peek() == ']'.code) {
+                    parser.next()
+                    return@serdeCatching null
+                }
+            }
             parser.peek()
             if (parser.peek() == ']'.code) {
                 parser.next()
                 return@serdeCatching null
             }
-        }
-        parser.peek()
-        if (parser.peek() == ']'.code) {
-            parser.next()
-            return@serdeCatching null
-        }
-        val value = seed.deserialize(JsonDeserializer(parser)).getOrThrow()
-        parser.peek()
-        if (parser.peek() == ','.code) {
-            parser.next()
+            val value = seed.deserialize(JsonDeserializer(parser)).getOrThrow()
             parser.peek()
+            if (parser.peek() == ','.code) {
+                parser.next()
+                parser.peek()
+            }
+            value
         }
-        value
-    }
 }
 
 /**
  * Map access for JSON objects.
  */
-private class JsonMapAccess(private val parser: JsonParser) : MapAccess {
+private class JsonMapAccess(
+    private val parser: JsonParser,
+) : MapAccess {
     private var first = true
 
-    override fun <K> nextKeySeed(seed: io.github.kotlinmania.serdecore.de.DeserializeSeed<K>): SerdeResult<K?> = serdeCatching {
-        if (first) {
-            parser.next() // consume '{'
-            first = false
+    override fun <K> nextKeySeed(seed: io.github.kotlinmania.serdecore.de.DeserializeSeed<K>): SerdeResult<K?> =
+        serdeCatching {
+            if (first) {
+                parser.next() // consume '{'
+                first = false
+                parser.peek()
+                if (parser.peek() == '}'.code) {
+                    parser.next()
+                    return@serdeCatching null
+                }
+            }
             parser.peek()
             if (parser.peek() == '}'.code) {
                 parser.next()
                 return@serdeCatching null
             }
-        }
-        parser.peek()
-        if (parser.peek() == '}'.code) {
+            val key = seed.deserialize(JsonDeserializer(parser)).getOrThrow()
+            parser.peek()
+            if (parser.peek() != ':'.code) throw SerdeException(SerdeError.custom("expected colon"))
             parser.next()
-            return@serdeCatching null
+            key
         }
-        val key = seed.deserialize(JsonDeserializer(parser)).getOrThrow()
-        parser.peek()
-        if (parser.peek() != ':'.code) throw SerdeException(SerdeError.custom("expected colon"))
-        parser.next()
-        key
-    }
 
-    override fun <V> nextValueSeed(seed: io.github.kotlinmania.serdecore.de.DeserializeSeed<V>): SerdeResult<V> = serdeCatching {
-        val value = seed.deserialize(JsonDeserializer(parser)).getOrThrow()
-        parser.peek()
-        if (parser.peek() == ','.code) {
-            parser.next()
+    override fun <V> nextValueSeed(seed: io.github.kotlinmania.serdecore.de.DeserializeSeed<V>): SerdeResult<V> =
+        serdeCatching {
+            val value = seed.deserialize(JsonDeserializer(parser)).getOrThrow()
+            parser.peek()
+            if (parser.peek() == ','.code) {
+                parser.next()
+            }
+            value
         }
-        value
-    }
 }
 
 private val <T> T?.orThrow: T

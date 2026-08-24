@@ -36,32 +36,35 @@ fun <T> fromSlice(json: ByteArray, deserialize: Deserialize<T>): SerdeResult<T> 
 /**
  * Serialize a [Serialize] value to a JSON string.
  */
-fun toStr(value: Serialize): SerdeResult<String> = serdeCatching {
-    val writer = VecIoWrite()
-    val serializer = JsonSerializer(writer)
-    value.serialize(serializer).getOrThrow()
-    writer.bytes.decodeToString()
-}
+fun toStr(value: Serialize): SerdeResult<String> =
+    serdeCatching {
+        val writer = VecIoWrite()
+        val serializer = JsonSerializer(writer)
+        value.serialize(serializer).getOrThrow()
+        writer.bytes.decodeToString()
+    }
 
 /**
  * Serialize a [Serialize] value to a JSON string with pretty-printing.
  */
-fun toStrPretty(value: Serialize): SerdeResult<String> = serdeCatching {
-    val writer = VecIoWrite()
-    val serializer = JsonSerializer(writer, pretty = true)
-    value.serialize(serializer).getOrThrow()
-    writer.bytes.decodeToString()
-}
+fun toStrPretty(value: Serialize): SerdeResult<String> =
+    serdeCatching {
+        val writer = VecIoWrite()
+        val serializer = JsonSerializer(writer, pretty = true)
+        value.serialize(serializer).getOrThrow()
+        writer.bytes.decodeToString()
+    }
 
 /**
  * Serialize a [Serialize] value to a byte array.
  */
-fun toVec(value: Serialize): SerdeResult<ByteArray> = serdeCatching {
-    val writer = VecIoWrite()
-    val serializer = JsonSerializer(writer)
-    value.serialize(serializer).getOrThrow()
-    writer.bytes
-}
+fun toVec(value: Serialize): SerdeResult<ByteArray> =
+    serdeCatching {
+        val writer = VecIoWrite()
+        val serializer = JsonSerializer(writer)
+        value.serialize(serializer).getOrThrow()
+        writer.bytes
+    }
 
 /**
  * Serialize a [Value] to a JSON string.
@@ -84,7 +87,7 @@ fun valueToStrPretty(value: Value): String {
 /**
  * Serialize a [Value] directly to an [IoWrite].
  */
-fun toJsonString(writer: IoWrite, value: Value, pretty: Boolean = false) {
+internal fun toJsonString(writer: IoWrite, value: Value, pretty: Boolean = false) {
     when (value) {
         is Value.Null -> writer.writeAll("null".encodeToByteArray())
         is Value.Bool -> writer.writeAll(if (value.value) "true".encodeToByteArray() else "false".encodeToByteArray())

@@ -14,7 +14,7 @@ internal class ExtendedFloatArray(
     /** Pre-calculated mantissa for the powers. */
     val mant: ULongArray,
     /** Pre-calculated binary exponents for the powers. */
-    val exp: IntArray
+    val exp: IntArray,
 ) {
     /** Get the [ExtendedFloat] at [index] without bounds checking. */
     fun getExtendedFloat(index: Int): ExtendedFloat =
@@ -37,7 +37,7 @@ internal class ModeratePathPowers(
     /** Step between large powers and number of small powers. */
     val step: Int,
     /** Exponent bias for the large powers. */
-    val bias: Int
+    val bias: Int,
 ) {
     /** Get a small [ExtendedFloat] at [index]. */
     fun getSmall(index: Int): ExtendedFloat = small.getExtendedFloat(index)

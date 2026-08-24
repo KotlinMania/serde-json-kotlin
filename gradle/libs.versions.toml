@@ -31,7 +31,7 @@ serde-kotlin = { module = "io.github.kotlinmania:serde-kotlin", version.ref = "s
 indexmap-kotlin = { module = "io.github.kotlinmania:indexmap-kotlin", version.ref = "indexmapKotlin" }
 
 [bundles]
-serdejson-commonMain = [
+serde-json-commonMain = [
   "kotlinx-coroutines-core",
   "kotlinx-serialization-core",
   "kotlinx-serialization-json",

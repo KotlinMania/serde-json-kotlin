@@ -72,7 +72,7 @@ private fun bhExtended(floatTraits: FloatTraits, f: Double): ExtendedFloat {
     val b = bExtended(floatTraits, f)
     return ExtendedFloat(
         (b.mant shl 1) + 1UL,
-        b.exp - 1
+        b.exp - 1,
     )
 }
 
@@ -112,7 +112,11 @@ private fun smallAtof(floatTraits: FloatTraits, mantissa: Bigint, exponent: Int,
     val realExp = exponent
 
     val theor = bhExtended(floatTraits, f)
-    val theorDigits = Bigint().apply { data.add(theor.mant); normalize() }
+    val theorDigits =
+        Bigint().apply {
+            data.add(theor.mant)
+            normalize()
+        }
     val theorExp = theor.exp
 
     val binaryExp = theorExp - realExp
@@ -154,16 +158,17 @@ internal fun bhcomp(
     val integerDigits = integer.size
     var fractionDigits = fraction
     val fractionLen = fractionDigits.size
-    val digitsStart = if (integerDigits == 0) {
-        var start = 0
-        while (start < fractionLen && fractionDigits[start] == '0'.code.toByte()) {
-            start++
+    val digitsStart =
+        if (integerDigits == 0) {
+            var start = 0
+            while (start < fractionLen && fractionDigits[start] == '0'.code.toByte()) {
+                start++
+            }
+            fractionDigits = fractionDigits.copyOfRange(start, fractionLen)
+            start
+        } else {
+            0
         }
-        fractionDigits = fractionDigits.copyOfRange(start, fractionLen)
-        start
-    } else {
-        0
-    }
     val sciExp = scientificExponent(exponent, integerDigits, digitsStart)
     val count = minOf(floatTraits.maxDigits, integerDigits + fractionLen - digitsStart)
     val scaledExponent = sciExp + 1 - count

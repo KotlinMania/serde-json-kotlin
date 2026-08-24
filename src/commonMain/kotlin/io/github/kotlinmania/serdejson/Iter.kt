@@ -9,7 +9,7 @@ package io.github.kotlinmania.serdejson
  * following a newline character are in column 1. The column is 0 immediately after
  * a newline character has been read.
  */
-class LineColIterator<I>(
+internal class LineColIterator<I>(
     private val iter: I,
 ) where I : Iterable<Int> {
     private val iterator = iter.iterator()

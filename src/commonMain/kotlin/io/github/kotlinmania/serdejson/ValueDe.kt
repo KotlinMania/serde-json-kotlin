@@ -2,9 +2,9 @@
 package io.github.kotlinmania.serdejson
 
 import io.github.kotlinmania.serde.SerdeError
-import io.github.kotlinmania.serde.SerdeException
 import io.github.kotlinmania.serde.SerdeResult
 import io.github.kotlinmania.serde.serdeCatching
+import io.github.kotlinmania.serdecore.de.Deserialize
 import io.github.kotlinmania.serdecore.de.DeserializeSeed
 import io.github.kotlinmania.serdecore.de.Deserializer
 import io.github.kotlinmania.serdecore.de.EnumAccess
@@ -13,7 +13,6 @@ import io.github.kotlinmania.serdecore.de.SeqAccess
 import io.github.kotlinmania.serdecore.de.Unexpected
 import io.github.kotlinmania.serdecore.de.VariantAccess
 import io.github.kotlinmania.serdecore.de.Visitor
-import io.github.kotlinmania.serdecore.de.Deserialize
 
 /**
  * A [Deserializer] that reads from a [Value].
@@ -22,19 +21,22 @@ import io.github.kotlinmania.serdecore.de.Deserialize
  * and `impl Deserializer for &Value` (the owned and borrowed variants are unified
  * here because Kotlin has no lifetimes).
  */
-class ValueDeserializer(private val value: Value) : Deserializer {
+class ValueDeserializer(
+    private val value: Value,
+) : Deserializer {
     override fun isHumanReadable(): Boolean = true
 
-    override fun <V> deserializeAny(visitor: Visitor<V>): SerdeResult<V> = serdeCatching {
-        when (value) {
-            is Value.Null -> visitor.visitUnit()
-            is Value.Bool -> visitor.visitBool(value.value)
-            is Value.Number -> deserializeNumberAny(value.value, visitor)
-            is Value.Str -> visitor.visitStr(value.value)
-            is Value.Array -> visitArray(value.value, visitor)
-            is Value.Object -> visitMap(value.value, visitor)
-        }
-    }.flatMap { it }
+    override fun <V> deserializeAny(visitor: Visitor<V>): SerdeResult<V> =
+        serdeCatching {
+            when (value) {
+                is Value.Null -> visitor.visitUnit()
+                is Value.Bool -> visitor.visitBool(value.value)
+                is Value.Number -> deserializeNumberAny(value.value, visitor)
+                is Value.Str -> visitor.visitStr(value.value)
+                is Value.Array -> visitArray(value.value, visitor)
+                is Value.Object -> visitMap(value.value, visitor)
+            }
+        }.flatMap { it }
 
     override fun <V> deserializeBool(visitor: Visitor<V>): SerdeResult<V> =
         when (value) {
@@ -43,7 +45,9 @@ class ValueDeserializer(private val value: Value) : Deserializer {
         }
 
     override fun <V> deserializeI8(visitor: Visitor<V>): SerdeResult<V> = deserializeI64(visitor)
+
     override fun <V> deserializeI16(visitor: Visitor<V>): SerdeResult<V> = deserializeI64(visitor)
+
     override fun <V> deserializeI32(visitor: Visitor<V>): SerdeResult<V> = deserializeI64(visitor)
 
     override fun <V> deserializeI64(visitor: Visitor<V>): SerdeResult<V> =
@@ -59,7 +63,9 @@ class ValueDeserializer(private val value: Value) : Deserializer {
         }
 
     override fun <V> deserializeU8(visitor: Visitor<V>): SerdeResult<V> = deserializeU64(visitor)
+
     override fun <V> deserializeU16(visitor: Visitor<V>): SerdeResult<V> = deserializeU64(visitor)
+
     override fun <V> deserializeU32(visitor: Visitor<V>): SerdeResult<V> = deserializeU64(visitor)
 
     override fun <V> deserializeU64(visitor: Visitor<V>): SerdeResult<V> =
@@ -206,17 +212,18 @@ private fun <V> visitMap(map: ValueMap, visitor: Visitor<V>): SerdeResult<V> {
 /**
  * [SeqAccess] backed by a [List] of [Value].
  */
-private class ValueSeqAccess(private val list: List<Value>) : SeqAccess {
+private class ValueSeqAccess(
+    private val list: List<Value>,
+) : SeqAccess {
     private val iter = list.iterator()
 
-    override fun <T> nextElementSeed(seed: DeserializeSeed<T>): SerdeResult<T?> {
-        return if (iter.hasNext()) {
+    override fun <T> nextElementSeed(seed: DeserializeSeed<T>): SerdeResult<T?> =
+        if (iter.hasNext()) {
             val value = iter.next()
             seed.deserialize(ValueDeserializer(value)).map { it }
         } else {
             SerdeResult.success(null)
         }
-    }
 
     override fun sizeHint(): Int? = if (!iter.hasNext()) 0 else null
 }
@@ -224,19 +231,20 @@ private class ValueSeqAccess(private val list: List<Value>) : SeqAccess {
 /**
  * [MapAccess] backed by a [ValueMap].
  */
-private class ValueMapAccess(private val map: ValueMap) : MapAccess {
+private class ValueMapAccess(
+    private val map: ValueMap,
+) : MapAccess {
     private val iter = map.iterator()
     private var currentValue: Value? = null
 
-    override fun <K> nextKeySeed(seed: DeserializeSeed<K>): SerdeResult<K?> {
-        return if (iter.hasNext()) {
+    override fun <K> nextKeySeed(seed: DeserializeSeed<K>): SerdeResult<K?> =
+        if (iter.hasNext()) {
             val (key, value) = iter.next()
             currentValue = value
             seed.deserialize(ValueDeserializer(Value.Str(key))).map { it }
         } else {
             SerdeResult.success(null)
         }
-    }
 
     override fun <V> nextValueSeed(seed: DeserializeSeed<V>): SerdeResult<V> {
         val value = currentValue ?: return SerdeResult.failure(SerdeError.custom("value is missing"))
@@ -263,7 +271,9 @@ private class ValueEnumAccess(
 /**
  * [VariantAccess] for deserializing enum variant values from a [Value].
  */
-private class ValueVariantAccess(private val value: Value?) : VariantAccess {
+private class ValueVariantAccess(
+    private val value: Value?,
+) : VariantAccess {
     override fun unitVariant(): SerdeResult<Unit> =
         if (value != null) {
             // Deserialize the value as unit
@@ -297,6 +307,7 @@ private class ValueVariantAccess(private val value: Value?) : VariantAccess {
 /** Visitor that accepts unit. */
 private object UnitVisitor : Visitor<Unit> {
     override fun expecting(): String = "unit"
+
     override fun visitUnit(): SerdeResult<Unit> = SerdeResult.success(Unit)
 }
 

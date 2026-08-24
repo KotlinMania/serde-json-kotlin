@@ -11,56 +11,63 @@ package io.github.kotlinmania.serdejson.lexical
 // Each value can be exactly represented as that type.
 
 /** Pre-calculated powers of 10 for f32. */
-internal val F32_POW10: FloatArray = floatArrayOf(
-    1.0f,
-    10.0f,
-    100.0f,
-    1000.0f,
-    10000.0f,
-    100000.0f,
-    1000000.0f,
-    10000000.0f,
-    100000000.0f,
-    1000000000.0f,
-    10000000000.0f,
-)
+internal val F32_POW10: FloatArray =
+    floatArrayOf(
+        1.0f,
+        10.0f,
+        100.0f,
+        1000.0f,
+        10000.0f,
+        100000.0f,
+        1000000.0f,
+        10000000.0f,
+        100000000.0f,
+        1000000000.0f,
+        10000000000.0f,
+    )
 
 /** Pre-calculated powers of 10 for f64. */
-internal val F64_POW10: DoubleArray = doubleArrayOf(
-    1.0,
-    10.0,
-    100.0,
-    1000.0,
-    10000.0,
-    100000.0,
-    1000000.0,
-    10000000.0,
-    100000000.0,
-    1000000000.0,
-    10000000000.0,
-    100000000000.0,
-    1000000000000.0,
-    10000000000000.0,
-    100000000000000.0,
-    1000000000000000.0,
-    10000000000000000.0,
-    100000000000000000.0,
-    1000000000000000000.0,
-    10000000000000000000.0,
-    100000000000000000000.0,
-    1000000000000000000000.0,
-    10000000000000000000000.0,
-)
+internal val F64_POW10: DoubleArray =
+    doubleArrayOf(
+        1.0,
+        10.0,
+        100.0,
+        1000.0,
+        10000.0,
+        100000.0,
+        1000000.0,
+        10000000.0,
+        100000000.0,
+        1000000000.0,
+        10000000000.0,
+        100000000000.0,
+        1000000000000.0,
+        10000000000000.0,
+        100000000000000.0,
+        1000000000000000.0,
+        10000000000000000.0,
+        100000000000000000.0,
+        1000000000000000000.0,
+        10000000000000000000.0,
+        100000000000000000000.0,
+        1000000000000000000000.0,
+        10000000000000000000000.0,
+    )
 
 /**
  * An interface for casting between machine scalars.
  */
 internal interface AsPrimitive {
     fun asU32(): UInt
+
     fun asU64(): ULong
+
     fun asU128(): ULong // Kotlin has no u128; represented as ULong
+
     fun asUSize(): Int
+
     fun asF32(): Float
+
     fun asF64(): Double
 }
 
@@ -177,19 +184,13 @@ internal interface FloatTraits : Number {
     fun isSignPositive(value: Double): Boolean
 
     /** Returns true if the float is a denormal. */
-    fun isDenormal(value: Double): Boolean {
-        return (toBits(value) and exponentMask) == 0UL
-    }
+    fun isDenormal(value: Double): Boolean = (toBits(value) and exponentMask) == 0UL
 
     /** Returns true if the float is a NaN or Infinite. */
-    fun isSpecial(value: Double): Boolean {
-        return (toBits(value) and exponentMask) == exponentMask
-    }
+    fun isSpecial(value: Double): Boolean = (toBits(value) and exponentMask) == exponentMask
 
     /** Returns true if the float is infinite. */
-    fun isInf(value: Double): Boolean {
-        return isSpecial(value) && (toBits(value) and mantissaMask) == 0UL
-    }
+    fun isInf(value: Double): Boolean = isSpecial(value) && (toBits(value) and mantissaMask) == 0UL
 
     /** Get exponent component from the float. */
     fun exponent(value: Double): Int {
@@ -213,18 +214,15 @@ internal interface FloatTraits : Number {
     }
 
     /** Get next greater float for a positive float. Value must be >= 0.0 and < INFINITY. */
-    fun nextPositive(value: Double): Double {
-        return fromBits(toBits(value) + 1UL)
-    }
+    fun nextPositive(value: Double): Double = fromBits(toBits(value) + 1UL)
 
     /** Round a positive number to even. */
-    fun roundPositiveEven(value: Double): Double {
-        return if ((mantissa(value) and 1UL) == 1UL) {
+    fun roundPositiveEven(value: Double): Double =
+        if ((mantissa(value) and 1UL) == 1UL) {
             nextPositive(value)
         } else {
             value
         }
-    }
 }
 
 /** f32 Float trait implementation. */
@@ -243,18 +241,20 @@ internal object F32Float : FloatTraits {
     override val carryMask: ULong = 0x1000000UL
 
     override fun exponentLimit(): Pair<Int, Int> = Pair(-10, 10)
+
     override fun mantissaLimit(): Int = 7
 
-    override fun pow10(value: Double, n: Int): Double {
-        return if (n > 0) {
+    override fun pow10(value: Double, n: Int): Double =
+        if (n > 0) {
             value * F32_POW10[n]
         } else {
             value / F32_POW10[-n]
         }
-    }
 
     override fun fromBits(u: ULong): Double = Float.fromBits(u.toInt()).toDouble()
+
     override fun toBits(value: Double): ULong = value.toFloat().toRawBits().toULong()
+
     override fun isSignPositive(value: Double): Boolean = !value.toFloat().isNaN() && value >= 0.0
 }
 
@@ -274,17 +274,19 @@ internal object F64Float : FloatTraits {
     override val carryMask: ULong = 0x20000000000000UL
 
     override fun exponentLimit(): Pair<Int, Int> = Pair(-22, 22)
+
     override fun mantissaLimit(): Int = 15
 
-    override fun pow10(value: Double, n: Int): Double {
-        return if (n > 0) {
+    override fun pow10(value: Double, n: Int): Double =
+        if (n > 0) {
             value * F64_POW10[n]
         } else {
             value / F64_POW10[-n]
         }
-    }
 
     override fun fromBits(u: ULong): Double = Double.fromBits(u.toLong())
+
     override fun toBits(value: Double): ULong = value.toRawBits().toULong()
+
     override fun isSignPositive(value: Double): Boolean = !value.isNaN() && value >= 0.0
 }

@@ -107,18 +107,10 @@ private fun roundToward(fp: ExtendedFloat, shift: Int): Boolean {
 }
 
 /**
- * Round down.
- */
-private fun downward(fp: ExtendedFloat, isTruncated: Boolean) {
-    // No-op: round toward zero ignores truncated bits.
-}
-
-/**
  * Shift right N-bytes and round toward zero.
  */
 internal fun roundDownward(fp: ExtendedFloat, shift: Int) {
-    val isTruncated = roundToward(fp, shift)
-    downward(fp, isTruncated)
+    roundToward(fp, shift)
 }
 
 // ROUND TO FLOAT
@@ -132,7 +124,7 @@ internal fun roundDownward(fp: ExtendedFloat, shift: Int) {
 internal fun roundToFloat(
     fp: ExtendedFloat,
     floatTraits: FloatTraits,
-    algorithm: (ExtendedFloat, Int) -> Unit
+    algorithm: (ExtendedFloat, Int) -> Unit,
 ) {
     val finalExp = fp.exp + floatTraits.defaultShift
     if (finalExp < floatTraits.denormalExponent) {
@@ -182,7 +174,7 @@ internal fun avoidOverflow(fp: ExtendedFloat, floatTraits: FloatTraits) {
 internal fun roundToNative(
     fp: ExtendedFloat,
     floatTraits: FloatTraits,
-    algorithm: (ExtendedFloat, Int) -> Unit
+    algorithm: (ExtendedFloat, Int) -> Unit,
 ) {
     // Shift all the way left, to ensure a consistent representation.
     fp.normalize()

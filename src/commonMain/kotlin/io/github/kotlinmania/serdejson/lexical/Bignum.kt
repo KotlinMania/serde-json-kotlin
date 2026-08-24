@@ -8,9 +8,9 @@ package io.github.kotlinmania.serdejson.lexical
  *
  * Internal storage for the Bigint, in little-endian order.
  */
-class Bigint(
+internal class Bigint(
     /** Internal storage for the Bigint, in little-endian order. */
-    var data: MutableList<ULong> = ArrayList(20)
+    var data: MutableList<ULong> = ArrayList(20),
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

@@ -18,7 +18,9 @@ sealed interface ValueIndex {
 }
 
 /** Index by integer position into a [Value.Array]. */
-class IntIndex(private val index: Int) : ValueIndex {
+class IntIndex(
+    private val index: Int,
+) : ValueIndex {
     override fun indexInto(v: Value): Value? =
         when (v) {
             is Value.Array -> v.value.getOrNull(index)
@@ -38,7 +40,9 @@ class IntIndex(private val index: Int) : ValueIndex {
 }
 
 /** Index by string key into a [Value.Object]. */
-class StrIndex(private val key: String) : ValueIndex {
+class StrIndex(
+    private val key: String,
+) : ValueIndex {
     override fun indexInto(v: Value): Value? =
         when (v) {
             is Value.Object -> v.value.get(key)

@@ -21,60 +21,62 @@ package io.github.kotlinmania.serdejson.lexical
 // ---------------------------------------------------------------------------
 
 /** Pre-computed powers of 5 for 64-bit values. */
-internal val POW5_64: ULongArray = ulongArrayOf(
-    1UL,
-    5UL,
-    25UL,
-    125UL,
-    625UL,
-    3125UL,
-    15625UL,
-    78125UL,
-    390625UL,
-    1953125UL,
-    9765625UL,
-    48828125UL,
-    244140625UL,
-    1220703125UL,
-    6103515625UL,
-    30517578125UL,
-    152587890625UL,
-    762939453125UL,
-    3814697265625UL,
-    19073486328125UL,
-    95367431640625UL,
-    476837158203125UL,
-    2384185791015625UL,
-    11920928955078125UL,
-    59604644775390625UL,
-    298023223876953125UL,
-    1490116119384765625UL,
-    7450580596923828125UL,
-)
+internal val POW5_64: ULongArray =
+    ulongArrayOf(
+        1UL,
+        5UL,
+        25UL,
+        125UL,
+        625UL,
+        3125UL,
+        15625UL,
+        78125UL,
+        390625UL,
+        1953125UL,
+        9765625UL,
+        48828125UL,
+        244140625UL,
+        1220703125UL,
+        6103515625UL,
+        30517578125UL,
+        152587890625UL,
+        762939453125UL,
+        3814697265625UL,
+        19073486328125UL,
+        95367431640625UL,
+        476837158203125UL,
+        2384185791015625UL,
+        11920928955078125UL,
+        59604644775390625UL,
+        298023223876953125UL,
+        1490116119384765625UL,
+        7450580596923828125UL,
+    )
 
 /** Pre-computed powers of 10 for 64-bit values. */
-internal val POW10_64: ULongArray = ulongArrayOf(
-    1UL,
-    10UL,
-    100UL,
-    1000UL,
-    10000UL,
-    100000UL,
-    1000000UL,
-    10000000UL,
-    100000000UL,
-    1000000000UL,
-    10000000000UL,
-    100000000000UL,
-    1000000000000UL,
-    10000000000000UL,
-    100000000000000UL,
-    1000000000000000UL,
-    10000000000000000UL,
-    100000000000000000UL,
-    1000000000000000000UL,
-    10000000000000000000UL,
-)
+internal val POW10_64: ULongArray =
+    ulongArrayOf(
+        1UL,
+        10UL,
+        100UL,
+        1000UL,
+        10000UL,
+        100000UL,
+        1000000UL,
+        10000000UL,
+        100000000UL,
+        1000000000UL,
+        10000000000UL,
+        100000000000UL,
+        1000000000000UL,
+        10000000000000UL,
+        100000000000000UL,
+        1000000000000000UL,
+        10000000000000000UL,
+        100000000000000000UL,
+        1000000000000000000UL,
+        10000000000000000000UL,
+    )
 
 // ---------------------------------------------------------------------------
 // Digit helpers (port-lint: source src/lexical/digit.rs)
@@ -167,17 +169,25 @@ internal fun mantissaExponent(
 /** Saturating subtraction (clamps to [Int] range, no overflow). */
 private fun Int.saturationSub(other: Int): Int {
     val r = this.toLong() - other.toLong()
-    return if (r < Int.MIN_VALUE.toLong()) Int.MIN_VALUE
-    else if (r > Int.MAX_VALUE.toLong()) Int.MAX_VALUE
-    else r.toInt()
+    return if (r < Int.MIN_VALUE.toLong()) {
+        Int.MIN_VALUE
+    } else if (r > Int.MAX_VALUE.toLong()) {
+        Int.MAX_VALUE
+    } else {
+        r.toInt()
+    }
 }
 
 /** Saturating addition (clamps to [Int] range, no overflow). */
 private fun Int.saturationAdd(other: Int): Int {
     val r = this.toLong() + other.toLong()
-    return if (r < Int.MIN_VALUE.toLong()) Int.MIN_VALUE
-    else if (r > Int.MAX_VALUE.toLong()) Int.MAX_VALUE
-    else r.toInt()
+    return if (r < Int.MIN_VALUE.toLong()) {
+        Int.MIN_VALUE
+    } else if (r > Int.MAX_VALUE.toLong()) {
+        Int.MAX_VALUE
+    } else {
+        r.toInt()
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -189,7 +199,7 @@ private fun Int.saturationAdd(other: Int): Int {
  *
  * Used for the bignum-based float round-tripping algorithm.
  */
-data class ExtendedFloat(
+internal data class ExtendedFloat(
     /** Mantissa for the extended-precision float. */
     var mant: ULong,
     /** Binary exponent for the extended-precision float. */
@@ -202,11 +212,12 @@ data class ExtendedFloat(
      * itself is 0. Returns the number of bits shifted.
      */
     fun normalize(): Int {
-        val shift = if (mant == 0UL) {
-            0
-        } else {
-            mant.countLeadingZeroBits()
-        }
+        val shift =
+            if (mant == 0UL) {
+                0
+            } else {
+                mant.countLeadingZeroBits()
+            }
         if (shift > 0) {
             shl(this, shift)
         }
@@ -234,7 +245,7 @@ data class ExtendedFloat(
 
         return ExtendedFloat(
             ahBh + (ahBl shr MantissaTraits.HALF) + (alBh shr MantissaTraits.HALF) + (tmp shr MantissaTraits.HALF),
-            exp + b.exp + MantissaTraits.FULL
+            exp + b.exp + MantissaTraits.FULL,
         )
     }
 
@@ -278,11 +289,12 @@ internal fun intoFloat(fp: ExtendedFloat, floatTraits: FloatTraits): Double {
     } else if (fp.exp >= floatTraits.maxExponent) {
         return floatTraits.fromBits(floatTraits.infinityBits)
     } else {
-        val exp: ULong = if (fp.exp == floatTraits.denormalExponent && (fp.mant and floatTraits.hiddenBitMask) == 0UL) {
-            0UL
-        } else {
-            (fp.exp + floatTraits.exponentBias).toULong()
-        }
+        val exp: ULong =
+            if (fp.exp == floatTraits.denormalExponent && (fp.mant and floatTraits.hiddenBitMask) == 0UL) {
+                0UL
+            } else {
+                (fp.exp + floatTraits.exponentBias).toULong()
+            }
         val expShifted = exp shl floatTraits.mantissaSize
         val mant = fp.mant and floatTraits.mantissaMask
         return floatTraits.fromBits(mant or expShifted)
@@ -302,7 +314,7 @@ internal fun intoFloat(fp: ExtendedFloat, floatTraits: FloatTraits): Double {
  *                 raw exponent and the number of fraction / truncated digits.
  * @return The parsed [Double].
  */
-fun parseConciseFloat(mantissa: ULong, mantExp: Int): Double {
+internal fun parseConciseFloat(mantissa: ULong, mantExp: Int): Double {
     // Reconstruct the decimal representation and delegate to the platform's
     // native double parser, which provides correct round-tripping on all
     // KMP targets.
@@ -323,7 +335,7 @@ fun parseConciseFloat(mantissa: ULong, mantExp: Int): Double {
  *
  * Precondition: The integer must not have leading zeros.
  */
-fun parseTruncatedFloat(integer: ByteArray, fraction: ByteArray, exponent: Int): Double {
+internal fun parseTruncatedFloat(integer: ByteArray, fraction: ByteArray, exponent: Int): Double {
     // Trim trailing zeros from the fraction part.
     var fracLen = fraction.size
     while (fracLen > 0 && fraction[fracLen - 1] == '0'.code.toByte()) {
@@ -386,11 +398,12 @@ private fun formatScientific(digits: String, exp: Int): String {
     // so we strip them and use the remaining digits directly.
     val power = exp + (significantDigits.length - 1)
 
-    val mantissaStr = if (significantDigits.length <= 1) {
-        significantDigits
-    } else {
-        significantDigits[0].toString() + "." + significantDigits.substring(1)
-    }
+    val mantissaStr =
+        if (significantDigits.length <= 1) {
+            significantDigits
+        } else {
+            significantDigits[0].toString() + "." + significantDigits.substring(1)
+        }
 
     return if (power == 0) {
         mantissaStr

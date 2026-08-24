@@ -127,11 +127,12 @@ private fun u64ToHi64_1(r0: ULong): Pair<ULong, Boolean> {
 private fun u64ToHi64_2(r0: ULong, r1: ULong): Pair<ULong, Boolean> {
     val ls = r0.countLeadingZeroBits()
     val rs = 64 - ls
-    val v = if (ls == 0) {
-        r0
-    } else {
-        (r0 shl ls) or (r1 shr rs)
-    }
+    val v =
+        if (ls == 0) {
+            r0
+        } else {
+            (r0 shl ls) or (r1 shr rs)
+        }
     val n = (r1 shl ls) != 0UL
     return Pair(v, n)
 }
@@ -402,9 +403,7 @@ private object Large {
     }
 
     /** Split two buffers into halfway, into (lo, hi). */
-    private fun karatsubaSplit(z: List<Limb>, m: Int): Pair<List<Limb>, List<Limb>> {
-        return Pair(z.subList(0, m), z.subList(m, z.size))
-    }
+    private fun karatsubaSplit(z: List<Limb>, m: Int): Pair<List<Limb>, List<Limb>> = Pair(z.subList(0, m), z.subList(m, z.size))
 
     /** Karatsuba multiplication algorithm with roughly equal input sizes. Assumes y.size >= x.size. */
     private fun karatsubaMul(x: List<Limb>, y: List<Limb>): MutableList<Limb> {

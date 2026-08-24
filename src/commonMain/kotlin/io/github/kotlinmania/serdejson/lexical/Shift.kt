@@ -26,11 +26,12 @@ internal fun shr(fp: ExtendedFloat, shift: Int) {
  */
 internal fun overflowingShr(fp: ExtendedFloat, shift: Int) {
     require(shift.toLong() <= BITS.toLong()) { "overflowingShr() overflow in shift right." }
-    fp.mant = if (shift.toLong() == BITS.toLong()) {
-        0UL
-    } else {
-        fp.mant shr shift
-    }
+    fp.mant =
+        if (shift.toLong() == BITS.toLong()) {
+            0UL
+        } else {
+            fp.mant shr shift
+        }
     fp.exp += shift
 }
 

@@ -14,19 +14,29 @@ sealed class Value : Serialize {
     object Null : Value()
 
     /** Represents a JSON boolean. */
-    class Bool(val value: Boolean) : Value()
+    class Bool(
+        val value: Boolean,
+    ) : Value()
 
     /** Represents a JSON number, whether integer or floating point. */
-    class Number(val value: io.github.kotlinmania.serdejson.JsonNumber) : Value()
+    class Number(
+        val value: io.github.kotlinmania.serdejson.JsonNumber,
+    ) : Value()
 
     /** Represents a JSON string. */
-    class Str(val value: String) : Value()
+    class Str(
+        val value: String,
+    ) : Value()
 
     /** Represents a JSON array. */
-    class Array(val value: List<Value>) : Value()
+    class Array(
+        val value: List<Value>,
+    ) : Value()
 
     /** Represents a JSON object. */
-    class Object(val value: ValueMap) : Value()
+    class Object(
+        val value: ValueMap,
+    ) : Value()
 
     /** Index into a JSON array or map. Returns null if the type doesn't match. */
     fun get(index: String): Value? =
@@ -103,11 +113,12 @@ sealed class Value : Serialize {
         var target: Value = this
         for (token in pointer.split('/').drop(1)) {
             val key = token.replace("~1", "/").replace("~0", "~")
-            target = when (target) {
-                is Object -> target.value.get(key) ?: return null
-                is Array -> parseIndex(key)?.let { target.value.getOrNull(it) } ?: return null
-                else -> return null
-            }
+            target =
+                when (target) {
+                    is Object -> target.value.get(key) ?: return null
+                    is Array -> parseIndex(key)?.let { target.value.getOrNull(it) } ?: return null
+                    else -> return null
+                }
         }
         return target
     }
@@ -154,6 +165,22 @@ sealed class Value : Serialize {
         toJsonString(writer, this, pretty = true)
         return writer.bytes.decodeToString()
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Value) return false
+        return eqValue(this, other)
+    }
+
+    override fun hashCode(): Int =
+        when (this) {
+            is Null -> 0
+            is Bool -> value.hashCode()
+            is Number -> value.hashCode()
+            is Str -> value.hashCode()
+            is Array -> value.hashCode()
+            is Object -> value.hashCode()
+        }
 
     companion object {
         /** Parses a string index, returning null for invalid indices. */
