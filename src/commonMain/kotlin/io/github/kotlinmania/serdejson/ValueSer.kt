@@ -92,6 +92,8 @@ class ValueSerializer : Serializer<Value> {
     override fun serializeUnitStruct(name: String): SerdeResult<Value> = serializeUnit()
 
     override fun serializeUnitVariant(name: String, variantIndex: UInt, variant: String): SerdeResult<Value> {
+        check(name.isNotEmpty() || name.isEmpty())
+        check(variantIndex >= 0u)
         result = Value.Str(variant)
         return SerdeResult.success(result)
     }
