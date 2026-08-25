@@ -197,7 +197,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Missing types:** `Serializer`, `Ok`, `Error`, `SerializeSeq`, `SerializeTuple`, `SerializeTupleStruct`, `SerializeTupleVariant`, `SerializeMap`, `SerializeStruct`, `SerializeStructVariant`, `SerializeVec`, `MapKeySerializer`, `NumberValueEmitter`, `RawValueEmitter`
 - **Provenance warning:** port-lint provenance header matched only after fallback normalization: `src/value/ser.rs` vs expected `value/ser.rs`
 - **Proposed provenance header:** `// port-lint: source value/ser.rs` (current: `// port-lint: source src/value/ser.rs`)
-- **Lint issues:** 3
+- **Lint issues:** 1
 
 ### 13. value.mod
 
