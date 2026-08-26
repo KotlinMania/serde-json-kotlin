@@ -1,6 +1,6 @@
 # port-lint Proposed Changes
 
-**Generated:** 2026-08-25
+**Generated:** 2026-08-26
 **Source:** tmp/serde_json/src
 **Target:** src/commonMain/kotlin
 
