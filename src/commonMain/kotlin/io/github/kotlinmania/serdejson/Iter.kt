@@ -1,4 +1,4 @@
-// port-lint: source iter.rs
+// port-lint: source serde_json/src/iter.rs
 package io.github.kotlinmania.serdejson
 
 /**

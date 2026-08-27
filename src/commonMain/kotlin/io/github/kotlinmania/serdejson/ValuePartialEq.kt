@@ -1,4 +1,4 @@
-// port-lint: source value/partial_eq.rs
+// port-lint: source serde_json/src/value/partial_eq.rs
 package io.github.kotlinmania.serdejson
 
 /** Compare a [Value] with a [Long] for equality. */
