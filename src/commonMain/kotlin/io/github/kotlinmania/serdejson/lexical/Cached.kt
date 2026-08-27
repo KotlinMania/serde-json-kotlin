@@ -1,4 +1,4 @@
-// port-lint: source serde_json/src/lexical/cached.rs
+// port-lint: source lexical/cached.rs
 // Adapted from https://github.com/Alexhuszagh/rust-lexical.
 
 package io.github.kotlinmania.serdejson.lexical

@@ -1,4 +1,4 @@
-// port-lint: source serde_json/src/lexical/cached_float80.rs
+// port-lint: source lexical/cached_float80.rs
 // Adapted from https://github.com/Alexhuszagh/rust-lexical.
 
 package io.github.kotlinmania.serdejson.lexical

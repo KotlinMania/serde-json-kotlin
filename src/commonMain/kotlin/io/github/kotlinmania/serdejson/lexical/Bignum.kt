@@ -1,4 +1,4 @@
-// port-lint: source serde_json/src/lexical/bignum.rs
+// port-lint: source lexical/bignum.rs
 // Adapted from https://github.com/Alexhuszagh/rust-lexical.
 
 package io.github.kotlinmania.serdejson.lexical

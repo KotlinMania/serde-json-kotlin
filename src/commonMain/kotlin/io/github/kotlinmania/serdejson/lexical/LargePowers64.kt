@@ -1,4 +1,4 @@
-// port-lint: source serde_json/src/lexical/large_powers64.rs
+// port-lint: source lexical/large_powers64.rs
 // Adapted from https://github.com/Alexhuszagh/rust-lexical.
 
 package io.github.kotlinmania.serdejson.lexical
