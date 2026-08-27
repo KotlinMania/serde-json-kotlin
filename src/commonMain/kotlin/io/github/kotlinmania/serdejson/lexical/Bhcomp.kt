@@ -1,4 +1,4 @@
-// port-lint: source tmp/serde_json/src/lexical/bhcomp.rs
+// port-lint: source lexical/bhcomp.rs
 // Adapted from https://github.com/Alexhuszagh/rust-lexical.
 
 package io.github.kotlinmania.serdejson.lexical

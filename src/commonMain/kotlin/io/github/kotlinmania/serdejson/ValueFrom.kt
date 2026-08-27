@@ -1,4 +1,4 @@
-// port-lint: source src/value/from.rs
+// port-lint: source value/from.rs
 package io.github.kotlinmania.serdejson
 
 /** Convert a [Byte] to a [Value]. */
