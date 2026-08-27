@@ -1,4 +1,4 @@
-// port-lint: source value/ser.rs
+// port-lint: source serde_json/src/value/ser.rs
 package io.github.kotlinmania.serdejson
 
 import io.github.kotlinmania.serde.SerdeError

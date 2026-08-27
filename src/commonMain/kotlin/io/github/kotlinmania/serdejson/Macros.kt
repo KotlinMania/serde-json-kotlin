@@ -1,4 +1,4 @@
-// port-lint: source macros.rs
+// port-lint: source serde_json/src/macros.rs
 package io.github.kotlinmania.serdejson
 
 import io.github.kotlinmania.serdecore.ser.Serialize
