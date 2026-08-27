@@ -1,4 +1,4 @@
-// port-lint: source serde_json/tests/lexical/math.rs
+// port-lint: source lexical/math.rs
 // Adapted from https://github.com/Alexhuszagh/rust-lexical.
 
 package io.github.kotlinmania.serdejson.lexical

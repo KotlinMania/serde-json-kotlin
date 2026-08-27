@@ -1,4 +1,4 @@
-// port-lint: source serde_json/src/lexical/mod.rs
+// port-lint: source lexical/mod.rs
 package io.github.kotlinmania.serdejson.lexical
 
 // The code in this module is derived from the `lexical` crate by @Alexhuszagh
