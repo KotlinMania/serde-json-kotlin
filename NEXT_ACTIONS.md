@@ -5,12 +5,12 @@ Based on AST analysis, here are the concrete next steps.
 ## Summary
 
 - **Files Present:** 29/37 (78.4%)
-- **Function parity:** 278/619 matched (target 495) — 44.9%
-- **Class/type parity:** 20/161 matched (target 112) — 12.4%
-- **Combined symbol parity:** 298/780 matched (target 607) — 38.2%
+- **Function parity:** 252/585 matched (target 399) — 43.1%
+- **Class/type parity:** 19/159 matched (target 96) — 11.9%
+- **Combined symbol parity:** 271/744 matched (target 495) — 36.4%
 - **Average inline-code cosine:** 0.40 (function body across 25 matched files)
 - **Average documentation cosine:** 0.63 (doc text across 25 matched files)
-- **Cheat-zeroed Files:** 9
+- **Cheat-zeroed Files:** 4
 - **Critical Issues:** 20 files with <0.60 function similarity
 
 ## Priority 1: Fix Incomplete High-Dependency Files
@@ -159,18 +159,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 0/14 matched (target 5)
 - **Missing types:** `Serializer`, `Ok`, `Error`, `SerializeSeq`, `SerializeTuple`, `SerializeTupleStruct`, `SerializeTupleVariant`, `SerializeMap`, `SerializeStruct`, `SerializeStructVariant`, `SerializeVec`, `MapKeySerializer`, `NumberValueEmitter`, `RawValueEmitter`
 
-### 13. value.mod
-
-- **Target:** `serdejson.Value [STUB]`
-- **Similarity:** 0.00
-- **Dependents:** 0
-- **Priority Score:** 93610.0
-- **Functions:** 26/34 matched (target 32)
-- **Missing functions:** `fmt`, `write`, `flush`, `io_error`, `get_mut`, `as_object_mut`, `as_array_mut`, `pointer_mut`
-- **Types:** 1/2 matched (target 7)
-- **Missing types:** `WriterFormatter`
-
-### 14. lexical.math
+### 13. lexical.math
 
 - **Target:** `lexical.Math [ZERO]`
 - **Similarity:** 0.00
@@ -181,7 +170,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 2/4 matched (target 6)
 - **Missing types:** `Hi64`, `Math`
 
-### 15. lexical.num
+### 14. lexical.num
 
 - **Target:** `lexical.Num`
 - **Similarity:** 0.54
@@ -192,7 +181,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 4/7 matched (target 8)
 - **Missing types:** `AsCast`, `Float`, `Unsigned`
 
-### 16. lexical.bignum
+### 15. lexical.bignum
 
 - **Target:** `lexical.Bignum`
 - **Similarity:** 0.18
@@ -203,7 +192,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 1/1 matched
 - **Missing types:** _none_
 
-### 17. lexical.rounding
+### 16. lexical.rounding
 
 - **Target:** `lexical.Rounding`
 - **Similarity:** 0.75
@@ -214,7 +203,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 0/0 matched
 - **Missing types:** _none_
 
-### 18. lexical.cached
+### 17. lexical.cached
 
 - **Target:** `lexical.Cached`
 - **Similarity:** 0.78
@@ -225,7 +214,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 3/3 matched (target 4)
 - **Missing types:** _none_
 
-### 19. value.partial_eq
+### 18. value.partial_eq
 
 - **Target:** `serdejson.ValuePartialEq`
 - **Similarity:** 0.48
@@ -236,7 +225,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 0/0 matched
 - **Missing types:** _none_
 
-### 20. lexical.bhcomp
+### 19. lexical.bhcomp
 
 - **Target:** `lexical.Bhcomp`
 - **Similarity:** 0.66
@@ -247,7 +236,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 0/0 matched
 - **Missing types:** _none_
 
-### 21. value.from
+### 20. value.from
 
 - **Target:** `serdejson.ValueFrom`
 - **Similarity:** 0.52
@@ -258,7 +247,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 0/0 matched
 - **Missing types:** _none_
 
-### 22. lexical.errors
+### 21. lexical.errors
 
 - **Target:** `lexical.Errors`
 - **Similarity:** 0.91
@@ -269,7 +258,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 1/1 matched (target 2)
 - **Missing types:** _none_
 
-### 23. lexical.algorithm
+### 22. lexical.algorithm
 
 - **Target:** `lexical.Algorithm`
 - **Similarity:** 0.81
@@ -280,7 +269,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 0/0 matched
 - **Missing types:** _none_
 
-### 24. lexical.shift
+### 23. lexical.shift
 
 - **Target:** `lexical.Shift`
 - **Similarity:** 0.86
@@ -291,51 +280,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 0/0 matched
 - **Missing types:** _none_
 
-### 25. macros
-
-- **Target:** `serdejson.Macros [ZERO]`
-- **Similarity:** 0.00
-- **Dependents:** 0
-- **Priority Score:** 10.0
-- **Functions:** 0/0 matched (target 16)
-- **Missing functions:** _none_
-- **Types:** 0/0 matched (target 1)
-- **Missing types:** _none_
-
-### 26. lexical.mod
-
-- **Target:** `lexical.Lexical [STUB]`
-- **Similarity:** 0.00
-- **Dependents:** 0
-- **Priority Score:** 10.0
-- **Functions:** 0/0 matched (target 20)
-- **Missing functions:** _none_
-- **Types:** 0/0 matched (target 1)
-- **Missing types:** _none_
-
-### 27. lib
-
-- **Target:** `serdejson.Lib [ZERO]`
-- **Similarity:** 0.00
-- **Dependents:** 0
-- **Priority Score:** 10.0
-- **Functions:** 0/0 matched (target 13)
-- **Missing functions:** _none_
-- **Types:** 0/0 matched (target 1)
-- **Missing types:** _none_
-
-### 28. io.mod
-
-- **Target:** `serdejson.Io [STUB]`
-- **Similarity:** 0.00
-- **Dependents:** 0
-- **Priority Score:** 10.0
-- **Functions:** 0/0 matched (target 15)
-- **Missing functions:** _none_
-- **Types:** 0/0 matched (target 6)
-- **Missing types:** _none_
-
-### 29. lexical.large_powers64
+### 24. lexical.large_powers64
 
 - **Target:** `lexical.LargePowers64`
 - **Similarity:** 1.00
@@ -354,4 +299,21 @@ For each file to be considered "complete":
 - All tests ported
 - Documentation ported
 - port-lint header present
+
+## Reexport / Wiring Modules
+
+These files match `reexport_modules` patterns in `.ast_distance_config.json`. They are filtered out of
+normal priority and missing-file ladders because they are wiring
+modules, not direct logic ports. Consult them for call-site routing;
+do not treat them as the next implementation target by default.
+
+### Matched
+
+| Source | Target | Path |
+|--------|--------|------|
+| `value.mod` | `serdejson.Value` | `value/mod` |
+| `macros` | `serdejson.Macros` | `macros` |
+| `lexical.mod` | `lexical.Lexical` | `lexical/mod` |
+| `lib` | `serdejson.Lib` | `lib` |
+| `io.mod` | `serdejson.Io` | `io/mod` |
 
