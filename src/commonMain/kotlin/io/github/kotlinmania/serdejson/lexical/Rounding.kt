@@ -1,4 +1,4 @@
-// port-lint: source lexical/rounding.rs
+// port-lint: source serde_json/src/lexical/rounding.rs
 // Adapted from https://github.com/Alexhuszagh/rust-lexical.
 
 package io.github.kotlinmania.serdejson.lexical

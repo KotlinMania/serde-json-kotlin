@@ -1,4 +1,4 @@
-// port-lint: tests lexical/math.rs
+// port-lint: tests serde_json/src/lexical/math.rs
 package io.github.kotlinmania.serdejson.lexical
 
 import kotlin.test.Test

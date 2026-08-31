@@ -1,4 +1,4 @@
-// port-lint: source map.rs
+// port-lint: source serde_json/src/map.rs
 package io.github.kotlinmania.serdejson
 
 import io.github.kotlinmania.indexmap.IndexMap

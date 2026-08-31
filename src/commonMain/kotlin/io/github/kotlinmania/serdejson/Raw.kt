@@ -1,4 +1,4 @@
-// port-lint: source raw.rs
+// port-lint: source serde_json/src/raw.rs
 package io.github.kotlinmania.serdejson
 
 import io.github.kotlinmania.serde.SerdeResult
