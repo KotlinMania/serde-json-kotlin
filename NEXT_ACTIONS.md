@@ -4,13 +4,13 @@ Based on AST analysis, here are the concrete next steps.
 
 ## Summary
 
-- **Files Present:** 29/37 (78.4%)
-- **Function parity:** 252/585 matched (target 399) — 43.1%
-- **Class/type parity:** 19/159 matched (target 96) — 11.9%
-- **Combined symbol parity:** 271/744 matched (target 495) — 36.4%
-- **Average inline-code cosine:** 0.40 (function body across 25 matched files)
-- **Average documentation cosine:** 0.63 (doc text across 25 matched files)
-- **Cheat-zeroed Files:** 4
+- **Files Present:** 29/68 (42.6%)
+- **Function parity:** 278/832 matched (target 466) — 33.4%
+- **Class/type parity:** 20/190 matched (target 110) — 10.5%
+- **Combined symbol parity:** 298/1022 matched (target 576) — 29.2%
+- **Average inline-code cosine:** 0.42 (function body across 24 matched files)
+- **Average documentation cosine:** 0.63 (doc text across 24 matched files)
+- **Cheat-zeroed Files:** 7
 - **Critical Issues:** 20 files with <0.60 function similarity
 
 ## Priority 1: Fix Incomplete High-Dependency Files
@@ -27,7 +27,7 @@ No missing high-value files detected.
 
 Every matched file is listed below with function and type symbol parity.
 
-### 1. map
+### 1. serde_json.map
 
 - **Target:** `serdejson.Map`
 - **Similarity:** 0.17
@@ -38,7 +38,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 0/26 matched (target 3)
 - **Missing types:** `Map`, `MapImpl`, `Output`, `Visitor`, `Value`, `Deserializer`, `Entry`, `VacantEntry`, `OccupiedEntry`, `VacantEntryImpl`, `OccupiedEntryImpl`, `Item`, `IntoIter`, `Iter`, `IterImpl`, `IterMut`, `IterMutImpl`, `IntoIterImpl`, `Keys`, `KeysImpl`, `Values`, `ValuesImpl`, `ValuesMut`, `ValuesMutImpl`, `IntoValues`, `IntoValuesImpl`
 
-### 2. number
+### 2. serde_json.number
 
 - **Target:** `serdejson.Number`
 - **Similarity:** 0.12
@@ -49,7 +49,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 1/11 matched (target 10)
 - **Missing types:** `Number`, `NumberVisitor`, `Value`, `NumberKey`, `FieldVisitor`, `NumberFromString`, `Visitor`, `Error`, `NumberDeserializer`, `NumberFieldDeserializer`
 
-### 3. error
+### 3. serde_json.error
 
 - **Target:** `serdejson.Error`
 - **Similarity:** 0.33
@@ -60,7 +60,18 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 2/6 matched (target 29)
 - **Missing types:** `Error`, `Result`, `ErrorImpl`, `JsonUnexpected`
 
-### 4. de
+### 4. serde_json.iter
+
+- **Target:** `serdejson.Iter`
+- **Similarity:** 0.68
+- **Dependents:** 2
+- **Priority Score:** 2020703.2
+- **Functions:** 4/5 matched
+- **Missing functions:** `new`
+- **Types:** 1/2 matched (target 1)
+- **Missing types:** `Item`
+
+### 5. serde_json.de
 
 - **Target:** `serdejson.De [STUB]`
 - **Similarity:** 0.00
@@ -71,7 +82,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 0/12 matched (target 8)
 - **Missing types:** `Deserializer`, `ParserNumber`, `Err`, `Error`, `SeqAccess`, `MapAccess`, `VariantAccess`, `Variant`, `UnitVariantAccess`, `MapKey`, `StreamDeserializer`, `Item`
 
-### 5. value.index
+### 6. value.index
 
 - **Target:** `serdejson.ValueIndex [ZERO]`
 - **Similarity:** 0.00
@@ -81,17 +92,6 @@ Every matched file is listed below with function and type symbol parity.
 - **Missing functions:** `index_into_mut`, `fmt`, `index`, `index_mut`
 - **Types:** 0/4 matched (target 3)
 - **Missing types:** `Index`, `Sealed`, `Type`, `Output`
-
-### 6. iter
-
-- **Target:** `serdejson.Iter`
-- **Similarity:** 0.68
-- **Dependents:** 1
-- **Priority Score:** 1020703.2
-- **Functions:** 4/5 matched
-- **Missing functions:** `new`
-- **Types:** 1/2 matched (target 1)
-- **Missing types:** `Item`
 
 ### 7. lexical.cached_float80
 
@@ -104,7 +104,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 0/0 matched (target 1)
 - **Missing types:** _none_
 
-### 8. ser
+### 8. serde_json.ser
 
 - **Target:** `serdejson.Ser`
 - **Similarity:** 0.05
@@ -115,7 +115,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 0/20 matched (target 4)
 - **Missing types:** `Serializer`, `Ok`, `Error`, `SerializeSeq`, `SerializeTuple`, `SerializeTupleStruct`, `SerializeTupleVariant`, `SerializeMap`, `SerializeStruct`, `SerializeStructVariant`, `Adapter`, `State`, `Compound`, `MapKeySerializer`, `NumberStrEmitter`, `RawValueStrEmitter`, `CharEscape`, `Formatter`, `CompactFormatter`, `PrettyFormatter`
 
-### 9. raw
+### 9. serde_json.raw
 
 - **Target:** `serdejson.Raw`
 - **Similarity:** 0.01
@@ -137,7 +137,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 0/19 matched (target 6)
 - **Missing types:** `ValueVisitor`, `Value`, `Err`, `Error`, `EnumDeserializer`, `Variant`, `Deserializer`, `VariantDeserializer`, `SeqDeserializer`, `MapDeserializer`, `EnumRefDeserializer`, `VariantRefDeserializer`, `SeqRefDeserializer`, `MapRefDeserializer`, `MapKeyDeserializer`, `KeyClassifier`, `KeyClass`, `BorrowedCowStrDeserializer`, `UnitOnly`
 
-### 11. read
+### 11. serde_json.read
 
 - **Target:** `serdejson.Read`
 - **Similarity:** 0.08
@@ -159,7 +159,18 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 0/14 matched (target 5)
 - **Missing types:** `Serializer`, `Ok`, `Error`, `SerializeSeq`, `SerializeTuple`, `SerializeTupleStruct`, `SerializeTupleVariant`, `SerializeMap`, `SerializeStruct`, `SerializeStructVariant`, `SerializeVec`, `MapKeySerializer`, `NumberValueEmitter`, `RawValueEmitter`
 
-### 13. lexical.math
+### 13. value.mod
+
+- **Target:** `serdejson.Value [STUB]`
+- **Similarity:** 0.00
+- **Dependents:** 0
+- **Priority Score:** 93610.0
+- **Functions:** 26/34 matched (target 32)
+- **Missing functions:** `fmt`, `write`, `flush`, `io_error`, `get_mut`, `as_object_mut`, `as_array_mut`, `pointer_mut`
+- **Types:** 1/2 matched (target 7)
+- **Missing types:** `WriterFormatter`
+
+### 14. lexical.math
 
 - **Target:** `lexical.Math [ZERO]`
 - **Similarity:** 0.00
@@ -170,7 +181,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 2/4 matched (target 6)
 - **Missing types:** `Hi64`, `Math`
 
-### 14. lexical.num
+### 15. lexical.num
 
 - **Target:** `lexical.Num`
 - **Similarity:** 0.54
@@ -181,7 +192,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 4/7 matched (target 8)
 - **Missing types:** `AsCast`, `Float`, `Unsigned`
 
-### 15. lexical.bignum
+### 16. lexical.bignum
 
 - **Target:** `lexical.Bignum`
 - **Similarity:** 0.18
@@ -192,7 +203,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 1/1 matched
 - **Missing types:** _none_
 
-### 16. lexical.rounding
+### 17. lexical.rounding
 
 - **Target:** `lexical.Rounding`
 - **Similarity:** 0.75
@@ -203,7 +214,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 0/0 matched
 - **Missing types:** _none_
 
-### 17. lexical.cached
+### 18. lexical.cached
 
 - **Target:** `lexical.Cached`
 - **Similarity:** 0.78
@@ -214,7 +225,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 3/3 matched (target 4)
 - **Missing types:** _none_
 
-### 18. value.partial_eq
+### 19. value.partial_eq
 
 - **Target:** `serdejson.ValuePartialEq`
 - **Similarity:** 0.48
@@ -225,7 +236,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 0/0 matched
 - **Missing types:** _none_
 
-### 19. lexical.bhcomp
+### 20. lexical.bhcomp
 
 - **Target:** `lexical.Bhcomp`
 - **Similarity:** 0.66
@@ -236,7 +247,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 0/0 matched
 - **Missing types:** _none_
 
-### 20. value.from
+### 21. value.from
 
 - **Target:** `serdejson.ValueFrom`
 - **Similarity:** 0.52
@@ -247,7 +258,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 0/0 matched
 - **Missing types:** _none_
 
-### 21. lexical.errors
+### 22. lexical.errors
 
 - **Target:** `lexical.Errors`
 - **Similarity:** 0.91
@@ -258,7 +269,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 1/1 matched (target 2)
 - **Missing types:** _none_
 
-### 22. lexical.algorithm
+### 23. lexical.algorithm
 
 - **Target:** `lexical.Algorithm`
 - **Similarity:** 0.81
@@ -269,7 +280,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 0/0 matched
 - **Missing types:** _none_
 
-### 23. lexical.shift
+### 24. lexical.shift
 
 - **Target:** `lexical.Shift`
 - **Similarity:** 0.86
@@ -280,7 +291,29 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 0/0 matched
 - **Missing types:** _none_
 
-### 24. lexical.large_powers64
+### 25. io.mod
+
+- **Target:** `serdejson.Io [STUB]`
+- **Similarity:** 0.00
+- **Dependents:** 0
+- **Priority Score:** 10.0
+- **Functions:** 0/0 matched (target 15)
+- **Missing functions:** _none_
+- **Types:** 0/0 matched (target 6)
+- **Missing types:** _none_
+
+### 26. lexical.mod
+
+- **Target:** `lexical.Lexical [STUB]`
+- **Similarity:** 0.00
+- **Dependents:** 0
+- **Priority Score:** 10.0
+- **Functions:** 0/0 matched (target 20)
+- **Missing functions:** _none_
+- **Types:** 0/0 matched (target 1)
+- **Missing types:** _none_
+
+### 27. lexical.large_powers64
 
 - **Target:** `lexical.LargePowers64`
 - **Similarity:** 1.00
@@ -311,9 +344,6 @@ do not treat them as the next implementation target by default.
 
 | Source | Target | Path |
 |--------|--------|------|
-| `value.mod` | `serdejson.Value` | `value/mod` |
-| `macros` | `serdejson.Macros` | `macros` |
-| `lexical.mod` | `lexical.Lexical` | `lexical/mod` |
-| `lib` | `serdejson.Lib` | `lib` |
-| `io.mod` | `serdejson.Io` | `io/mod` |
+| `serde_json.macros` | `serdejson.Macros` | `serde_json/src/macros` |
+| `serde_json.lib` | `serdejson.Lib` | `serde_json/src/lib` |
 

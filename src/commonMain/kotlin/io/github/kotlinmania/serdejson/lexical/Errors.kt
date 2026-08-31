@@ -1,4 +1,4 @@
-// port-lint: source lexical/errors.rs
+// port-lint: source serde_json/src/lexical/errors.rs
 // Adapted from https://github.com/Alexhuszagh/rust-lexical.
 
 package io.github.kotlinmania.serdejson.lexical

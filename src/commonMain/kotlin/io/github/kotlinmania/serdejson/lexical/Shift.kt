@@ -1,4 +1,4 @@
-// port-lint: source lexical/shift.rs
+// port-lint: source serde_json/src/lexical/shift.rs
 // Adapted from https://github.com/Alexhuszagh/rust-lexical.
 
 package io.github.kotlinmania.serdejson.lexical
