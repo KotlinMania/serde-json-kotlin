@@ -17,12 +17,22 @@
   },
   "reexport_modules": [
     "lib",
+    "lib.rs",
+    "serde_json/src/lib.rs",
     "macros",
+    "macros.rs",
+    "serde_json/src/macros.rs",
     "value/mod",
     "value.mod",
+    "value/mod.rs",
+    "serde_json/src/value/mod.rs",
     "lexical/mod",
     "lexical.mod",
+    "lexical/mod.rs",
+    "serde_json/src/lexical/mod.rs",
     "io/mod",
-    "io.mod"
+    "io.mod",
+    "io/mod.rs",
+    "serde_json/src/io/mod.rs"
   ]
 }
