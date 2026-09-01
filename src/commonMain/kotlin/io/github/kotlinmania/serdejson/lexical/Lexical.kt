@@ -1,4 +1,4 @@
-// port-lint: source serde_json/src/lexical/mod.rs
+// port-lint: source lexical/mod.rs
 package io.github.kotlinmania.serdejson.lexical
 
 // The code in this module is derived from the `lexical` crate by @Alexhuszagh
@@ -17,7 +17,7 @@ package io.github.kotlinmania.serdejson.lexical
 // String.toDouble() while preserving the same API entry points.
 
 // ---------------------------------------------------------------------------
-// Small powers (port-lint: source src/lexical/small_powers.rs)
+// Small powers (port-lint: source lexical/small_powers.rs)
 // ---------------------------------------------------------------------------
 
 /** Pre-computed powers of 5 for 64-bit values. */
@@ -79,7 +79,7 @@ internal val POW10_64: ULongArray =
     )
 
 // ---------------------------------------------------------------------------
-// Digit helpers (port-lint: source src/lexical/digit.rs)
+// Digit helpers (port-lint: source lexical/digit.rs)
 // ---------------------------------------------------------------------------
 
 /**
@@ -113,7 +113,7 @@ private fun ULong.checkedAdd(other: ULong): ULong? {
 }
 
 // ---------------------------------------------------------------------------
-// Exponent helpers (port-lint: source src/lexical/exponent.rs)
+// Exponent helpers (port-lint: source lexical/exponent.rs)
 // ---------------------------------------------------------------------------
 
 /**
@@ -191,7 +191,7 @@ private fun Int.saturationAdd(other: Int): Int {
 }
 
 // ---------------------------------------------------------------------------
-// ExtendedFloat (port-lint: source src/lexical/float.rs)
+// ExtendedFloat (port-lint: source lexical/float.rs)
 // ---------------------------------------------------------------------------
 
 /**
@@ -302,7 +302,7 @@ internal fun intoFloat(fp: ExtendedFloat, floatTraits: FloatTraits): Double {
 }
 
 // ---------------------------------------------------------------------------
-// Parsers (port-lint: source src/lexical/parse.rs)
+// Parsers (port-lint: source lexical/parse.rs)
 // ---------------------------------------------------------------------------
 
 /**

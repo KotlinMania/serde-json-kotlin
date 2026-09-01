@@ -1,4 +1,4 @@
-// port-lint: tests serde_json/src/test.rs
+// port-lint: tests ../tests/test.rs
 package io.github.kotlinmania.serdejson
 
 import kotlin.test.Test

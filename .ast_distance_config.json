@@ -2,7 +2,7 @@
   "type": "port",
   "name": "serde-json-kotlin",
   "source": {
-    "path": "tmp",
+    "path": "tmp/serde_json/src",
     "lang": "rust"
   },
   "target": {
