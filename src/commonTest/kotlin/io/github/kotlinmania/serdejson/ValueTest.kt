@@ -60,6 +60,34 @@ class ValueTest {
     }
 
     @Test
+    fun testPartialEq() {
+        val num = Value.Number(JsonNumber.from(42))
+        assertTrue(eqI64(num, 42L))
+        assertFalse(eqI64(num, 43L))
+        assertTrue(eqU64(num, 42uL))
+        assertFalse(eqU64(num, 43uL))
+        assertTrue(eqF64(num, 42.0))
+        assertFalse(eqF64(num, 43.0))
+
+        val flt = Value.Number(JsonNumber.from(3.5f)!!)
+        assertTrue(eqF32(flt, 3.5f))
+        assertFalse(eqF32(flt, 3.0f))
+
+        val b = Value.Bool(true)
+        assertTrue(eqBool(b, true))
+        assertFalse(eqBool(b, false))
+
+        val s = Value.Str("hello")
+        assertTrue(eqStr(s, "hello"))
+        assertFalse(eqStr(s, "world"))
+
+        assertTrue(s.eq("hello"))
+        assertTrue("hello".eq(s))
+        assertFalse(s.eq("world"))
+        assertFalse("world".eq(s))
+    }
+
+    @Test
     fun testPointer() {
         val parsed = fromStr("""{"a":{"b":[10,20,30]}}""").getOrThrow()
         assertEquals(Value.Number(JsonNumber.from(20)), parsed.pointer("/a/b/1"))
