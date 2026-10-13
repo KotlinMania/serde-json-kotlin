@@ -257,7 +257,7 @@ class JsonParser(
  * A JSON deserializer that wraps a [JsonParser] and implements the serde [Deserializer] interface.
  */
 class JsonDeserializer(
-    private val parser: JsonParser,
+    internal val parser: JsonParser,
 ) : Deserializer {
     override fun isHumanReadable(): Boolean = true
 
