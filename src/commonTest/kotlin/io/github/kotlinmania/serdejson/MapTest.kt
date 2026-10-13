@@ -8,44 +8,44 @@ import kotlin.test.assertTrue
 class MapTest {
     @Test
     fun testPreserveOrder() {
-        val v = fromStr("""{"b":null,"a":null,"c":null}""").getOrThrow()
-        val keys = v.asObject()!!.keys()
-        assertEquals(listOf("b", "a", "c"), keys)
+        val expected = listOf("b", "a", "c")
+
+        val v: Value = fromStr("""{"b":null,"a":null,"c":null}""").getOrThrow()
+        val keys: List<String> = v.asObject()!!.keys().collect()
+        assertEquals(keys, expected)
     }
 
     @Test
     fun testShiftInsert() {
-        val v = fromStr("""{"b":null,"a":null,"c":null}""").getOrThrow()
-        val map = v.asObject()!!
-        map.shiftInsert(0, "d", Value.Null)
-        val keys = map.keys()
-        assertEquals(listOf("d", "b", "a", "c"), keys)
+        val v: Value = fromStr("""{"b":null,"a":null,"c":null}""").getOrThrow()
+        val valMap = v.asObjectMut()!!
+        valMap.shiftInsert(0, "d", Value.Null)
+
+        val keys: List<String> = valMap.keys().collect()
+        assertEquals(keys, listOf("d", "b", "a", "c"))
     }
 
     @Test
-    fun testInsertAndRemove() {
-        val map = JsonMap()
-        map.insert("a", Value.Bool(true))
-        map.insert("b", Value.Bool(false))
-        assertEquals(2, map.len())
-        assertTrue(map.containsKey("a"))
-        assertTrue(map.containsKey("b"))
-        assertEquals(Value.Bool(true), map.get("a"))
+    fun testAppend() {
+        val expected = listOf("b", "a", "c")
 
-        val removed = map.remove("a")
-        assertEquals(Value.Bool(true), removed)
-        assertEquals(1, map.len())
-        assertEquals(listOf("b"), map.keys())
+        val v: Value = fromStr("""{"b":null,"a":null,"c":null}""").getOrThrow()
+        val valMap = v.asObjectMut()!!
+        val m = Map.new()
+        m.append(valMap)
+        val keys: List<String> = m.keys().collect()
+
+        assertEquals(keys, expected)
+        assertTrue(valMap.isEmpty())
     }
 
     @Test
-    fun testClear() {
-        val map = JsonMap()
-        map.insert("x", Value.Null)
-        map.insert("y", Value.Null)
-        assertEquals(2, map.len())
-        map.clear()
-        assertEquals(0, map.len())
-        assertTrue(map.isEmpty())
+    fun testRetain() {
+        val v: Value = fromStr("""{"b":null,"a":null,"c":null}""").getOrThrow()
+        val valMap = v.asObjectMut()!!
+        valMap.retain { k, _ -> k != "b" }
+
+        val keys: List<String> = valMap.keys().collect()
+        assertEquals(keys, listOf("a", "c"))
     }
 }

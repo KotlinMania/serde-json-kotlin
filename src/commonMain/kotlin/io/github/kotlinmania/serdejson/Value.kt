@@ -58,11 +58,17 @@ sealed class Value : Serialize {
     /** If the [Value] is an Object, returns the associated [ValueMap]. Returns null otherwise. */
     fun asObject(): ValueMap? = (this as? Object)?.value
 
+    /** If the [Value] is an Object, returns a mutable reference to the associated [ValueMap]. Returns null otherwise. */
+    fun asObjectMut(): ValueMap? = asObject()
+
     /** Returns true if the [Value] is an Array. */
     fun isArray(): Boolean = this is Array
 
     /** If the [Value] is an Array, returns the associated list. Returns null otherwise. */
     fun asArray(): List<Value>? = (this as? Array)?.value
+
+    /** If the [Value] is an Array, returns a mutable reference to the associated list. Returns null otherwise. */
+    fun asArrayMut(): List<Value>? = asArray()
 
     /** Returns true if the [Value] is a String. */
     fun isString(): Boolean = this is Str
