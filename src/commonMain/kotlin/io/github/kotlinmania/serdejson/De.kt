@@ -296,7 +296,13 @@ class JsonDeserializer(
 
     private fun expectIdent(s: String) {
         for (c in s) {
-            parser.next()
+            val next = parser.next()
+            if (next < 0) {
+                throw SerdeException(SerdeError.custom(JsonError.syntax(ErrorCode.EofWhileParsingValue, parser.position().first, parser.position().second).toString()))
+            }
+            if (next != c.code) {
+                throw SerdeException(SerdeError.custom(JsonError.syntax(ErrorCode.ExpectedSomeIdent, parser.position().first, parser.position().second).toString()))
+            }
         }
     }
 
