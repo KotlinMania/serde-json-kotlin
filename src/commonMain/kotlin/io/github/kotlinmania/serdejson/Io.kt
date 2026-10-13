@@ -76,7 +76,7 @@ internal sealed class Result<out E, out T> {
 }
 
 /**
- * The Write trait for writing bytes to a sink.
+ * The Write interface for writing bytes to a sink.
  */
 internal fun interface IoWrite {
     fun write(buf: ByteArray): IoResult<Unit>

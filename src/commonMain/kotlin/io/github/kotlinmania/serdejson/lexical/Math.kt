@@ -468,14 +468,8 @@ private object Large {
 /** Number of digits to bottom-out to asymptotically slow algorithms. */
 private const val KARATSUBA_CUTOFF: Int = 32
 
-// TRAITS
-// ------
-
 /**
  * Math operations on a big integer, implemented as extension functions on [Bigint].
- *
- * In the upstream Rust crate these are a trait; in Kotlin we use direct functions
- * on the Bigint data class.
  */
 
 /** Compare self to y. Returns -1 for less, 0 for equal, 1 for greater. */

@@ -50,7 +50,7 @@ internal class ModeratePathPowers(
 }
 
 /**
- * Cached powers as a trait for a floating-point type.
+ * Cached powers as an interface for a floating-point type.
  */
 internal interface ModeratePathCache {
     /** Get cached powers. */

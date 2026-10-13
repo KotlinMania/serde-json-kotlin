@@ -16,10 +16,6 @@ import io.github.kotlinmania.serdecore.de.Visitor
 
 /**
  * A [Deserializer] that reads from a [Value].
- *
- * This is the Kotlin equivalent of the upstream `impl Deserializer for Value`
- * and `impl Deserializer for &Value` (the owned and borrowed variants are unified
- * here because Kotlin has no lifetimes).
  */
 class ValueDeserializer(
     private val value: Value,
@@ -170,7 +166,7 @@ class ValueDeserializer(
                 }
             }
             is Value.Str -> visitor.visitEnum(ValueEnumAccess(value.value, null))
-            else -> SerdeResult.failure(SerdeError.custom("expected string or map for enum, got ${valueTypeName(value)}"))
+            else -> SerdeResult.failure(SerdeError.custom("expected string or map for enum, got ${Type(value)}"))
         }
 
     override fun <V> deserializeIdentifier(visitor: Visitor<V>): SerdeResult<V> = deserializeStr(visitor)
@@ -178,7 +174,7 @@ class ValueDeserializer(
     override fun <V> deserializeIgnoredAny(visitor: Visitor<V>): SerdeResult<V> = visitor.visitUnit()
 
     private fun typeError(expected: String): SerdeError =
-        SerdeError.custom("invalid type: expected $expected, got ${valueTypeName(value)}")
+        SerdeError.custom("invalid type: expected $expected, got ${Type(value)}")
 }
 
 /**
@@ -293,14 +289,14 @@ private class ValueVariantAccess(
         when (value) {
             is Value.Array -> if (value.value.isEmpty()) visitor.visitUnit() else visitArray(value.value, visitor)
             null -> SerdeResult.failure(SerdeError.custom("expected tuple variant, got unit variant"))
-            else -> SerdeResult.failure(SerdeError.custom("expected tuple variant, got ${valueTypeName(value)}"))
+            else -> SerdeResult.failure(SerdeError.custom("expected tuple variant, got ${Type(value)}"))
         }
 
     override fun <V> structVariant(fields: List<String>, visitor: Visitor<V>): SerdeResult<V> =
         when (value) {
             is Value.Object -> visitMap(value.value, visitor)
             null -> SerdeResult.failure(SerdeError.custom("expected struct variant, got unit variant"))
-            else -> SerdeResult.failure(SerdeError.custom("expected struct variant, got ${valueTypeName(value)}"))
+            else -> SerdeResult.failure(SerdeError.custom("expected struct variant, got ${Type(value)}"))
         }
 }
 

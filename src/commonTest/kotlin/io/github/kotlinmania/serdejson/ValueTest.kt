@@ -95,4 +95,30 @@ class ValueTest {
         assertNull(parsed.pointer("/a/b/99"))
         assertNull(parsed.pointer("/nonexistent"))
     }
+
+    @Test
+    fun testIndex() {
+        val parsed = fromStr("""{"arr":[10,20],"obj":{"k":"v"}}""").getOrThrow()
+        assertEquals(Value.Number(JsonNumber.from(10)), parsed.index(StrIndex("arr")).index(IntIndex(0)))
+        assertEquals(Value.Number(JsonNumber.from(20)), parsed.index(StringIndex("arr")).index(IntIndex(1)))
+        assertEquals(Value.Null, parsed.index(StrIndex("arr")).index(IntIndex(2)))
+        assertEquals(Value.Null, parsed.index(RefIndex(StrIndex("missing"))))
+
+        assertEquals(Value.Str("v"), parsed.index(StrIndex("obj")).index(StrIndex("k")))
+        assertEquals(Value.Null, parsed.index(StrIndex("obj")).index(StrIndex("missing")))
+
+        val typeNull = Type(Value.Null)
+        val sb = StringBuilder()
+        assertEquals("null", typeNull.fmt(sb))
+        assertEquals("null", typeNull.toString())
+        assertEquals("boolean", Type(Value.Bool(false)).toString())
+        assertEquals("number", Type(Value.Number(JsonNumber.from(1))).toString())
+        assertEquals("string", Type(Value.Str("s")).toString())
+        assertEquals("array", Type(Value.Array(emptyList())).toString())
+        assertEquals("object", Type(Value.Object(JsonMap())).toString())
+
+        val mutObj = Value.Object(JsonMap())
+        mutObj.indexMut(StrIndex("newKey"))
+        assertEquals(Value.Null, mutObj.index(StrIndex("newKey")))
+    }
 }

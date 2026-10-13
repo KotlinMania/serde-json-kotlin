@@ -72,12 +72,12 @@ internal interface AsPrimitive {
 }
 
 /**
- * Numerical type trait.
+ * Numerical type interface.
  */
 internal interface Number
 
 /**
- * Defines a trait that supports integral operations.
+ * Defines an interface that supports integral operations.
  */
 internal interface Integer : Number {
     companion object {
@@ -86,7 +86,7 @@ internal interface Integer : Number {
 }
 
 /**
- * Type trait for the mantissa type.
+ * Interface for the mantissa type.
  */
 internal interface Mantissa : Integer {
     /** Mask to extract the high bits from the integer. */
@@ -104,7 +104,7 @@ internal interface Mantissa : Integer {
 }
 
 /**
- * Mantissa traits for u64 (ULong).
+ * Mantissa parameters for [ULong].
  */
 internal object MantissaTraits : Mantissa {
     override val hiMask: ULong = 0xFFFFFFFF00000000UL
@@ -120,7 +120,7 @@ internal object MantissaTraits : Mantissa {
 }
 
 /**
- * Float traits interface (equivalent to Rust `Float` trait).
+ * Float parameters interface.
  */
 internal interface FloatTraits : Number {
     /** Literal zero. */
@@ -225,7 +225,7 @@ internal interface FloatTraits : Number {
         }
 }
 
-/** f32 Float trait implementation. */
+/** Float parameters for 32-bit floating-point numbers. */
 internal object F32Float : FloatTraits {
     override val zero: Double = 0.0
     override val maxDigits: Int = 114
@@ -258,7 +258,7 @@ internal object F32Float : FloatTraits {
     override fun isSignPositive(value: Double): Boolean = !value.toFloat().isNaN() && value >= 0.0
 }
 
-/** f64 Float trait implementation. */
+/** Float parameters for 64-bit floating-point numbers. */
 internal object F64Float : FloatTraits {
     override val zero: Double = 0.0
     override val maxDigits: Int = 769
