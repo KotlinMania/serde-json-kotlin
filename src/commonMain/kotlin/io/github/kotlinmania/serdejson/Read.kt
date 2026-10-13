@@ -3,10 +3,6 @@ package io.github.kotlinmania.serdejson
 
 /**
  * Position information for error reporting.
- *
- * In the upstream Rust crate this is returned by the `Read` trait. The Kotlin
- * port uses [JsonParser] directly, which tracks position internally. This
- * class preserves the public API for consumers that need position data.
  */
 data class Position(
     /** One-based line number. */
@@ -17,11 +13,6 @@ data class Position(
 
 /**
  * JSON input source that reads from a slice of bytes.
- *
- * In the upstream Rust crate, `SliceRead` provides byte-level input to the
- * deserializer. In the Kotlin port, [JsonParser] operates on [String] directly
- * and handles all input reading. This class provides a bridge for callers that
- * have a [ByteArray] input.
  */
 class SliceRead(
     private val slice: ByteArray,
