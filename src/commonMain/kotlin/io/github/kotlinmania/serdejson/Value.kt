@@ -145,20 +145,7 @@ sealed class Value : Serialize {
     }
 
     override fun <Ok> serialize(serializer: Serializer<Ok>): SerdeResult<Ok> =
-        when (this) {
-            is Null -> serializer.serializeUnit()
-            is Bool -> serializer.serializeBool(value)
-            is Number -> value.serialize(serializer)
-            is Str -> serializer.serializeStr(value)
-            is Array -> serializer.collectSeq(value)
-            is Object -> {
-                val map = serializer.serializeMap(value.len()).getOrThrow()
-                for ((k, v) in value) {
-                    map.serializeEntry(Value.Str(k), v).getOrThrow()
-                }
-                map.end()
-            }
-        }
+        serialize(this, serializer)
 
     override fun toString(): String {
         val writer = VecIoWrite()
@@ -204,7 +191,7 @@ sealed class Value : Serialize {
  * Convert a [Serialize] value into a [Value] which is an enum that can represent any valid JSON data.
  */
 fun toValue(value: Serialize): SerdeResult<Value> {
-    val writer = ValueSerializer()
+    val writer = Serializer()
     return value.serialize(writer).map { writer.result }
 }
 
