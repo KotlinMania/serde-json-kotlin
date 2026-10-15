@@ -1433,10 +1433,7 @@ internal class JsonSeqAccess(
         val peek = parser.parseWhitespace()
         if (peek < 0) throw SerdeException(parser.peekError(ErrorCode.EofWhileParsingList))
         return when {
-            peek == ']'.code -> {
-                parser.eatChar()
-                false
-            }
+            peek == ']'.code -> false
             first -> {
                 first = false
                 true
@@ -1482,10 +1479,7 @@ internal class JsonMapAccess(
         val peek = parser.parseWhitespace()
         if (peek < 0) throw SerdeException(parser.peekError(ErrorCode.EofWhileParsingObject))
         return when {
-            peek == '}'.code -> {
-                parser.eatChar()
-                false
-            }
+            peek == '}'.code -> false
             first -> {
                 first = false
                 if (peek == '"'.code) {
