@@ -376,18 +376,58 @@ class JsonParser(
         }
     }
 
-    /** Handles overflow in the integer part by switching to f64 parsing. */
+    /** Handles overflow in the integer part by switching to f64 parsing without losing precision. */
     private fun parseLongInteger(positive: Boolean, significand: ULong): Double {
-        var exp = 0
+        val sb = StringBuilder()
+        sb.append(significand)
         while (true) {
-            when (peekOrNull().toChar()) {
+            when (val ch = peekOrNull().toChar()) {
                 in '0'..'9' -> {
                     eatChar()
-                    exp++
+                    sb.append(ch)
                 }
-                '.' -> return parseDecimal(positive, significand, exp)
-                'e', 'E' -> return parseExponent(positive, significand, exp)
-                else -> return f64FromParts(positive, significand, exp)
+                '.' -> {
+                    eatChar()
+                    sb.append('.')
+                    var hasDigits = false
+                    while (peekOrNull().toChar() in '0'..'9') {
+                        val digit = peekOrNull().toChar()
+                        eatChar()
+                        sb.append(digit)
+                        hasDigits = true
+                    }
+                    if (!hasDigits) {
+                        if (peekRaw() >= 0) throw SerdeException(peekError(ErrorCode.InvalidNumber))
+                        throw SerdeException(peekError(ErrorCode.EofWhileParsingValue))
+                    }
+                }
+                'e', 'E' -> {
+                    eatChar()
+                    sb.append('e')
+                    val expSign = peekOrNull().toChar()
+                    if (expSign == '+' || expSign == '-') {
+                        eatChar()
+                        sb.append(expSign)
+                    }
+                    val next = nextCharOrNull()
+                    if (next.toChar() !in '0'..'9') throw SerdeException(error(ErrorCode.InvalidNumber))
+                    sb.append(next.toChar())
+                    while (peekOrNull().toChar() in '0'..'9') {
+                        val digit = peekOrNull().toChar()
+                        eatChar()
+                        sb.append(digit)
+                    }
+                    val d = sb.toString().toDoubleOrNull()
+                        ?: throw SerdeException(error(ErrorCode.NumberOutOfRange))
+                    if (d.isInfinite()) throw SerdeException(error(ErrorCode.NumberOutOfRange))
+                    return if (positive) d else -d
+                }
+                else -> {
+                    val d = sb.toString().toDoubleOrNull()
+                        ?: throw SerdeException(error(ErrorCode.NumberOutOfRange))
+                    if (d.isInfinite()) throw SerdeException(error(ErrorCode.NumberOutOfRange))
+                    return if (positive) d else -d
+                }
             }
         }
     }
