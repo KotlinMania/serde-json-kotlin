@@ -1,10 +1,10 @@
-// port-lint: source value/mod.rs
 package io.github.kotlinmania.serdejson
 
 import io.github.kotlinmania.serde.SerdeResult
 import io.github.kotlinmania.serdecore.de.Deserialize
 import io.github.kotlinmania.serdecore.ser.Serialize
 import io.github.kotlinmania.serdecore.ser.Serializer
+import io.github.kotlinmania.serdejson.io.VecIoWrite
 
 /**
  * Represents any valid JSON value.
