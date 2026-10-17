@@ -100,3 +100,8 @@ fun obj(vararg pairs: Pair<String, Value>): Value {
 
 /** Build a JSON object from a block. */
 fun obj(block: JsonObjectBuilder.() -> Unit): Value = json(block)
+
+/**
+ * Build a [Value] from a JSON string (convenience function).
+ */
+fun json(jsonStr: String): Value = fromStr(jsonStr).getOrThrow()

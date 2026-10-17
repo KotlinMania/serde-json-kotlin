@@ -14,6 +14,8 @@ import io.github.kotlinmania.serdecore.ser.SerializeTuple
 import io.github.kotlinmania.serdecore.ser.SerializeTupleStruct
 import io.github.kotlinmania.serdecore.ser.SerializeTupleVariant
 import io.github.kotlinmania.serdecore.ser.Serializer
+import io.github.kotlinmania.serdejson.io.IoWrite
+import io.github.kotlinmania.serdejson.io.VecIoWrite
 
 private val QUOTE = byteArrayOf('"'.code.toByte())
 private val ESC_QUOTE = "\\\"".encodeToByteArray()
@@ -384,4 +386,99 @@ private class JsonStructVariantSerialize(
             }
             writer.writeAll(CLOSE_BRACE)
         }
+}
+
+/**
+ * Serialize a [Serialize] value to a JSON string.
+ */
+fun toStr(value: Serialize): SerdeResult<String> =
+    serdeCatching {
+        val writer = VecIoWrite()
+        val serializer = JsonSerializer(writer)
+        value.serialize(serializer).getOrThrow()
+        writer.bytes.decodeToString()
+    }
+
+/**
+ * Serialize a [Serialize] value to a JSON string with pretty-printing.
+ */
+fun toStrPretty(value: Serialize): SerdeResult<String> =
+    serdeCatching {
+        val writer = VecIoWrite()
+        val serializer = JsonSerializer(writer, pretty = true)
+        value.serialize(serializer).getOrThrow()
+        writer.bytes.decodeToString()
+    }
+
+/**
+ * Serialize a [Serialize] value to a byte array.
+ */
+fun toVec(value: Serialize): SerdeResult<ByteArray> =
+    serdeCatching {
+        val writer = VecIoWrite()
+        val serializer = JsonSerializer(writer)
+        value.serialize(serializer).getOrThrow()
+        writer.bytes
+    }
+
+/**
+ * Serialize a [Value] to a JSON string.
+ */
+fun valueToStr(value: Value): String {
+    val writer = VecIoWrite()
+    toJsonString(writer, value, pretty = false)
+    return writer.bytes.decodeToString()
+}
+
+/**
+ * Serialize a [Value] to a pretty JSON string.
+ */
+fun valueToStrPretty(value: Value): String {
+    val writer = VecIoWrite()
+    toJsonString(writer, value, pretty = true)
+    return writer.bytes.decodeToString()
+}
+
+/**
+ * Serialize a [Value] directly to an [IoWrite].
+ */
+internal fun toJsonString(writer: IoWrite, value: Value, pretty: Boolean = false) {
+    when (value) {
+        is Value.Null -> writer.writeAll(NULL_BYTES)
+        is Value.Bool -> writer.writeAll(if (value.value) TRUE_BYTES else FALSE_BYTES)
+        is Value.Number -> writer.writeAll(value.value.toString().encodeToByteArray())
+        is Value.Str -> {
+            writer.writeAll(QUOTE)
+            escapeStringToWriter(writer, value.value)
+            writer.writeAll(QUOTE)
+        }
+        is Value.Array -> {
+            writer.writeAll(OPEN_BRACKET)
+            for ((i, v) in value.value.withIndex()) {
+                if (i > 0) writer.writeAll(COMMA)
+                if (pretty) writer.writeAll(NEWLINE)
+                if (pretty) repeat(1) { writer.writeAll(TWO_SPACES) }
+                toJsonString(writer, v, pretty)
+            }
+            if (pretty && value.value.isNotEmpty()) writer.writeAll(NEWLINE)
+            writer.writeAll(CLOSE_BRACKET)
+        }
+        is Value.Object -> {
+            writer.writeAll(OPEN_BRACE)
+            var first = true
+            for ((k, v) in value.value) {
+                if (!first) writer.writeAll(COMMA)
+                first = false
+                if (pretty) writer.writeAll(NEWLINE)
+                if (pretty) repeat(1) { writer.writeAll(TWO_SPACES) }
+                writer.writeAll(QUOTE)
+                escapeStringToWriter(writer, k)
+                writer.writeAll(QUOTE)
+                writer.writeAll(if (pretty) ": ".encodeToByteArray() else COLON)
+                toJsonString(writer, v, pretty)
+            }
+            if (pretty && value.value.isNotEmpty()) writer.writeAll(NEWLINE)
+            writer.writeAll(CLOSE_BRACE)
+        }
+    }
 }

@@ -19,9 +19,6 @@ import io.github.kotlinmania.serdecore.de.Visitor
 
 /**
  * A number as parsed by the JSON deserializer's number-parsing machinery.
- *
- * Mirrors upstream `ParserNumber` — the intermediate representation before
- * dispatching to the appropriate `visit_*` method on the [Visitor].
  */
 internal sealed class DeParserNumber {
     class F64(
@@ -53,20 +50,17 @@ internal sealed class DeParserNumber {
 
 // ─── JsonParser ───────────────────────────────────────────────────────────────
 //
-// A JSON parser that reads from a string. This is the core byte-level scanner
-// used by the deserializer. Unlike the upstream Rust which operates on a
-// `Read<'de>` trait over raw bytes, this Kotlin port operates on a `String`
-// directly, which simplifies Unicode handling.
+// A JSON parser that reads from a string. This is the core character-level scanner
+// used by the deserializer.
 //
-// The parser is designed to be driven by [JsonDeserializer]: each `deserialize_*`
+// The parser is designed to be driven by [JsonDeserializer]: each deserialize
 // method on the deserializer calls the parser to peek/consume bytes and dispatch
 // to the appropriate visitor method.
 
 /**
  * A JSON parser that reads from a string, tracking position for error reporting.
  *
- * This is the Kotlin equivalent of upstream's `Deserializer<R>` minus the serde
- * `Deserializer` trait impl — it provides the low-level scanning primitives:
+ * Provides the low-level scanning primitives:
  * whitespace skipping, identifier parsing, number parsing, string parsing, etc.
  */
 class JsonParser(
@@ -87,7 +81,7 @@ class JsonParser(
 
     /**
      * Returns the first non-whitespace character code without consuming it,
-     * or -1 at EOF. Equivalent to upstream `parse_whitespace`.
+     * or -1 at EOF.
      */
     internal fun parseWhitespace(): Int {
         skipWhitespace()
@@ -163,7 +157,7 @@ class JsonParser(
 
     // ── Error helpers ──
 
-    /** Error caused by a byte from next_char(). */
+    /** Error caused by a byte from nextChar(). */
     internal fun error(code: ErrorCode): SerdeError =
         SerdeError.custom(JsonError.syntax(code, line, col).toString())
 
@@ -233,22 +227,16 @@ class JsonParser(
             }
             in '1'..'9' -> {
                 var significand = (next - '0'.code).toULong()
-                while (true) {
-                    val peek = peekOrNull()
-                    if (peek.toChar() in '0'..'9') {
-                        val digit = (peek - '0'.code).toULong()
-                        // Overflow check: if significand * 10 + digit > ULong.MAX_VALUE
-                        if (overflow(significand, digit, ULong.MAX_VALUE)) {
-                            return DeParserNumber.F64(parseLongInteger(positive, significand))
-                        }
-                        eatChar()
-                        significand = significand * 10uL + digit
-                    } else {
-                        return parseNumber(positive, significand)
+                while (peekOrNull().toChar() in '0'..'9') {
+                    val digit = (peekOrNull() - '0'.code).toULong()
+                    // Overflow check: if significand * 10 + digit > ULong.MAX_VALUE
+                    if (overflow(significand, digit, ULong.MAX_VALUE)) {
+                        return DeParserNumber.F64(parseLongInteger(positive, significand))
                     }
+                    eatChar()
+                    significand = significand * 10uL + digit
                 }
-                @Suppress("UNREACHABLE_CODE")
-                throw SerdeException(error(ErrorCode.InvalidNumber))
+                parseNumber(positive, significand)
             }
             else -> throw SerdeException(error(ErrorCode.InvalidNumber))
         }
@@ -256,7 +244,6 @@ class JsonParser(
 
     /**
      * Checks if `a * 10 + b` would overflow `max`.
-     * Equivalent to the upstream `overflow!` macro.
      */
     private fun overflow(a: ULong, b: ULong, max: ULong): Boolean =
         a >= max / 10uL && (a > max / 10uL || b > max % 10uL)
@@ -324,7 +311,7 @@ class JsonParser(
         significand: ULong,
         startingExp: Int,
     ): Double {
-        eatChar() // consume 'e'/'E'
+        eatChar() // consume exponent marker
         val positiveExp =
             when (peekOrNull().toChar()) {
                 '+' -> {
@@ -417,14 +404,16 @@ class JsonParser(
                         eatChar()
                         sb.append(digit)
                     }
-                    val d = sb.toString().toDoubleOrNull()
-                        ?: throw SerdeException(error(ErrorCode.NumberOutOfRange))
+                    val d =
+                        sb.toString().toDoubleOrNull()
+                            ?: throw SerdeException(error(ErrorCode.NumberOutOfRange))
                     if (d.isInfinite()) throw SerdeException(error(ErrorCode.NumberOutOfRange))
                     return if (positive) d else -d
                 }
                 else -> {
-                    val d = sb.toString().toDoubleOrNull()
-                        ?: throw SerdeException(error(ErrorCode.NumberOutOfRange))
+                    val d =
+                        sb.toString().toDoubleOrNull()
+                            ?: throw SerdeException(error(ErrorCode.NumberOutOfRange))
                     if (d.isInfinite()) throw SerdeException(error(ErrorCode.NumberOutOfRange))
                     return if (positive) d else -d
                 }
@@ -457,8 +446,7 @@ class JsonParser(
     }
 
     /**
-     * Constructs an f64 from a significand and exponent using the POW10 table.
-     * Equivalent to upstream's `f64_from_parts` (non-float_roundtrip variant).
+     * Constructs a Double from a significand and exponent using the POW10 table.
      */
     private fun f64FromParts(positive: Boolean, significand: ULong, exponent: Int): Double {
         var f = significand.toDouble()
@@ -603,12 +591,8 @@ class JsonParser(
         return cp
     }
 
-    /** Parses a JSON string as raw bytes (for deserialize_bytes). */
-    internal fun parseStrRaw(): ByteArray {
-        // For now, parse as string and encode back to UTF-8 bytes.
-        // Upstream distinguishes borrowed vs copied, but in Kotlin we always copy.
-        return parseStr().encodeToByteArray()
-    }
+    /** Parses a JSON string as raw bytes (for deserializeBytes). */
+    internal fun parseStrRaw(): ByteArray = parseStr().encodeToByteArray()
 
     /** Ignores a JSON string (skips past it). The opening `"` must be consumed. */
     internal fun ignoreStr() {
@@ -754,7 +738,7 @@ class JsonParser(
 
     /**
      * Skips over a JSON value without parsing it into any type.
-     * Used by `deserialize_ignored_any`.
+     * Used by `deserializeIgnoredAny`.
      */
     internal fun ignoreValue() {
         val stack = ArrayDeque<Char>()
@@ -993,7 +977,7 @@ class JsonParser(
 
     /**
      * Records the current position, ignores a value, then returns the raw
-     * substring spanning that value. Used by `deserialize_raw_value`.
+     * substring spanning that value. Used by `deserializeRawValue`.
      */
     internal fun parseRawValue(): String {
         skipWhitespace()
@@ -1006,8 +990,7 @@ class JsonParser(
 // ─── POW10 table ─────────────────────────────────────────────────────────────
 
 /**
- * Table of powers of 10 for fast f64 construction.
- * Matches upstream's `POW10` static array.
+ * Table of powers of 10 for fast Double construction.
  */
 private val POW10: kotlin.collections.Map<Int, Double> =
     buildMap {
@@ -1054,7 +1037,7 @@ class JsonDeserializer(
 
     override fun isHumanReadable(): Boolean = true
 
-    // ── deserialize_any ──
+    // ── deserializeAny ──
 
     override fun <V> deserializeAny(visitor: Visitor<V>): SerdeResult<V> =
         serdeCatching {
@@ -1107,7 +1090,7 @@ class JsonDeserializer(
             }
         }.flatMap { it }
 
-    // ── deserialize_bool ──
+    // ── deserializeBool ──
 
     override fun <V> deserializeBool(visitor: Visitor<V>): SerdeResult<V> =
         serdeCatching {
@@ -1178,7 +1161,7 @@ class JsonDeserializer(
 
     /**
      * Parses a JSON number and dispatches to the visitor's appropriate
-     * `visit_*` method. Equivalent to upstream `deserialize_number`.
+     * visit method.
      */
     private fun <V> deserializeNumber(visitor: Visitor<V>): SerdeResult<V> =
         serdeCatching {
@@ -1196,11 +1179,11 @@ class JsonDeserializer(
             }
         }.flatMap { it }
 
-    // ── deserialize_char ──
+    // ── deserializeChar ──
 
     override fun <V> deserializeChar(visitor: Visitor<V>): SerdeResult<V> = deserializeStr(visitor)
 
-    // ── deserialize_str / string ──
+    // ── deserializeStr / string ──
 
     override fun <V> deserializeStr(visitor: Visitor<V>): SerdeResult<V> =
         serdeCatching {
@@ -1213,7 +1196,7 @@ class JsonDeserializer(
 
     override fun <V> deserializeString(visitor: Visitor<V>): SerdeResult<V> = deserializeStr(visitor)
 
-    // ── deserialize_bytes / byte_buf ──
+    // ── deserializeBytes / byteBuf ──
 
     override fun <V> deserializeBytes(visitor: Visitor<V>): SerdeResult<V> {
         val peek = parser.parseWhitespace()
@@ -1232,7 +1215,7 @@ class JsonDeserializer(
 
     override fun <V> deserializeByteBuf(visitor: Visitor<V>): SerdeResult<V> = deserializeBytes(visitor)
 
-    // ── deserialize_option ──
+    // ── deserializeOption ──
 
     override fun <V> deserializeOption(visitor: Visitor<V>): SerdeResult<V> =
         serdeCatching {
@@ -1241,13 +1224,13 @@ class JsonDeserializer(
                 parser.eatChar()
                 parser.parseIdent("ull")
             } else {
-                null // non-null — will visit_some
+                null // non-null — will visitSome
             }
         }.flatMap { isNull ->
             if (isNull == null) visitor.visitSome(this) else visitor.visitNone()
         }
 
-    // ── deserialize_unit ──
+    // ── deserializeUnit ──
 
     override fun <V> deserializeUnit(visitor: Visitor<V>): SerdeResult<V> =
         serdeCatching {
@@ -1261,7 +1244,7 @@ class JsonDeserializer(
     override fun <V> deserializeUnitStruct(name: String, visitor: Visitor<V>): SerdeResult<V> =
         deserializeUnit(visitor)
 
-    // ── deserialize_newtype_struct ──
+    // ── deserializeNewtypeStruct ──
 
     override fun <V> deserializeNewtypeStruct(name: String, visitor: Visitor<V>): SerdeResult<V> {
         if (name == RawValue.TOKEN) {
@@ -1270,7 +1253,7 @@ class JsonDeserializer(
         return visitor.visitNewtypeStruct(this)
     }
 
-    // ── deserialize_seq ──
+    // ── deserializeSeq ──
 
     override fun <V> deserializeSeq(visitor: Visitor<V>): SerdeResult<V> =
         serdeCatching {
@@ -1291,7 +1274,7 @@ class JsonDeserializer(
     override fun <V> deserializeTupleStruct(name: String, len: Int, visitor: Visitor<V>): SerdeResult<V> =
         deserializeSeq(visitor)
 
-    // ── deserialize_map ──
+    // ── deserializeMap ──
 
     override fun <V> deserializeMap(visitor: Visitor<V>): SerdeResult<V> =
         serdeCatching {
@@ -1306,7 +1289,7 @@ class JsonDeserializer(
             }
         }.flatMap { it }
 
-    // ── deserialize_struct ──
+    // ── deserializeStruct ──
 
     override fun <V> deserializeStruct(name: String, fields: List<String>, visitor: Visitor<V>): SerdeResult<V> =
         serdeCatching {
@@ -1333,10 +1316,10 @@ class JsonDeserializer(
             }
         }.flatMap { it }
 
-    // ── deserialize_enum ──
+    // ── deserializeEnum ──
 
     /**
-     * Parses an enum as either `{"$KEY":$VALUE}` or a bare `"variant_name"`.
+     * Parses an enum as either `{"$KEY":$VALUE}` or a bare `"variantName"`.
      *
      * For the object form, the deserializer creates a [JsonVariantAccess]
      * that provides access to the variant's content.
@@ -1366,26 +1349,22 @@ class JsonDeserializer(
             }
         }.flatMap { it }
 
-    // ── deserialize_identifier ──
+    // ── deserializeIdentifier ──
 
     override fun <V> deserializeIdentifier(visitor: Visitor<V>): SerdeResult<V> = deserializeStr(visitor)
 
-    // ── deserialize_ignored_any ──
+    // ── deserializeIgnoredAny ──
 
     override fun <V> deserializeIgnoredAny(visitor: Visitor<V>): SerdeResult<V> =
         serdeCatching {
             parser.ignoreValue()
         }.flatMap { visitor.visitUnit() }
 
-    // ── peek_invalid_type ──
+    // ── peekInvalidType ──
 
     /**
-     * Peeks at the current value and produces an `invalid_type` error
+     * Peeks at the current value and produces an invalidType error
      * describing what was found vs. what was expected.
-     *
-     * This is the upstream `peek_invalid_type` — when a `deserialize_*`
-     * method gets the wrong type, it calls this to build a descriptive error
-     * instead of just returning a generic "expected X" message.
      */
     private fun <V> peekInvalidType(visitor: Visitor<V>): SerdeError {
         val peek = parser.peekOrNull()
@@ -1567,9 +1546,9 @@ internal class JsonVariantAccess(
     VariantAccess {
     override fun <V> variantSeed(seed: DeserializeSeed<V>): SerdeResult<Pair<V, VariantAccess>> =
         serdeCatching {
-            val val_ = seed.deserialize(de).getOrThrow()
+            val value = seed.deserialize(de).getOrThrow()
             de.parser.parseObjectColon()
-            Pair(val_, this as VariantAccess)
+            Pair(value, this as VariantAccess)
         }
 
     override fun unitVariant(): SerdeResult<Unit> =
@@ -1590,7 +1569,7 @@ internal class JsonVariantAccess(
 // ─── UnitVariantAccess (enum bare string form) ─────────────────────────────────
 
 /**
- * Enum access for the bare `"variant_name"` form (unit variants).
+ * Enum access for the bare `"variantName"` form (unit variants).
  *
  * Created by [JsonDeserializer.deserializeEnum] when the input is a JSON string.
  * The variant name is the string itself. Since this is a unit variant, the
@@ -1633,10 +1612,10 @@ internal class JsonUnitVariantAccess(
  *
  * Map keys in JSON are always strings, but serde may request them as numbers
  * or booleans. This deserializer handles the conversion:
- * - For `deserialize_any` / `deserialize_str`, it parses the string normally.
+ * - For `deserializeAny` / `deserializeStr`, it parses the string normally.
  * - For numeric types, it parses the string content as a number in quotes
  *   (e.g., `"42"` → 42).
- * - For `deserialize_bool`, it reads `true`/`false` within the quotes.
+ * - For `deserializeBool`, it reads `true`/`false` within the quotes.
  */
 internal class JsonMapKey(
     private val de: JsonDeserializer,
@@ -1710,7 +1689,7 @@ internal class JsonMapKey(
                     false
                 }
                 else -> {
-                    // Not a bool — parse as string and return invalid_type error
+                    // Not a bool — parse as string and return invalidType error
                     val s = parser.parseStr()
                     throw SerdeException(SerdeError.invalidType(Unexpected.Str(s), visitor))
                 }
@@ -1734,7 +1713,7 @@ internal class JsonMapKey(
     override fun <V> deserializeByteBuf(visitor: Visitor<V>): SerdeResult<V> =
         de.deserializeBytes(visitor)
 
-    // Forward to deserialize_any for string-like types
+    // Forward to deserializeAny for string-like types
     override fun <V> deserializeChar(visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
 
     override fun <V> deserializeStr(visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
@@ -1841,10 +1820,6 @@ fun <T> streamDeserializer(json: String, deserialize: io.github.kotlinmania.serd
     StreamDeserializer(deserialize, JsonParser(json))
 
 // ─── Top-level deserialization functions ───────────────────────────────────────
-//
-// These are the Kotlin equivalents of upstream's `from_str`, `from_slice`,
-// and `from_reader` — they create a deserializer, deserialize the value,
-// and verify the input is fully consumed.
 
 /**
  * Deserialize an instance of type T from a string of JSON text using the given [Deserialize].
@@ -1865,3 +1840,30 @@ fun <T> deserializeFromStr(json: String, deserialize: io.github.kotlinmania.serd
  */
 fun <T> deserializeFromSlice(json: ByteArray, deserialize: io.github.kotlinmania.serdecore.de.Deserialize<T>): SerdeResult<T> =
     deserializeFromStr(json.decodeToString(), deserialize)
+
+/**
+ * Parse a JSON string into a [Value].
+ */
+fun fromStr(json: String): SerdeResult<Value> =
+    JsonParser(json).parseValue()
+
+/**
+ * Parse a JSON string into a type T using the given [io.github.kotlinmania.serdecore.de.Deserialize] implementation.
+ */
+fun <T> fromStr(json: String, deserialize: io.github.kotlinmania.serdecore.de.Deserialize<T>): SerdeResult<T> {
+    val parser = JsonParser(json)
+    val deserializer = JsonDeserializer(parser)
+    return deserialize.deserialize(deserializer)
+}
+
+/**
+ * Parse a JSON byte array into a [Value].
+ */
+fun fromSlice(json: ByteArray): SerdeResult<Value> =
+    fromStr(json.decodeToString())
+
+/**
+ * Parse a JSON byte array into a type T using the given [io.github.kotlinmania.serdecore.de.Deserialize] implementation.
+ */
+fun <T> fromSlice(json: ByteArray, deserialize: io.github.kotlinmania.serdecore.de.Deserialize<T>): SerdeResult<T> =
+    fromStr(json.decodeToString(), deserialize)
