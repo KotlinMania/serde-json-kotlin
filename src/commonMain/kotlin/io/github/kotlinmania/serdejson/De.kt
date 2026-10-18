@@ -699,7 +699,9 @@ class JsonParser(
 
     private fun parseObjectValue(): Value {
         eatChar() // consume '{'
-        val map = ValueMap()
+        val map =
+            io.github.kotlinmania.serdejson
+                .JsonMap()
         if (parseWhitespace().toChar() == '}') {
             eatChar()
             return Value.Object(map)

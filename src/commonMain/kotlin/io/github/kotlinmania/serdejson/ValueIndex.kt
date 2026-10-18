@@ -28,8 +28,6 @@ sealed interface Index {
     fun indexOrInsert(v: Value): Value
 }
 
-typealias ValueIndex = Index
-
 /** Index by integer position into a [Value.Array]. */
 class IntIndex(
     private val index: Int,
@@ -79,7 +77,11 @@ class StrIndex(
     override fun indexOrInsert(v: Value): Value {
         var current = v
         if (current is Value.Null) {
-            current = Value.Object(ValueMap())
+            current =
+                Value.Object(
+                    io.github.kotlinmania.serdejson
+                        .JsonMap(),
+                )
         }
         when (current) {
             is Value.Object -> {

@@ -476,13 +476,3 @@ class IntoValues internal constructor(
 
     override fun toString(): String = list.toString()
 }
-
-/**
- * A [JsonMap] specialized for String keys and [Value] values, matching upstream `Map<String, Value>`.
- */
-typealias ValueMap = JsonMap
-
-/**
- * A type alias for [JsonMap] matching upstream `Map`.
- */
-typealias Map = JsonMap

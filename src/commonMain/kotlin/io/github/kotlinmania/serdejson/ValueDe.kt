@@ -200,7 +200,7 @@ private fun <V> visitArray(array: List<Value>, visitor: Visitor<V>): SerdeResult
 /**
  * Visit a map.
  */
-private fun <V> visitMap(map: ValueMap, visitor: Visitor<V>): SerdeResult<V> {
+private fun <V> visitMap(map: io.github.kotlinmania.serdejson.JsonMap, visitor: Visitor<V>): SerdeResult<V> {
     val mapAccess = ValueMapAccess(map)
     return visitor.visitMap(mapAccess)
 }
@@ -228,7 +228,7 @@ private class ValueSeqAccess(
  * [MapAccess] backed by a [ValueMap].
  */
 private class ValueMapAccess(
-    private val map: ValueMap,
+    private val map: io.github.kotlinmania.serdejson.JsonMap,
 ) : MapAccess {
     private val iter = map.iterator()
     private var currentValue: Value? = null

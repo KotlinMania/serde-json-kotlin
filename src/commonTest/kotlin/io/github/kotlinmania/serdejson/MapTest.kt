@@ -31,7 +31,9 @@ class MapTest {
 
         val v: Value = fromStr("""{"b":null,"a":null,"c":null}""").getOrThrow()
         val valMap = v.asObjectMut()!!
-        val m = Map.new()
+        val m =
+            io.github.kotlinmania.serdejson.JsonMap
+                .new()
         m.append(valMap)
         val keys: List<String> = m.keys().collect()
 

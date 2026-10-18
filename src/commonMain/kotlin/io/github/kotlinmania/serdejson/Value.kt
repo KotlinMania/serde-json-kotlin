@@ -35,7 +35,7 @@ sealed class Value : Serialize {
 
     /** Represents a JSON object. */
     class Object(
-        val value: ValueMap,
+        val value: io.github.kotlinmania.serdejson.JsonMap,
     ) : Value()
 
     /** Index into a JSON array or map. Returns null if the type doesn't match. */
@@ -56,10 +56,10 @@ sealed class Value : Serialize {
     fun isObject(): Boolean = this is Object
 
     /** If the [Value] is an Object, returns the associated [ValueMap]. Returns null otherwise. */
-    fun asObject(): ValueMap? = (this as? Object)?.value
+    fun asObject(): io.github.kotlinmania.serdejson.JsonMap? = (this as? Object)?.value
 
     /** If the [Value] is an Object, returns a mutable reference to the associated [ValueMap]. Returns null otherwise. */
-    fun asObjectMut(): ValueMap? = asObject()
+    fun asObjectMut(): io.github.kotlinmania.serdejson.JsonMap? = asObject()
 
     /** Returns true if the [Value] is an Array. */
     fun isArray(): Boolean = this is Array

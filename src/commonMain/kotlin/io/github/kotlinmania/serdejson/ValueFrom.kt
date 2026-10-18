@@ -43,7 +43,7 @@ fun Value.Companion.from(s: String): Value = Value.Str(s)
 fun Value.Companion.from(n: JsonNumber): Value = Value.Number(n)
 
 /** Convert a [ValueMap] to a [Value]. */
-fun Value.Companion.from(m: ValueMap): Value = Value.Object(m)
+fun Value.Companion.from(m: io.github.kotlinmania.serdejson.JsonMap): Value = Value.Object(m)
 
 /** Convert a [List] of [Value] to a [Value.Array]. */
 fun Value.Companion.from(list: List<Value>): Value = Value.Array(list)
@@ -63,7 +63,9 @@ fun Value.Companion.fromIter(iter: Iterable<Value>): Value = Value.Array(iter.to
 /** Create a [Value.Object] by collecting an iterator of key-value pairs. */
 @kotlin.jvm.JvmName("fromIterPairs")
 fun Value.Companion.fromIter(iter: Iterable<Pair<String, Value>>): Value {
-    val map = ValueMap()
+    val map =
+        io.github.kotlinmania.serdejson
+            .JsonMap()
     for ((k, v) in iter) {
         map.insert(k, v)
     }
