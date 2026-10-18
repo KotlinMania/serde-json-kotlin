@@ -171,7 +171,7 @@ open class Serializer : io.github.kotlinmania.serdecore.ser.Serializer<Value> {
         variant: String,
         value: T,
     ): SerdeResult<Value> {
-        val values = ValueMap()
+        val values = io.github.kotlinmania.serdejson.JsonMap()
         val inner = toValue(value).getOrElse { return SerdeResult.failure(it) }
         values.insert(variant, inner)
         val res = Value.Object(values)
@@ -201,7 +201,7 @@ open class Serializer : io.github.kotlinmania.serdecore.ser.Serializer<Value> {
 
     override fun serializeMap(len: Int?): SerdeResult<SerdeSerializeMap<Value>> =
         SerdeResult.success(
-            SerializeMap.Map(ValueMap.withCapacity(len ?: 0), null),
+            SerializeMap.Map(io.github.kotlinmania.serdejson.JsonMap.withCapacity(len ?: 0), null),
         )
 
     override fun serializeStruct(name: String, len: Int): SerdeResult<SerializeStruct<Value>> =
@@ -209,7 +209,7 @@ open class Serializer : io.github.kotlinmania.serdecore.ser.Serializer<Value> {
             NUMBER_TOKEN -> SerdeResult.success(SerializeMap.Number(null))
             RAW_VALUE_TOKEN -> SerdeResult.success(SerializeMap.RawValue(null))
             else -> {
-                val map = ValueMap.withCapacity(len)
+                val map = io.github.kotlinmania.serdejson.JsonMap.withCapacity(len)
                 SerdeResult.success(SerializeMap.Map(map, null))
             }
         }
@@ -221,7 +221,7 @@ open class Serializer : io.github.kotlinmania.serdecore.ser.Serializer<Value> {
         len: Int,
     ): SerdeResult<SerializeStructVariant<Value>> =
         SerdeResult.success(
-            SerializeStructVariant(variant, ValueMap()),
+            SerializeStructVariant(variant, io.github.kotlinmania.serdejson.JsonMap()),
         )
 
     override fun collectStr(value: Any): SerdeResult<Value> {
@@ -277,7 +277,7 @@ class SerializeTupleVariant internal constructor(
     }
 
     override fun end(): SerdeResult<Value> {
-        val objectMap = ValueMap()
+        val objectMap = io.github.kotlinmania.serdejson.JsonMap()
         objectMap.insert(name, Value.Array(vec))
         return SerdeResult.success(Value.Object(objectMap))
     }
@@ -287,10 +287,10 @@ sealed class SerializeMap :
     SerdeSerializeMap<Value>,
     SerializeStruct<Value> {
     class Map internal constructor(
-        val map: ValueMap,
+        val map: io.github.kotlinmania.serdejson.JsonMap,
         var nextKey: String? = null,
     ) : SerializeMap() {
-        constructor() : this(ValueMap(), null)
+        constructor() : this(io.github.kotlinmania.serdejson.JsonMap(), null)
     }
 
     class Number internal constructor(
@@ -376,9 +376,9 @@ sealed class SerializeMap :
 
 class SerializeStructVariant internal constructor(
     private val name: String,
-    private val map: ValueMap,
+    private val map: io.github.kotlinmania.serdejson.JsonMap,
 ) : io.github.kotlinmania.serdecore.ser.SerializeStructVariant<Value> {
-    constructor(name: String) : this(name, ValueMap())
+    constructor(name: String) : this(name, io.github.kotlinmania.serdejson.JsonMap())
 
     override fun <T : Serialize> serializeField(key: String, value: T): SerdeResult<Unit> {
         val v = toValue(value).getOrElse { return SerdeResult.failure(it) }
@@ -387,7 +387,7 @@ class SerializeStructVariant internal constructor(
     }
 
     override fun end(): SerdeResult<Value> {
-        val objectMap = ValueMap()
+        val objectMap = io.github.kotlinmania.serdejson.JsonMap()
         objectMap.insert(name, Value.Object(map))
         return SerdeResult.success(Value.Object(objectMap))
     }

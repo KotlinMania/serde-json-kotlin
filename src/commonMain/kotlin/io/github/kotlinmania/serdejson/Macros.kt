@@ -27,7 +27,7 @@ fun json(block: JsonObjectBuilder.() -> Unit): Value {
 
 /** Build a JSON object. */
 class JsonObjectBuilder {
-    private val map = ValueMap()
+    private val map = io.github.kotlinmania.serdejson.JsonMap()
 
     /** Add a key-value pair to the object. */
     infix fun String.to(value: Value) {
@@ -93,7 +93,7 @@ fun arr(elements: List<Value>): Value = Value.Array(elements)
 
 /** Build a JSON object from key-value pairs. */
 fun obj(vararg pairs: Pair<String, Value>): Value {
-    val map = ValueMap()
+    val map = io.github.kotlinmania.serdejson.JsonMap()
     for ((k, v) in pairs) map.insert(k, v)
     return Value.Object(map)
 }
