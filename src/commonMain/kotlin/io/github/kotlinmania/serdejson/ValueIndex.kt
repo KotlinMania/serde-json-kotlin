@@ -77,7 +77,11 @@ class StrIndex(
     override fun indexOrInsert(v: Value): Value {
         var current = v
         if (current is Value.Null) {
-            current = Value.Object(io.github.kotlinmania.serdejson.JsonMap())
+            current =
+                Value.Object(
+                    io.github.kotlinmania.serdejson
+                        .JsonMap(),
+                )
         }
         when (current) {
             is Value.Object -> {

@@ -63,7 +63,9 @@ fun Value.Companion.fromIter(iter: Iterable<Value>): Value = Value.Array(iter.to
 /** Create a [Value.Object] by collecting an iterator of key-value pairs. */
 @kotlin.jvm.JvmName("fromIterPairs")
 fun Value.Companion.fromIter(iter: Iterable<Pair<String, Value>>): Value {
-    val map = io.github.kotlinmania.serdejson.JsonMap()
+    val map =
+        io.github.kotlinmania.serdejson
+            .JsonMap()
     for ((k, v) in iter) {
         map.insert(k, v)
     }
