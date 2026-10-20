@@ -170,7 +170,7 @@ internal class JsonSerializer(
         serdeCatching {
             val s = serializeStruct(name, 1).getOrThrow()
             s.serializeField(variant, value).getOrThrow()
-            s.end()
+            s.end().getOrThrow()
         }
 
     override fun serializeSeq(len: Int?): SerdeResult<SerializeSeq<Unit>> =
@@ -264,7 +264,7 @@ private class JsonSeqSerialize(
                 writer.writeAll(NEWLINE)
                 repeat(childIndent) { writer.writeAll(TWO_SPACES) }
             }
-            value.serialize(JsonSerializer(writer, pretty, childIndent))
+            value.serialize(JsonSerializer(writer, pretty, childIndent)).getOrThrow()
         }
 
     override fun <T> serializeField(value: T): SerdeResult<Unit>
@@ -316,7 +316,7 @@ private class JsonMapSerialize(
                 writer.writeAll(NEWLINE)
                 repeat(childIndent) { writer.writeAll(TWO_SPACES) }
             }
-            key.serialize(JsonSerializer(writer, pretty, childIndent))
+            key.serialize(JsonSerializer(writer, pretty, childIndent)).getOrThrow()
         }
 
     override fun <T> serializeValue(value: T): SerdeResult<Unit>
@@ -324,7 +324,7 @@ private class JsonMapSerialize(
         serdeCatching {
             writer.writeAll(COLON)
             if (pretty) writer.writeAll(SPACE)
-            value.serialize(JsonSerializer(writer, pretty, childIndent))
+            value.serialize(JsonSerializer(writer, pretty, childIndent)).getOrThrow()
         }
 
     override fun <K, V> serializeEntry(key: K, value: V): SerdeResult<Unit>
@@ -337,17 +337,17 @@ private class JsonMapSerialize(
                 writer.writeAll(NEWLINE)
                 repeat(childIndent) { writer.writeAll(TWO_SPACES) }
             }
-            key.serialize(JsonSerializer(writer, pretty, childIndent))
+            key.serialize(JsonSerializer(writer, pretty, childIndent)).getOrThrow()
             writer.writeAll(COLON)
             if (pretty) writer.writeAll(SPACE)
-            value.serialize(JsonSerializer(writer, pretty, childIndent))
+            value.serialize(JsonSerializer(writer, pretty, childIndent)).getOrThrow()
         }
 
     override fun <T> serializeField(key: String, value: T): SerdeResult<Unit>
         where T : Serialize =
         serdeCatching {
             writeKey(key)
-            value.serialize(JsonSerializer(writer, pretty, childIndent))
+            value.serialize(JsonSerializer(writer, pretty, childIndent)).getOrThrow()
         }
 
     override fun skipField(key: String): SerdeResult<Unit> = SerdeResult.success(Unit)

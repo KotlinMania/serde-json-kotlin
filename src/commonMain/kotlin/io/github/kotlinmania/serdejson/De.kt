@@ -1554,9 +1554,7 @@ internal class JsonVariantAccess(
         }
 
     override fun unitVariant(): SerdeResult<Unit> =
-        serdeCatching {
-            de.parser.parseValue().getOrThrow()
-        }
+        io.github.kotlinmania.serdecore.de.UnitDeserialize.deserialize(de)
 
     override fun <T> newtypeVariantSeed(seed: DeserializeSeed<T>): SerdeResult<T> =
         seed.deserialize(de)
