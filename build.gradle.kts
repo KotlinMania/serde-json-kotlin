@@ -34,7 +34,6 @@ import java.util.zip.ZipInputStream
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
-    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.android.kmp)
     alias(libs.plugins.detekt)
     alias(libs.plugins.ktlint)
