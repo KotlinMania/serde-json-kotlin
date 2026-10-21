@@ -20,13 +20,10 @@ class RawValue(
     /** The raw JSON text underlying this value. */
     val json: String,
 ) : Serialize {
-    override fun <Ok> serialize(serializer: Serializer<Ok>): SerdeResult<Ok> {
-        // Serialize as a struct with a single field named after the token,
-        // so the serializer emits the raw JSON verbatim.
-        val s = serializer.serializeStruct(TOKEN, 1).getOrThrow()
-        s.serializeField(TOKEN, RawValueSerialize(this))
-        return s.end()
-    }
+    override fun <Ok> serialize(serializer: Serializer<Ok>): SerdeResult<Ok> =
+        serializer.serializeStruct(TOKEN, 1).flatMap { fields ->
+            fields.serializeField(TOKEN, RawValueSerialize(this)).flatMap { fields.end() }
+        }
 
     override fun equals(other: Any?): Boolean =
         other is RawValue && other.json == this.json

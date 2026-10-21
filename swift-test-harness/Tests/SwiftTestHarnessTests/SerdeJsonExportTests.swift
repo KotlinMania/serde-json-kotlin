@@ -1,36 +1,58 @@
 import Testing
 import SerdeJson
+import IoGithubKotlinmaniaSerdeCore
 
-// Smoke test for the Kotlin → Swift Export → SPM → swift test pipeline.
-//
-// The file's mere existence and successful compilation prove three layers
-// of the pipeline:
-//
-//   1. `embedSwiftExportForXcode` produced `SerdeJson.swiftmodule/`
-//      and the supporting KotlinRuntimeSupport / ExportedKotlinPackages /
-//      KotlinRuntime swiftmodule bundles. If any of them were missing,
-//      `import SerdeJson` above would fail at compile time.
-//
-//   2. The static archive `libSerdeJson.a` (produced by the
-//      `linkSwiftExportBinaryDebugStaticMacosArm64` and
-//      `mergeMacosDebugSwiftExportLibraries` tasks) supplied every
-//      `__root____*` and `KotlinError`-related symbol the Swift modules
-//      reference. If the archive were missing or empty, this test
-//      executable would fail to link with "undefined symbols for
-//      architecture arm64".
-//
-//   3. The Kotlin `swiftExport { moduleName = "SerdeJson" }` and
-//      `flattenPackage = "io.github.kotlinmania.serdejson"` configuration in
-//      build.gradle.kts produced a module name that's both syntactically
-//      valid as a Swift identifier and reachable from this Package.swift
-//      via the `SerdeJsonLibrary` product.
-//
-// Add more meaningful per-API tests below as the Swift Export surface
-// grows. For now the import + a single passing assertion is the
-// canary that the pipeline is green for this repo.
-@Suite struct SerdeJsonExportTests {
-    @Test func testSwiftModuleLoads() throws {
-        #expect(Bool(true), "SerdeJson swift module imported cleanly")
+@Suite("Concrete JSON outcomes")
+struct SerdeJsonExportTests {
+    @Test func parsedNullHasConcreteValueType() {
+        let result: JsonValueOutcome = fromStr(json: "null")
+        let value: Value? = result.value
+        #expect(value?.isNull() == true)
+        #expect(result.error == nil)
+    }
+
+    @Test func serializationHasConcreteStringType() {
+        let parsed = fromStr(json: "\"value\"")
+        let value: Value = parsed.value!
+        let encoded: JsonStringOutcome = toStr(value: value)
+        let text: String? = encoded.value
+        #expect(text == "\"value\"")
+        #expect(encoded.error == nil)
+    }
+
+    @Test func parseFailureHasConcreteDiagnosticType() {
+        let result = fromStr(json: "null false")
+        let value: Value? = result.value
+        let error: io.github.kotlinmania.serde.SerdeError? = result.error
+        #expect(value == nil)
+        #expect(error != nil)
+        #expect(result.exceptionOrNull() === error)
+    }
+
+    @Test func outcomeRetainsOriginalDiagnosticIdentity() {
+        let error = io.github.kotlinmania.serde.SerdeError(message: "original", source: nil)
+        let result = JsonValueOutcome.companion.failure(error: error)
+        let value: Value? = result.value
+        #expect(value == nil)
+        #expect(result.error === error)
+    }
+
+    @Test func jsonInputFeedsConcreteModelDecoding() {
+        let input = JsonDecoding.shared.input(json: "0")
+        let result = io.github.kotlinmania.serde.SerdeDecoding.shared.signed(input: input)
+        let value: Int64? = result.value
+        #expect(value == 0)
+        #expect(result.error == nil)
+    }
+
+    @Test func rawValueRetainsFormatting() {
+        let text = "{ \"value\" : [ 1, 2 ] }"
+        let parsed: JsonRawValueOutcome = rawValueFromString(json: text)
+        let value: RawValue? = parsed.value
+        #expect(value != nil)
+        let encoded = toStr(value: value!)
+        let actual: String? = encoded.value
+        #expect(actual == text)
+        #expect(encoded.error == nil)
     }
 }
-
