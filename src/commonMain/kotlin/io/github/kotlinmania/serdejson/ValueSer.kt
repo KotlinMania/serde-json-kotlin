@@ -111,19 +111,13 @@ open class Serializer : io.github.kotlinmania.serdecore.ser.Serializer<Value> {
     }
 
     override fun serializeF32(v: Float): SerdeResult<Value> {
-        val n =
-            JsonNumber.fromF32(v)
-                ?: return SerdeResult.failure(SerdeError.custom("not a JSON number"))
-        val res = Value.Number(n)
+        val res: Value = JsonNumber.fromF32(v)?.let { Value.Number(it) } ?: Value.Null
         result = res
         return SerdeResult.success(res)
     }
 
     override fun serializeF64(v: Double): SerdeResult<Value> {
-        val n =
-            JsonNumber.fromF64(v)
-                ?: return SerdeResult.failure(SerdeError.custom("not a JSON number"))
-        val res = Value.Number(n)
+        val res: Value = JsonNumber.fromF64(v)?.let { Value.Number(it) } ?: Value.Null
         result = res
         return SerdeResult.success(res)
     }
@@ -143,7 +137,7 @@ open class Serializer : io.github.kotlinmania.serdecore.ser.Serializer<Value> {
     }
 
     override fun serializeBytes(v: ByteArray): SerdeResult<Value> {
-        val vec = v.map { Value.Number(JsonNumber.fromI64(it.toLong())) }
+        val vec = v.map { Value.Number(JsonNumber.fromU64(it.toUByte().toULong())) }
         val res = Value.Array(vec)
         result = res
         return SerdeResult.success(res)

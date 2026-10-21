@@ -3,7 +3,6 @@ package io.github.kotlinmania.serdejson
 import io.github.kotlinmania.serde.SerdeError
 import io.github.kotlinmania.serde.SerdeResult
 import io.github.kotlinmania.serdecore.ser.Serialize
-import io.github.kotlinmania.serdecore.ser.Serializer
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
@@ -14,7 +13,7 @@ class ValueResultPropagationTest {
     private class FailedValue(
         private val error: SerdeError,
     ) : Serialize {
-        override fun <Ok> serialize(serializer: Serializer<Ok>): SerdeResult<Ok> = SerdeResult.failure(error)
+        override fun <Ok> serialize(serializer: io.github.kotlinmania.serdecore.ser.Serializer<Ok>): SerdeResult<Ok> = SerdeResult.failure(error)
     }
 
     private fun assertFailure(result: SerdeResult<*>, error: SerdeError) {
@@ -25,7 +24,7 @@ class ValueResultPropagationTest {
     @Test
     fun newtypeVariantPreservesFailureAndSuccessfulPayload() {
         val error = SerdeError.custom("nested value failed")
-        val serializer = io.github.kotlinmania.serdejson.Serializer()
+        val serializer = Serializer()
         assertFailure(serializer.serializeNewtypeVariant("State", 0u, "Ready", FailedValue(error)), error)
         val value = serializer.serializeNewtypeVariant("State", 0u, "Ready", Value.Str("payload")).getOrThrow()
         assertEquals(Value.Str("payload"), assertIs<Value.Object>(value).value["Ready"])
