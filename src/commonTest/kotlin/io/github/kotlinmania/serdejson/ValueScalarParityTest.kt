@@ -6,6 +6,7 @@ import io.github.kotlinmania.serdecore.ser.Serializer
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
+import kotlin.test.assertNotNull
 
 class ValueScalarParityTest {
     private class FloatValue(
@@ -30,7 +31,7 @@ class ValueScalarParityTest {
         for (value in listOf(Float.NaN, Float.POSITIVE_INFINITY, Float.NEGATIVE_INFINITY)) {
             assertEquals(Value.Null, toValue(FloatValue(value)).getOrThrow())
         }
-        assertEquals(Value.Number(JsonNumber.fromF32(1.5f)!!), toValue(FloatValue(1.5f)).getOrThrow())
+        assertEquals(Value.Number(assertNotNull(JsonNumber.fromF32(1.5f))), toValue(FloatValue(1.5f)).getOrThrow())
     }
 
     @Test
@@ -38,7 +39,7 @@ class ValueScalarParityTest {
         for (value in listOf(Double.NaN, Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY)) {
             assertEquals(Value.Null, toValue(DoubleValue(value)).getOrThrow())
         }
-        assertEquals(Value.Number(JsonNumber.fromF64(1.5)!!), toValue(DoubleValue(1.5)).getOrThrow())
+        assertEquals(Value.Number(assertNotNull(JsonNumber.fromF64(1.5))), toValue(DoubleValue(1.5)).getOrThrow())
     }
 
     @Test

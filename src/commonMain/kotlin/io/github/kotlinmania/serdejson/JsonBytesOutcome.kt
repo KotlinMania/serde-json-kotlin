@@ -16,12 +16,21 @@ class JsonBytesOutcome private constructor(
 
     val isFailure: Boolean get() = error != null
 
-    fun getOrThrow(): ByteArray = value ?: error!!.raise()
+    fun getOrThrow(): ByteArray =
+        when {
+            value != null -> value
+            error != null -> error.raise()
+            else -> kotlin.error("JsonBytesOutcome invariant violated")
+        }
 
     fun exceptionOrNull(): SerdeError? = error
 
     internal fun toSerdeResult(): SerdeResult<ByteArray> =
-        if (error != null) SerdeResult.failure(error) else SerdeResult.success(value!!)
+        when {
+            value != null -> SerdeResult.success(value)
+            error != null -> SerdeResult.failure(error)
+            else -> kotlin.error("JsonBytesOutcome invariant violated")
+        }
 
     companion object {
         fun success(value: ByteArray): JsonBytesOutcome = JsonBytesOutcome(value, null)

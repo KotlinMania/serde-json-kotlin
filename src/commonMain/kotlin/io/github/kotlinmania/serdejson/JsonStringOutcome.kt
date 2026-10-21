@@ -16,12 +16,21 @@ class JsonStringOutcome private constructor(
 
     val isFailure: Boolean get() = error != null
 
-    fun getOrThrow(): String = value ?: error!!.raise()
+    fun getOrThrow(): String =
+        when {
+            value != null -> value
+            error != null -> error.raise()
+            else -> kotlin.error("JsonStringOutcome invariant violated")
+        }
 
     fun exceptionOrNull(): SerdeError? = error
 
     internal fun toSerdeResult(): SerdeResult<String> =
-        if (error != null) SerdeResult.failure(error) else SerdeResult.success(value!!)
+        when {
+            value != null -> SerdeResult.success(value)
+            error != null -> SerdeResult.failure(error)
+            else -> kotlin.error("JsonStringOutcome invariant violated")
+        }
 
     companion object {
         fun success(value: String): JsonStringOutcome = JsonStringOutcome(value, null)
