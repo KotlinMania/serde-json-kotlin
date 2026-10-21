@@ -288,7 +288,7 @@ private class ValueMapAccess(
             val (key, value) = iter.next()
             remaining -= 1
             currentValue = value
-            seed.deserialize(ValueDeserializer(Value.Str(key))).map { it }
+            seed.deserialize(ValueMapKey(key)).map { it }
         } else {
             SerdeResult.success(null)
         }
@@ -356,6 +356,104 @@ private object UnitVisitor : Visitor<Unit> {
     override fun expecting(): String = "unit"
 
     override fun visitUnit(): SerdeResult<Unit> = SerdeResult.success(Unit)
+}
+
+private class ValueMapKey(
+    private val key: String,
+) : Deserializer by ValueDeserializer(Value.Str(key)) {
+    override fun <V> deserializeI8(visitor: Visitor<V>): SerdeResult<V> = numericKey { it.deserializeI8(visitor) }
+
+    override fun <V> deserializeI16(visitor: Visitor<V>): SerdeResult<V> = numericKey { it.deserializeI16(visitor) }
+
+    override fun <V> deserializeI32(visitor: Visitor<V>): SerdeResult<V> = numericKey { it.deserializeI32(visitor) }
+
+    override fun <V> deserializeI64(visitor: Visitor<V>): SerdeResult<V> = numericKey { it.deserializeI64(visitor) }
+
+    override fun <V> deserializeI128(visitor: Visitor<V>): SerdeResult<V> = integer128Key(visitor, signed = true)
+
+    override fun <V> deserializeU8(visitor: Visitor<V>): SerdeResult<V> = numericKey { it.deserializeU8(visitor) }
+
+    override fun <V> deserializeU16(visitor: Visitor<V>): SerdeResult<V> = numericKey { it.deserializeU16(visitor) }
+
+    override fun <V> deserializeU32(visitor: Visitor<V>): SerdeResult<V> = numericKey { it.deserializeU32(visitor) }
+
+    override fun <V> deserializeU64(visitor: Visitor<V>): SerdeResult<V> = numericKey { it.deserializeU64(visitor) }
+
+    override fun <V> deserializeU128(visitor: Visitor<V>): SerdeResult<V> = integer128Key(visitor, signed = false)
+
+    override fun <V> deserializeF32(visitor: Visitor<V>): SerdeResult<V> = numericKey { it.deserializeF32(visitor) }
+
+    override fun <V> deserializeF64(visitor: Visitor<V>): SerdeResult<V> = numericKey { it.deserializeF64(visitor) }
+
+    private fun <V> numericKey(decode: (JsonDeserializer) -> SerdeResult<V>): SerdeResult<V> {
+        val first = key.firstOrNull()
+        if (first == null || (first !in '0'..'9' && first != '-')) {
+            return SerdeResult.failure(SerdeError.custom(JsonError.syntax(ErrorCode.ExpectedNumericKey, 0, 0).toString()))
+        }
+        val parser = JsonParser(key)
+        val value = decode(JsonDeserializer(parser)).getOrElse { return SerdeResult.failure(it) }
+        if (parser.peekRaw() != -1) {
+            return SerdeResult.failure(SerdeError.custom(JsonError.syntax(ErrorCode.ExpectedNumericKey, 0, 0).toString()))
+        }
+        return SerdeResult.success(value)
+    }
+
+    private fun <V> integer128Key(visitor: Visitor<V>, signed: Boolean): SerdeResult<V> {
+        val checked =
+            object : Visitor<V> {
+                override fun expecting(): String = visitor.expecting()
+
+                private fun withinRange(value: String, maximum: String): Boolean {
+                    val magnitude = value.removePrefix("-")
+                    return magnitude.length < maximum.length || (magnitude.length == maximum.length && magnitude <= maximum)
+                }
+
+                override fun visitI128(v: String): SerdeResult<V> {
+                    val maximum = if (v.startsWith('-')) "170141183460469231731687303715884105728" else "170141183460469231731687303715884105727"
+                    if (!withinRange(v, maximum)) return SerdeResult.failure(SerdeError.custom(ErrorCode.NumberOutOfRange.toString()))
+                    return visitor.visitI128(if (v == "-0") "0" else v)
+                }
+
+                override fun visitU128(v: String): SerdeResult<V> {
+                    if (!withinRange(v, "340282366920938463463374607431768211455")) {
+                        return SerdeResult.failure(SerdeError.custom(ErrorCode.NumberOutOfRange.toString()))
+                    }
+                    return visitor.visitU128(v)
+                }
+            }
+        return numericKey { if (signed) it.deserializeI128(checked) else it.deserializeU128(checked) }
+    }
+
+    override fun <V> deserializeBool(visitor: Visitor<V>): SerdeResult<V> =
+        when (key) {
+            "true" -> visitor.visitBool(true)
+            "false" -> visitor.visitBool(false)
+            else -> SerdeResult.failure(SerdeError.invalidType(Unexpected.Str(key), visitor))
+        }
+
+    override fun <V> deserializeOption(visitor: Visitor<V>): SerdeResult<V> = visitor.visitSome(this)
+
+    override fun <V> deserializeNewtypeStruct(name: String, visitor: Visitor<V>): SerdeResult<V> = visitor.visitNewtypeStruct(this)
+
+    override fun <V> deserializeBytes(visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeByteBuf(visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeUnit(visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeUnitStruct(name: String, visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeSeq(visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeTuple(len: Int, visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeTupleStruct(name: String, len: Int, visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeMap(visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeStruct(name: String, fields: List<String>, visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeIgnoredAny(visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
 }
 
 /**
