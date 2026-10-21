@@ -8,11 +8,63 @@ import io.github.kotlinmania.serdecore.de.Deserialize
 import io.github.kotlinmania.serdecore.de.DeserializeSeed
 import io.github.kotlinmania.serdecore.de.Deserializer
 import io.github.kotlinmania.serdecore.de.EnumAccess
+import io.github.kotlinmania.serdecore.de.Expected
 import io.github.kotlinmania.serdecore.de.MapAccess
 import io.github.kotlinmania.serdecore.de.SeqAccess
 import io.github.kotlinmania.serdecore.de.Unexpected
 import io.github.kotlinmania.serdecore.de.VariantAccess
 import io.github.kotlinmania.serdecore.de.Visitor
+
+internal object ValueDeserialize : Deserialize<Value> {
+    override fun <D : Deserializer> deserialize(deserializer: D): SerdeResult<Value> =
+        deserializer.deserializeAny(ValueVisitor)
+}
+
+private object ValueVisitor : Visitor<Value> {
+    override fun expecting(): String = "any valid JSON value"
+
+    override fun visitBool(v: Boolean): SerdeResult<Value> = SerdeResult.success(Value.Bool(v))
+
+    override fun visitI64(v: Long): SerdeResult<Value> = SerdeResult.success(Value.Number(JsonNumber.fromI64(v)))
+
+    override fun visitI128(v: String): SerdeResult<Value> {
+        val signed = v.toLongOrNull()
+        if (signed != null) return visitI64(signed)
+        val unsigned = v.toULongOrNull() ?: return SerdeResult.failure(SerdeError.custom("number out of range"))
+        return visitU64(unsigned)
+    }
+
+    override fun visitU64(v: ULong): SerdeResult<Value> = SerdeResult.success(Value.Number(JsonNumber.fromU64(v)))
+
+    override fun visitU128(v: String): SerdeResult<Value> {
+        val unsigned = v.toULongOrNull() ?: return SerdeResult.failure(SerdeError.custom("number out of range"))
+        return visitU64(unsigned)
+    }
+
+    override fun visitF64(v: Double): SerdeResult<Value> =
+        SerdeResult.success(JsonNumber.fromF64(v)?.let { Value.Number(it) } ?: Value.Null)
+
+    override fun visitStr(v: String): SerdeResult<Value> = SerdeResult.success(Value.Str(v))
+
+    override fun visitNone(): SerdeResult<Value> = SerdeResult.success(Value.Null)
+
+    override fun <D : Deserializer> visitSome(deserializer: D): SerdeResult<Value> =
+        ValueDeserialize.deserialize(deserializer)
+
+    override fun visitUnit(): SerdeResult<Value> = SerdeResult.success(Value.Null)
+
+    override fun <A : SeqAccess> visitSeq(access: A): SerdeResult<Value> {
+        val values = mutableListOf<Value>()
+        while (true) {
+            val element = access.nextElement(ValueDeserialize).getOrElse { return SerdeResult.failure(it) } ?: break
+            values.add(element)
+        }
+        return SerdeResult.success(Value.Array(values))
+    }
+
+    override fun <A : MapAccess> visitMap(access: A): SerdeResult<Value> =
+        MapVisitor.visitMap(access).map { Value.Object(it) }
+}
 
 /**
  * A [Deserializer] that reads from a [Value].
@@ -48,15 +100,11 @@ class ValueDeserializer(
 
     override fun <V> deserializeI64(visitor: Visitor<V>): SerdeResult<V> =
         when (value) {
-            is Value.Number -> {
-                val n = value.value
-                n.asI64()?.let { visitor.visitI64(it) }
-                    ?: n.asU64()?.let { visitor.visitI64(it.toLong()) }
-                    ?: n.asF64()?.let { visitor.visitI64(it.toLong()) }
-                    ?: SerdeResult.failure(typeError("i64"))
-            }
+            is Value.Number -> deserializeNumberAny(value.value, visitor)
             else -> SerdeResult.failure(typeError("i64"))
         }
+
+    override fun <V> deserializeI128(visitor: Visitor<V>): SerdeResult<V> = deserializeI64(visitor)
 
     override fun <V> deserializeU8(visitor: Visitor<V>): SerdeResult<V> = deserializeU64(visitor)
 
@@ -66,27 +114,17 @@ class ValueDeserializer(
 
     override fun <V> deserializeU64(visitor: Visitor<V>): SerdeResult<V> =
         when (value) {
-            is Value.Number -> {
-                val n = value.value
-                n.asU64()?.let { visitor.visitU64(it) }
-                    ?: n.asI64()?.let { if (it >= 0) visitor.visitU64(it.toULong()) else SerdeResult.failure(typeError("u64")) }
-                    ?: n.asF64()?.let { visitor.visitU64(it.toULong()) }
-                    ?: SerdeResult.failure(typeError("u64"))
-            }
+            is Value.Number -> deserializeNumberAny(value.value, visitor)
             else -> SerdeResult.failure(typeError("u64"))
         }
+
+    override fun <V> deserializeU128(visitor: Visitor<V>): SerdeResult<V> = deserializeU64(visitor)
 
     override fun <V> deserializeF32(visitor: Visitor<V>): SerdeResult<V> = deserializeF64(visitor)
 
     override fun <V> deserializeF64(visitor: Visitor<V>): SerdeResult<V> =
         when (value) {
-            is Value.Number -> {
-                val n = value.value
-                n.asF64()?.let { visitor.visitF64(it) }
-                    ?: n.asI64()?.let { visitor.visitF64(it.toDouble()) }
-                    ?: n.asU64()?.let { visitor.visitF64(it.toDouble()) }
-                    ?: SerdeResult.failure(typeError("f64"))
-            }
+            is Value.Number -> deserializeNumberAny(value.value, visitor)
             else -> SerdeResult.failure(typeError("f64"))
         }
 
@@ -180,21 +218,26 @@ class ValueDeserializer(
 /**
  * Deserialize a number value, dispatching to the appropriate visitor method.
  */
-private fun <V> deserializeNumberAny(n: JsonNumber, visitor: Visitor<V>): SerdeResult<V> =
-    when {
-        n.isU64() -> visitor.visitU64(n.asU64()!!)
-        n.isI64() -> visitor.visitI64(n.asI64()!!)
-        n.isF64() -> visitor.visitF64(n.asF64()!!)
-        else -> visitor.visitF64(n.asF64() ?: 0.0)
-    }
+private fun <V> deserializeNumberAny(n: JsonNumber, visitor: Visitor<V>): SerdeResult<V> {
+    val unsigned = n.asU64()
+    if (unsigned != null) return visitor.visitU64(unsigned)
+    val signed = n.asI64()
+    if (signed != null) return visitor.visitI64(signed)
+    val float = n.asF64()
+    if (float != null) return visitor.visitF64(float)
+    return SerdeResult.failure(SerdeError.custom("number out of range"))
+}
 
 /**
  * Visit an array as a sequence.
  */
 private fun <V> visitArray(array: List<Value>, visitor: Visitor<V>): SerdeResult<V> {
     val seqAccess = ValueSeqAccess(array)
-    val result = visitor.visitSeq(seqAccess)
-    return result
+    val result = visitor.visitSeq(seqAccess).getOrElse { return SerdeResult.failure(it) }
+    if (seqAccess.sizeHint() != 0) {
+        return SerdeResult.failure(SerdeError.invalidLength(array.size, Expected { "fewer elements in array" }))
+    }
+    return SerdeResult.success(result)
 }
 
 /**
@@ -202,7 +245,11 @@ private fun <V> visitArray(array: List<Value>, visitor: Visitor<V>): SerdeResult
  */
 private fun <V> visitMap(map: io.github.kotlinmania.serdejson.JsonMap, visitor: Visitor<V>): SerdeResult<V> {
     val mapAccess = ValueMapAccess(map)
-    return visitor.visitMap(mapAccess)
+    val result = visitor.visitMap(mapAccess).getOrElse { return SerdeResult.failure(it) }
+    if (mapAccess.sizeHint() != 0) {
+        return SerdeResult.failure(SerdeError.invalidLength(map.len(), Expected { "fewer elements in map" }))
+    }
+    return SerdeResult.success(result)
 }
 
 /**
@@ -212,16 +259,18 @@ private class ValueSeqAccess(
     private val list: List<Value>,
 ) : SeqAccess {
     private val iter = list.iterator()
+    private var remaining = list.size
 
     override fun <T> nextElementSeed(seed: DeserializeSeed<T>): SerdeResult<T?> =
         if (iter.hasNext()) {
             val value = iter.next()
+            remaining -= 1
             seed.deserialize(ValueDeserializer(value)).map { it }
         } else {
             SerdeResult.success(null)
         }
 
-    override fun sizeHint(): Int? = if (!iter.hasNext()) 0 else null
+    override fun sizeHint(): Int = remaining
 }
 
 /**
@@ -231,11 +280,13 @@ private class ValueMapAccess(
     private val map: io.github.kotlinmania.serdejson.JsonMap,
 ) : MapAccess {
     private val iter = map.iterator()
+    private var remaining = map.len()
     private var currentValue: Value? = null
 
     override fun <K> nextKeySeed(seed: DeserializeSeed<K>): SerdeResult<K?> =
         if (iter.hasNext()) {
             val (key, value) = iter.next()
+            remaining -= 1
             currentValue = value
             seed.deserialize(ValueDeserializer(Value.Str(key))).map { it }
         } else {
@@ -248,7 +299,7 @@ private class ValueMapAccess(
         return seed.deserialize(ValueDeserializer(value))
     }
 
-    override fun sizeHint(): Int? = if (!iter.hasNext()) 0 else null
+    override fun sizeHint(): Int = remaining
 }
 
 /**
@@ -323,8 +374,7 @@ fun Value.unexpected(): Unexpected =
 /**
  * Deserialize a [Value] into a type [T] using the given [Deserialize] implementation.
  *
- * This is the primary entry point for converting a [Value] into a typed value,
- * equivalent to the upstream `Value::deserialize`.
+ * Converts a [Value] into a typed value.
  */
 fun <T> Value.deserialize(deserialize: Deserialize<T>): SerdeResult<T> =
     deserialize.deserialize(ValueDeserializer(this))

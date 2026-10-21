@@ -4,9 +4,9 @@ package io.github.kotlinmania.serdejson
 import io.github.kotlinmania.indexmap.IndexMap
 import io.github.kotlinmania.serde.SerdeResult
 import io.github.kotlinmania.serdecore.de.Deserialize
-import io.github.kotlinmania.serdecore.de.DeserializeSeed
 import io.github.kotlinmania.serdecore.de.Deserializer
 import io.github.kotlinmania.serdecore.de.MapAccess
+import io.github.kotlinmania.serdecore.de.StringDeserialize
 import io.github.kotlinmania.serdecore.de.Visitor
 import io.github.kotlinmania.serdecore.ser.Serialize
 import io.github.kotlinmania.serdecore.ser.Serializer
@@ -242,7 +242,7 @@ class JsonMap(
     }
 }
 
-private object MapVisitor : Visitor<JsonMap> {
+internal object MapVisitor : Visitor<JsonMap> {
     override fun expecting(): String = "a map"
 
     override fun visitUnit(): SerdeResult<JsonMap> = SerdeResult.success(JsonMap.new())
@@ -250,31 +250,8 @@ private object MapVisitor : Visitor<JsonMap> {
     override fun <A : MapAccess> visitMap(access: A): SerdeResult<JsonMap> {
         val values = JsonMap.new()
         while (true) {
-            val keySeed =
-                object : DeserializeSeed<String> {
-                    override fun <D : Deserializer> deserialize(deserializer: D): SerdeResult<String> =
-                        deserializer.deserializeString(
-                            object : Visitor<String> {
-                                override fun expecting(): String = "a string"
-
-                                override fun visitStr(v: String): SerdeResult<String> = SerdeResult.success(v)
-
-                                override fun visitString(v: String): SerdeResult<String> = SerdeResult.success(v)
-                            },
-                        )
-                }
-            val key = access.nextKeySeed(keySeed).getOrThrow() ?: break
-            val valueSeed =
-                object : DeserializeSeed<Value> {
-                    override fun <D : Deserializer> deserialize(deserializer: D): SerdeResult<Value> =
-                        if (deserializer is JsonDeserializer) {
-                            deserializer.parser.parseValue()
-                        } else {
-                            SerdeResult.success(Value.Null)
-                        }
-                }
-            val value = access.nextValueSeed(valueSeed).getOrThrow()
-            values.insert(key, value)
+            val entry = access.nextEntry(StringDeserialize, ValueDeserialize).getOrElse { return SerdeResult.failure(it) } ?: break
+            values.insert(entry.first, entry.second)
         }
         return SerdeResult.success(values)
     }
