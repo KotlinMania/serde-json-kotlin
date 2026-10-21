@@ -178,6 +178,10 @@ private class RawValueSerialize(
 fun rawValueFromString(json: String): JsonRawValueOutcome =
     JsonRawValueOutcome.fromResult(deserializeFromStr(json, RawValue))
 
+/** Converts a serializable value into owned raw JSON text. */
+fun toRawValue(value: Serialize): JsonRawValueOutcome =
+    JsonRawValueOutcome.fromResult(toStr(value).toSerdeResult().map { RawValue(it) })
+
 private object RawKey : Deserialize<Unit> {
     override fun <D : Deserializer> deserialize(deserializer: D): SerdeResult<Unit> =
         deserializer.deserializeIdentifier(

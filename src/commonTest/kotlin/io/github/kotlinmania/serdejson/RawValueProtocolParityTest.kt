@@ -9,6 +9,8 @@ import io.github.kotlinmania.serdecore.de.I64Deserialize
 import io.github.kotlinmania.serdecore.de.MapAccess
 import io.github.kotlinmania.serdecore.de.StringDeserialize
 import io.github.kotlinmania.serdecore.de.Visitor
+import io.github.kotlinmania.serdecore.ser.Serialize
+import io.github.kotlinmania.serdecore.ser.Serializer
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
@@ -17,6 +19,45 @@ import kotlin.test.assertSame
 import kotlin.test.assertTrue
 
 class RawValueProtocolParityTest {
+    @Test
+    fun serializableValuesConvertToOwnedRawJson() {
+        val value = Value.Array(listOf(Value.Null, Value.Bool(true), Value.Str("text"), Value.Number(JsonNumber.fromU64(ULong.MAX_VALUE))))
+        assertEquals("[null,true,\"text\",18446744073709551615]", toRawValue(value).getOrThrow().json)
+    }
+
+    @Test
+    fun rawConversionRetainsExistingRawFormatting() {
+        val text = "{ \"value\" : [ 1, 2 ] }"
+        assertEquals(text, toRawValue(rawValueFromString(text).getOrThrow()).getOrThrow().json)
+    }
+
+    @Test
+    fun rawConversionPreservesSerializerFailureIdentity() {
+        val error = SerdeError.custom("serializer failed")
+        val value =
+            object : Serialize {
+                override fun <Ok> serialize(serializer: Serializer<Ok>): SerdeResult<Ok> = SerdeResult.failure(error)
+            }
+        assertSame(error, toRawValue(value).error)
+    }
+
+    @Test
+    fun rawConversionRejectsSequenceMapKeys() {
+        val key =
+            object : Serialize {
+                override fun <Ok> serialize(serializer: Serializer<Ok>): SerdeResult<Ok> =
+                    serializer.serializeSeq(0).flatMap { it.end() }
+            }
+        val value =
+            object : Serialize {
+                override fun <Ok> serialize(serializer: Serializer<Ok>): SerdeResult<Ok> =
+                    serializer.serializeMap(1).flatMap { map ->
+                        map.serializeEntry(key, Value.Null).flatMap { map.end() }
+                    }
+            }
+        assertEquals("key must be a string", toRawValue(value).error?.message)
+    }
+
     @Test
     fun rawValuesDriveFreshTypedDeserializers() {
         val number = rawValueFromString("7").getOrThrow()
