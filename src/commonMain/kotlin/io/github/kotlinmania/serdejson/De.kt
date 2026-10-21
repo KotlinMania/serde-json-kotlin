@@ -2,7 +2,6 @@
 package io.github.kotlinmania.serdejson
 
 import io.github.kotlinmania.serde.SerdeError
-import io.github.kotlinmania.serde.SerdeException
 import io.github.kotlinmania.serde.SerdeResult
 import io.github.kotlinmania.serde.serdeCatching
 import io.github.kotlinmania.serdecore.de.DeserializeSeed
@@ -174,8 +173,8 @@ class JsonParser(
     internal fun parseIdent(ident: String) {
         for (expected in ident) {
             when (val next = nextChar()) {
-                -1 -> throw SerdeException(error(ErrorCode.EofWhileParsingValue))
-                else -> if (next != expected.code) throw SerdeException(error(ErrorCode.ExpectedSomeIdent))
+                -1 -> (error(ErrorCode.EofWhileParsingValue)).raise()
+                else -> if (next != expected.code) (error(ErrorCode.ExpectedSomeIdent)).raise()
             }
         }
     }
@@ -188,7 +187,7 @@ class JsonParser(
      */
     internal fun parseAnySignedNumber(): DeParserNumber {
         val peek = peekRaw()
-        if (peek < 0) throw SerdeException(peekError(ErrorCode.EofWhileParsingValue))
+        if (peek < 0) (peekError(ErrorCode.EofWhileParsingValue)).raise()
         val value =
             when (peek.toChar()) {
                 '-' -> {
@@ -196,12 +195,12 @@ class JsonParser(
                     parseAnyNumber(false)
                 }
                 in '0'..'9' -> parseAnyNumber(true)
-                else -> throw SerdeException(peekError(ErrorCode.InvalidNumber))
+                else -> (peekError(ErrorCode.InvalidNumber)).raise()
             }
         // After a complete number, the next char must not be a digit or
         // other number continuation — otherwise it's invalid.
         val after = peekRaw()
-        if (after >= 0) throw SerdeException(peekError(ErrorCode.InvalidNumber))
+        if (after >= 0) (peekError(ErrorCode.InvalidNumber)).raise()
         return value
     }
 
@@ -221,7 +220,7 @@ class JsonParser(
             '0' -> {
                 // Only one leading zero allowed.
                 if (peekOrNull().toChar() in '0'..'9') {
-                    throw SerdeException(peekError(ErrorCode.InvalidNumber))
+                    (peekError(ErrorCode.InvalidNumber)).raise()
                 }
                 parseNumber(positive, 0uL)
             }
@@ -238,7 +237,7 @@ class JsonParser(
                 }
                 parseNumber(positive, significand)
             }
-            else -> throw SerdeException(error(ErrorCode.InvalidNumber))
+            else -> (error(ErrorCode.InvalidNumber)).raise()
         }
     }
 
@@ -295,8 +294,8 @@ class JsonParser(
         }
         if (expAfter == 0) {
             // No digits after decimal point
-            if (peekRaw() >= 0) throw SerdeException(peekError(ErrorCode.InvalidNumber))
-            throw SerdeException(peekError(ErrorCode.EofWhileParsingValue))
+            if (peekRaw() >= 0) (peekError(ErrorCode.InvalidNumber)).raise()
+            (peekError(ErrorCode.EofWhileParsingValue)).raise()
         }
         val exp = exponentBefore + expAfter
         return when (peekOrNull().toChar()) {
@@ -325,7 +324,7 @@ class JsonParser(
                 else -> true
             }
         val next = nextCharOrNull()
-        if (next.toChar() !in '0'..'9') throw SerdeException(error(ErrorCode.InvalidNumber))
+        if (next.toChar() !in '0'..'9') (error(ErrorCode.InvalidNumber)).raise()
         var exp = (next - '0'.code)
         while (peekOrNull().toChar() in '0'..'9') {
             val digit = (peekOrNull() - '0'.code)
@@ -384,8 +383,8 @@ class JsonParser(
                         hasDigits = true
                     }
                     if (!hasDigits) {
-                        if (peekRaw() >= 0) throw SerdeException(peekError(ErrorCode.InvalidNumber))
-                        throw SerdeException(peekError(ErrorCode.EofWhileParsingValue))
+                        if (peekRaw() >= 0) (peekError(ErrorCode.InvalidNumber)).raise()
+                        (peekError(ErrorCode.EofWhileParsingValue)).raise()
                     }
                 }
                 'e', 'E' -> {
@@ -397,7 +396,7 @@ class JsonParser(
                         sb.append(expSign)
                     }
                     val next = nextCharOrNull()
-                    if (next.toChar() !in '0'..'9') throw SerdeException(error(ErrorCode.InvalidNumber))
+                    if (next.toChar() !in '0'..'9') (error(ErrorCode.InvalidNumber)).raise()
                     sb.append(next.toChar())
                     while (peekOrNull().toChar() in '0'..'9') {
                         val digit = peekOrNull().toChar()
@@ -406,15 +405,15 @@ class JsonParser(
                     }
                     val d =
                         sb.toString().toDoubleOrNull()
-                            ?: throw SerdeException(error(ErrorCode.NumberOutOfRange))
-                    if (d.isInfinite()) throw SerdeException(error(ErrorCode.NumberOutOfRange))
+                            ?: (error(ErrorCode.NumberOutOfRange)).raise()
+                    if (d.isInfinite()) (error(ErrorCode.NumberOutOfRange)).raise()
                     return if (positive) d else -d
                 }
                 else -> {
                     val d =
                         sb.toString().toDoubleOrNull()
-                            ?: throw SerdeException(error(ErrorCode.NumberOutOfRange))
-                    if (d.isInfinite()) throw SerdeException(error(ErrorCode.NumberOutOfRange))
+                            ?: (error(ErrorCode.NumberOutOfRange)).raise()
+                    if (d.isInfinite()) (error(ErrorCode.NumberOutOfRange)).raise()
                     return if (positive) d else -d
                 }
             }
@@ -440,7 +439,7 @@ class JsonParser(
         zeroSig: Boolean,
         positiveExp: Boolean,
     ): Double {
-        if (!zeroSig && positiveExp) throw SerdeException(error(ErrorCode.NumberOutOfRange))
+        if (!zeroSig && positiveExp) (error(ErrorCode.NumberOutOfRange)).raise()
         while (peekOrNull().toChar() in '0'..'9') eatChar()
         return if (positive) 0.0 else -0.0
     }
@@ -457,14 +456,14 @@ class JsonParser(
             if (pow != null) {
                 if (exp >= 0) {
                     f *= pow
-                    if (f.isInfinite()) throw SerdeException(error(ErrorCode.NumberOutOfRange))
+                    if (f.isInfinite()) (error(ErrorCode.NumberOutOfRange)).raise()
                 } else {
                     f /= pow
                 }
                 break@loop
             } else {
                 if (f == 0.0) break@loop
-                if (exp >= 0) throw SerdeException(error(ErrorCode.NumberOutOfRange))
+                if (exp >= 0) (error(ErrorCode.NumberOutOfRange)).raise()
                 f /= 1e308
                 exp += 308
             }
@@ -484,7 +483,7 @@ class JsonParser(
             '0' -> {
                 buf.append('0')
                 if (peekOrNull().toChar() in '0'..'9') {
-                    throw SerdeException(peekError(ErrorCode.InvalidNumber))
+                    (peekError(ErrorCode.InvalidNumber)).raise()
                 }
             }
             in '1'..'9' -> {
@@ -494,7 +493,7 @@ class JsonParser(
                     eatChar()
                 }
             }
-            else -> throw SerdeException(error(ErrorCode.InvalidNumber))
+            else -> (error(ErrorCode.InvalidNumber)).raise()
         }
     }
 
@@ -528,7 +527,7 @@ class JsonParser(
             when {
                 c == '"' -> return sb.toString()
                 c == '\\' -> {
-                    if (pos >= input.length) throw SerdeException(error(ErrorCode.EofWhileParsingString))
+                    if (pos >= input.length) (error(ErrorCode.EofWhileParsingString)).raise()
                     val esc = input[pos]
                     pos++
                     col++
@@ -569,25 +568,25 @@ class JsonParser(
                                 sb.appendCodePoint(cp)
                             }
                         }
-                        else -> throw SerdeException(error(ErrorCode.InvalidEscape))
+                        else -> (error(ErrorCode.InvalidEscape)).raise()
                     }
                 }
-                c.code < 0x20 -> throw SerdeException(error(ErrorCode.ControlCharacterWhileParsingString))
+                c.code < 0x20 -> (error(ErrorCode.ControlCharacterWhileParsingString)).raise()
                 else -> sb.append(c)
             }
         }
-        throw SerdeException(error(ErrorCode.EofWhileParsingString))
+        (error(ErrorCode.EofWhileParsingString)).raise()
     }
 
     /** Parses a 4-hex-digit unicode escape. Assumes `\\u` has been consumed. */
     private fun decodeHexEscape(): Int {
-        if (pos + 4 > input.length) throw SerdeException(error(ErrorCode.UnexpectedEndOfHexEscape))
+        if (pos + 4 > input.length) (error(ErrorCode.UnexpectedEndOfHexEscape)).raise()
         val hex = input.substring(pos, pos + 4)
         pos += 4
         col += 4
         val cp =
             hex.toIntOrNull(16)
-                ?: throw SerdeException(error(ErrorCode.InvalidUnicodeCodePoint))
+                ?: (error(ErrorCode.InvalidUnicodeCodePoint)).raise()
         return cp
     }
 
@@ -608,7 +607,7 @@ class JsonParser(
             when {
                 c == '"' -> return
                 c == '\\' -> {
-                    if (pos >= input.length) throw SerdeException(error(ErrorCode.EofWhileParsingString))
+                    if (pos >= input.length) (error(ErrorCode.EofWhileParsingString)).raise()
                     if (input[pos] == 'u') {
                         pos++
                         col++
@@ -620,7 +619,7 @@ class JsonParser(
                 }
             }
         }
-        throw SerdeException(error(ErrorCode.EofWhileParsingString))
+        (error(ErrorCode.EofWhileParsingString)).raise()
     }
 
     // ── Value parsing (used by fromStr for Value) ──
@@ -629,7 +628,7 @@ class JsonParser(
     fun parseValue(): SerdeResult<Value> =
         serdeCatching {
             val peek = parseWhitespace()
-            if (peek < 0) throw SerdeException(error(ErrorCode.EofWhileParsingValue))
+            if (peek < 0) (error(ErrorCode.EofWhileParsingValue)).raise()
             when (peek.toChar()) {
                 'n' -> {
                     eatChar()
@@ -661,7 +660,7 @@ class JsonParser(
                     val n = parseAnyNumber(true)
                     numberToValue(n)
                 }
-                else -> throw SerdeException(peekError(ErrorCode.ExpectedSomeValue))
+                else -> (peekError(ErrorCode.ExpectedSomeValue)).raise()
             }
         }
 
@@ -690,8 +689,8 @@ class JsonParser(
                     return Value.Array(list)
                 }
                 else -> {
-                    if (pos >= input.length) throw SerdeException(peekError(ErrorCode.EofWhileParsingList))
-                    throw SerdeException(peekError(ErrorCode.ExpectedListCommaOrEnd))
+                    if (pos >= input.length) (peekError(ErrorCode.EofWhileParsingList)).raise()
+                    (peekError(ErrorCode.ExpectedListCommaOrEnd)).raise()
                 }
             }
         }
@@ -708,14 +707,14 @@ class JsonParser(
         }
         while (true) {
             if (parseWhitespace().toChar() != '"') {
-                if (pos >= input.length) throw SerdeException(peekError(ErrorCode.EofWhileParsingObject))
-                throw SerdeException(peekError(ErrorCode.KeyMustBeAString))
+                if (pos >= input.length) (peekError(ErrorCode.EofWhileParsingObject)).raise()
+                (peekError(ErrorCode.KeyMustBeAString)).raise()
             }
             eatChar() // consume '"'
             val key = parseStr()
             if (parseWhitespace().toChar() != ':') {
-                if (pos >= input.length) throw SerdeException(peekError(ErrorCode.EofWhileParsingObject))
-                throw SerdeException(peekError(ErrorCode.ExpectedColon))
+                if (pos >= input.length) (peekError(ErrorCode.EofWhileParsingObject)).raise()
+                (peekError(ErrorCode.ExpectedColon)).raise()
             }
             eatChar() // consume ':'
             val value = parseValue().getOrThrow()
@@ -729,8 +728,8 @@ class JsonParser(
                     return Value.Object(map)
                 }
                 else -> {
-                    if (pos >= input.length) throw SerdeException(peekError(ErrorCode.EofWhileParsingObject))
-                    throw SerdeException(peekError(ErrorCode.ExpectedObjectCommaOrEnd))
+                    if (pos >= input.length) (peekError(ErrorCode.EofWhileParsingObject)).raise()
+                    (peekError(ErrorCode.ExpectedObjectCommaOrEnd)).raise()
                 }
             }
         }
@@ -746,7 +745,7 @@ class JsonParser(
         val stack = ArrayDeque<Char>()
         while (true) {
             val peek = parseWhitespace()
-            if (peek < 0) throw SerdeException(peekError(ErrorCode.EofWhileParsingValue))
+            if (peek < 0) (peekError(ErrorCode.EofWhileParsingValue)).raise()
             val frame: Char? =
                 when (peek.toChar()) {
                     'n' -> {
@@ -782,7 +781,7 @@ class JsonParser(
                         eatChar()
                         peek.toChar()
                     }
-                    else -> throw SerdeException(peekError(ErrorCode.ExpectedSomeValue))
+                    else -> (peekError(ErrorCode.ExpectedSomeValue)).raise()
                 }
 
             var acceptComma: Boolean
@@ -802,11 +801,9 @@ class JsonParser(
             while (true) {
                 val p = parseWhitespace()
                 if (p < 0) {
-                    throw SerdeException(
-                        peekError(
+                    (peekError(
                             if (currentFrame == '[') ErrorCode.EofWhileParsingList else ErrorCode.EofWhileParsingObject,
-                        ),
-                    )
+                        )).raise()
                 }
                 when (p.toChar()) {
                     ',' -> {
@@ -833,11 +830,9 @@ class JsonParser(
                     }
                     else -> {
                         if (acceptComma) {
-                            throw SerdeException(
-                                peekError(
+                            (peekError(
                                     if (currentFrame == '[') ErrorCode.ExpectedListCommaOrEnd else ErrorCode.ExpectedObjectCommaOrEnd,
-                                ),
-                            )
+                                )).raise()
                         } else {
                             break
                         }
@@ -848,16 +843,16 @@ class JsonParser(
             // After comma in an object, expect a key
             if (currentFrame == '{') {
                 val p = parseWhitespace()
-                if (p < 0) throw SerdeException(peekError(ErrorCode.EofWhileParsingObject))
+                if (p < 0) (peekError(ErrorCode.EofWhileParsingObject)).raise()
                 if (p.toChar() == '"') {
                     eatChar()
                     ignoreStr()
                     val cp = parseWhitespace()
-                    if (cp < 0) throw SerdeException(peekError(ErrorCode.EofWhileParsingObject))
-                    if (cp.toChar() != ':') throw SerdeException(peekError(ErrorCode.ExpectedColon))
+                    if (cp < 0) (peekError(ErrorCode.EofWhileParsingObject)).raise()
+                    if (cp.toChar() != ':') (peekError(ErrorCode.ExpectedColon)).raise()
                     eatChar()
                 } else {
-                    throw SerdeException(peekError(ErrorCode.KeyMustBeAString))
+                    (peekError(ErrorCode.KeyMustBeAString)).raise()
                 }
             }
             stack.addLast(currentFrame)
@@ -870,13 +865,13 @@ class JsonParser(
         when (next.toChar()) {
             '0' -> {
                 if (peekOrNull().toChar() in '0'..'9') {
-                    throw SerdeException(peekError(ErrorCode.InvalidNumber))
+                    (peekError(ErrorCode.InvalidNumber)).raise()
                 }
             }
             in '1'..'9' -> {
                 while (peekOrNull().toChar() in '0'..'9') eatChar()
             }
-            else -> throw SerdeException(error(ErrorCode.InvalidNumber))
+            else -> (error(ErrorCode.InvalidNumber)).raise()
         }
         when (peekOrNull().toChar()) {
             '.' -> ignoreDecimal()
@@ -892,7 +887,7 @@ class JsonParser(
             eatChar()
             atLeastOne = true
         }
-        if (!atLeastOne) throw SerdeException(peekError(ErrorCode.InvalidNumber))
+        if (!atLeastOne) (peekError(ErrorCode.InvalidNumber)).raise()
         when (peekOrNull().toChar()) {
             'e', 'E' -> ignoreExponent()
             else -> {}
@@ -906,7 +901,7 @@ class JsonParser(
             else -> {}
         }
         val next = nextCharOrNull()
-        if (next.toChar() !in '0'..'9') throw SerdeException(error(ErrorCode.InvalidNumber))
+        if (next.toChar() !in '0'..'9') (error(ErrorCode.InvalidNumber)).raise()
         while (peekOrNull().toChar() in '0'..'9') eatChar()
     }
 
@@ -933,8 +928,8 @@ class JsonParser(
             ':'.code -> {
                 eatChar()
             }
-            -1 -> throw SerdeException(peekError(ErrorCode.EofWhileParsingObject))
-            else -> throw SerdeException(peekError(ErrorCode.ExpectedColon))
+            -1 -> (peekError(ErrorCode.EofWhileParsingObject)).raise()
+            else -> (peekError(ErrorCode.ExpectedColon)).raise()
         }
     }
 
@@ -949,11 +944,11 @@ class JsonParser(
             ','.code -> {
                 eatChar()
                 val p2 = parseWhitespace()
-                if (p2 == ']'.code) throw SerdeException(peekError(ErrorCode.TrailingComma))
-                throw SerdeException(peekError(ErrorCode.TrailingCharacters))
+                if (p2 == ']'.code) (peekError(ErrorCode.TrailingComma)).raise()
+                (peekError(ErrorCode.TrailingCharacters)).raise()
             }
-            -1 -> throw SerdeException(peekError(ErrorCode.EofWhileParsingList))
-            else -> throw SerdeException(peekError(ErrorCode.TrailingCharacters))
+            -1 -> (peekError(ErrorCode.EofWhileParsingList)).raise()
+            else -> (peekError(ErrorCode.TrailingCharacters)).raise()
         }
     }
 
@@ -963,9 +958,9 @@ class JsonParser(
             '}'.code -> {
                 eatChar()
             }
-            ','.code -> throw SerdeException(peekError(ErrorCode.TrailingComma))
-            -1 -> throw SerdeException(peekError(ErrorCode.EofWhileParsingObject))
-            else -> throw SerdeException(peekError(ErrorCode.TrailingCharacters))
+            ','.code -> (peekError(ErrorCode.TrailingComma)).raise()
+            -1 -> (peekError(ErrorCode.EofWhileParsingObject)).raise()
+            else -> (peekError(ErrorCode.TrailingCharacters)).raise()
         }
     }
 
@@ -1028,7 +1023,7 @@ class JsonDeserializer(
     private inline fun <T> checkRecursion(block: () -> T): T {
         remainingDepth--
         if (remainingDepth == 0) {
-            throw SerdeException(parser.peekError(ErrorCode.RecursionLimitExceeded))
+            (parser.peekError(ErrorCode.RecursionLimitExceeded)).raise()
         }
         try {
             return block()
@@ -1044,7 +1039,7 @@ class JsonDeserializer(
     override fun <V> deserializeAny(visitor: Visitor<V>): SerdeResult<V> =
         serdeCatching {
             val peek = parser.parseWhitespace()
-            if (peek < 0) throw SerdeException(parser.peekError(ErrorCode.EofWhileParsingValue))
+            if (peek < 0) (parser.peekError(ErrorCode.EofWhileParsingValue)).raise()
             when (peek.toChar()) {
                 'n' -> {
                     parser.eatChar()
@@ -1076,6 +1071,7 @@ class JsonDeserializer(
                     checkRecursion {
                         parser.eatChar()
                         val ret = visitor.visitSeq(JsonSeqAccess(this))
+                        ret.getOrThrow()
                         parser.endSeq()
                         ret
                     }
@@ -1084,11 +1080,12 @@ class JsonDeserializer(
                     checkRecursion {
                         parser.eatChar()
                         val ret = visitor.visitMap(JsonMapAccess(this))
+                        ret.getOrThrow()
                         parser.endMap()
                         ret
                     }
                 }
-                else -> throw SerdeException(parser.peekError(ErrorCode.ExpectedSomeValue))
+                else -> (parser.peekError(ErrorCode.ExpectedSomeValue)).raise()
             }
         }.flatMap { it }
 
@@ -1097,7 +1094,7 @@ class JsonDeserializer(
     override fun <V> deserializeBool(visitor: Visitor<V>): SerdeResult<V> =
         serdeCatching {
             val peek = parser.parseWhitespace()
-            if (peek < 0) throw SerdeException(parser.peekError(ErrorCode.EofWhileParsingValue))
+            if (peek < 0) (parser.peekError(ErrorCode.EofWhileParsingValue)).raise()
             when (peek.toChar()) {
                 't' -> {
                     parser.eatChar()
@@ -1109,7 +1106,7 @@ class JsonDeserializer(
                     parser.parseIdent("alse")
                     false
                 }
-                else -> throw SerdeException(peekInvalidType(visitor))
+                else -> (peekInvalidType(visitor)).raise()
             }
         }.flatMap { visitor.visitBool(it) }
 
@@ -1138,7 +1135,7 @@ class JsonDeserializer(
     override fun <V> deserializeI128(visitor: Visitor<V>): SerdeResult<V> =
         serdeCatching {
             val peek = parser.parseWhitespace()
-            if (peek < 0) throw SerdeException(parser.peekError(ErrorCode.EofWhileParsingValue))
+            if (peek < 0) (parser.peekError(ErrorCode.EofWhileParsingValue)).raise()
             if (peek == '-'.code) {
                 parser.eatChar()
                 val buf = StringBuilder("-")
@@ -1154,8 +1151,8 @@ class JsonDeserializer(
     override fun <V> deserializeU128(visitor: Visitor<V>): SerdeResult<V> =
         serdeCatching {
             val peek = parser.parseWhitespace()
-            if (peek < 0) throw SerdeException(parser.peekError(ErrorCode.EofWhileParsingValue))
-            if (peek == '-'.code) throw SerdeException(parser.peekError(ErrorCode.NumberOutOfRange))
+            if (peek < 0) (parser.peekError(ErrorCode.EofWhileParsingValue)).raise()
+            if (peek == '-'.code) (parser.peekError(ErrorCode.NumberOutOfRange)).raise()
             val buf = StringBuilder()
             parser.scanInteger128(buf)
             buf.toString()
@@ -1168,7 +1165,7 @@ class JsonDeserializer(
     private fun <V> deserializeNumber(visitor: Visitor<V>): SerdeResult<V> =
         serdeCatching {
             val peek = parser.parseWhitespace()
-            if (peek < 0) throw SerdeException(parser.peekError(ErrorCode.EofWhileParsingValue))
+            if (peek < 0) (parser.peekError(ErrorCode.EofWhileParsingValue)).raise()
             when (peek.toChar()) {
                 '-' -> {
                     parser.eatChar()
@@ -1177,7 +1174,7 @@ class JsonDeserializer(
                 in '0'..'9' -> {
                     parser.parseInteger(true).visit(visitor)
                 }
-                else -> throw SerdeException(peekInvalidType(visitor))
+                else -> (peekInvalidType(visitor)).raise()
             }
         }.flatMap { it }
 
@@ -1190,8 +1187,8 @@ class JsonDeserializer(
     override fun <V> deserializeStr(visitor: Visitor<V>): SerdeResult<V> =
         serdeCatching {
             val peek = parser.parseWhitespace()
-            if (peek < 0) throw SerdeException(parser.peekError(ErrorCode.EofWhileParsingValue))
-            if (peek != '"'.code) throw SerdeException(peekInvalidType(visitor))
+            if (peek < 0) (parser.peekError(ErrorCode.EofWhileParsingValue)).raise()
+            if (peek != '"'.code) (peekInvalidType(visitor)).raise()
             parser.eatChar()
             parser.parseStr()
         }.flatMap { visitor.visitStr(it) }
@@ -1237,8 +1234,8 @@ class JsonDeserializer(
     override fun <V> deserializeUnit(visitor: Visitor<V>): SerdeResult<V> =
         serdeCatching {
             val peek = parser.parseWhitespace()
-            if (peek < 0) throw SerdeException(parser.peekError(ErrorCode.EofWhileParsingValue))
-            if (peek != 'n'.code) throw SerdeException(peekInvalidType(visitor))
+            if (peek < 0) (parser.peekError(ErrorCode.EofWhileParsingValue)).raise()
+            if (peek != 'n'.code) (peekInvalidType(visitor)).raise()
             parser.eatChar()
             parser.parseIdent("ull")
         }.flatMap { visitor.visitUnit() }
@@ -1260,11 +1257,12 @@ class JsonDeserializer(
     override fun <V> deserializeSeq(visitor: Visitor<V>): SerdeResult<V> =
         serdeCatching {
             val peek = parser.parseWhitespace()
-            if (peek < 0) throw SerdeException(parser.peekError(ErrorCode.EofWhileParsingValue))
-            if (peek != '['.code) throw SerdeException(peekInvalidType(visitor))
+            if (peek < 0) (parser.peekError(ErrorCode.EofWhileParsingValue)).raise()
+            if (peek != '['.code) (peekInvalidType(visitor)).raise()
             checkRecursion {
                 parser.eatChar()
                 val ret = visitor.visitSeq(JsonSeqAccess(this))
+                ret.getOrThrow()
                 parser.endSeq()
                 ret
             }
@@ -1281,11 +1279,12 @@ class JsonDeserializer(
     override fun <V> deserializeMap(visitor: Visitor<V>): SerdeResult<V> =
         serdeCatching {
             val peek = parser.parseWhitespace()
-            if (peek < 0) throw SerdeException(parser.peekError(ErrorCode.EofWhileParsingValue))
-            if (peek != '{'.code) throw SerdeException(peekInvalidType(visitor))
+            if (peek < 0) (parser.peekError(ErrorCode.EofWhileParsingValue)).raise()
+            if (peek != '{'.code) (peekInvalidType(visitor)).raise()
             checkRecursion {
                 parser.eatChar()
                 val ret = visitor.visitMap(JsonMapAccess(this))
+                ret.getOrThrow()
                 parser.endMap()
                 ret
             }
@@ -1296,12 +1295,13 @@ class JsonDeserializer(
     override fun <V> deserializeStruct(name: String, fields: List<String>, visitor: Visitor<V>): SerdeResult<V> =
         serdeCatching {
             val peek = parser.parseWhitespace()
-            if (peek < 0) throw SerdeException(parser.peekError(ErrorCode.EofWhileParsingValue))
+            if (peek < 0) (parser.peekError(ErrorCode.EofWhileParsingValue)).raise()
             when (peek.toChar()) {
                 '[' -> {
                     checkRecursion {
                         parser.eatChar()
                         val ret = visitor.visitSeq(JsonSeqAccess(this))
+                        ret.getOrThrow()
                         parser.endSeq()
                         ret
                     }
@@ -1310,11 +1310,12 @@ class JsonDeserializer(
                     checkRecursion {
                         parser.eatChar()
                         val ret = visitor.visitMap(JsonMapAccess(this))
+                        ret.getOrThrow()
                         parser.endMap()
                         ret
                     }
                 }
-                else -> throw SerdeException(peekInvalidType(visitor))
+                else -> (peekInvalidType(visitor)).raise()
             }
         }.flatMap { it }
 
@@ -1330,16 +1331,17 @@ class JsonDeserializer(
     override fun <V> deserializeEnum(name: String, variants: List<String>, visitor: Visitor<V>): SerdeResult<V> =
         serdeCatching {
             val peek = parser.parseWhitespace()
-            if (peek < 0) throw SerdeException(parser.peekError(ErrorCode.EofWhileParsingValue))
+            if (peek < 0) (parser.peekError(ErrorCode.EofWhileParsingValue)).raise()
             when (peek.toChar()) {
                 '{' -> {
                     checkRecursion {
                         parser.eatChar()
                         val ret = visitor.visitEnum(JsonVariantAccess(this))
+                        ret.getOrThrow()
                         // After the variant, expect '}'
                         val p = parser.parseWhitespace()
-                        if (p < 0) throw SerdeException(parser.error(ErrorCode.EofWhileParsingObject))
-                        if (p != '}'.code) throw SerdeException(parser.error(ErrorCode.ExpectedSomeValue))
+                        if (p < 0) (parser.error(ErrorCode.EofWhileParsingObject)).raise()
+                        if (p != '}'.code) (parser.error(ErrorCode.ExpectedSomeValue)).raise()
                         parser.eatChar()
                         ret
                     }
@@ -1347,7 +1349,7 @@ class JsonDeserializer(
                 '"' -> {
                     visitor.visitEnum(JsonUnitVariantAccess(this))
                 }
-                else -> throw SerdeException(parser.peekError(ErrorCode.ExpectedSomeValue))
+                else -> (parser.peekError(ErrorCode.ExpectedSomeValue)).raise()
             }
         }.flatMap { it }
 
@@ -1390,15 +1392,15 @@ class JsonDeserializer(
                 parser.eatChar()
                 try {
                     parser.parseAnyNumber(false).invalidType(visitor)
-                } catch (e: SerdeException) {
-                    e.error
+                } catch (e: Throwable) {
+                    if (e is io.github.kotlinmania.serde.SerdeDiagnosticCarrier) e.error else throw e
                 }
             }
             in '0'..'9' -> {
                 try {
                     parser.parseAnyNumber(true).invalidType(visitor)
-                } catch (e: SerdeException) {
-                    e.error
+                } catch (e: Throwable) {
+                    if (e is io.github.kotlinmania.serde.SerdeDiagnosticCarrier) e.error else throw e
                 }
             }
             '"' -> {
@@ -1452,7 +1454,7 @@ internal class JsonSeqAccess(
     private fun hasNextElement(): Boolean {
         val parser = de.parser
         val peek = parser.parseWhitespace()
-        if (peek < 0) throw SerdeException(parser.peekError(ErrorCode.EofWhileParsingList))
+        if (peek < 0) (parser.peekError(ErrorCode.EofWhileParsingList)).raise()
         return when {
             peek == ']'.code -> false
             first -> {
@@ -1462,11 +1464,11 @@ internal class JsonSeqAccess(
             peek == ','.code -> {
                 parser.eatChar()
                 val p = parser.parseWhitespace()
-                if (p == ']'.code) throw SerdeException(parser.peekError(ErrorCode.TrailingComma))
-                if (p < 0) throw SerdeException(parser.peekError(ErrorCode.EofWhileParsingValue))
+                if (p == ']'.code) (parser.peekError(ErrorCode.TrailingComma)).raise()
+                if (p < 0) (parser.peekError(ErrorCode.EofWhileParsingValue)).raise()
                 true
             }
-            else -> throw SerdeException(parser.peekError(ErrorCode.ExpectedListCommaOrEnd))
+            else -> (parser.peekError(ErrorCode.ExpectedListCommaOrEnd)).raise()
         }
     }
 }
@@ -1498,7 +1500,7 @@ internal class JsonMapAccess(
     private fun hasNextKey(): Boolean {
         val parser = de.parser
         val peek = parser.parseWhitespace()
-        if (peek < 0) throw SerdeException(parser.peekError(ErrorCode.EofWhileParsingObject))
+        if (peek < 0) (parser.peekError(ErrorCode.EofWhileParsingObject)).raise()
         return when {
             peek == '}'.code -> false
             first -> {
@@ -1506,7 +1508,7 @@ internal class JsonMapAccess(
                 if (peek == '"'.code) {
                     true
                 } else {
-                    throw SerdeException(parser.peekError(ErrorCode.KeyMustBeAString))
+                    (parser.peekError(ErrorCode.KeyMustBeAString)).raise()
                 }
             }
             peek == ','.code -> {
@@ -1515,14 +1517,14 @@ internal class JsonMapAccess(
                 if (p == '"'.code) {
                     true
                 } else if (p == '}'.code) {
-                    throw SerdeException(parser.peekError(ErrorCode.TrailingComma))
+                    (parser.peekError(ErrorCode.TrailingComma)).raise()
                 } else if (p < 0) {
-                    throw SerdeException(parser.peekError(ErrorCode.EofWhileParsingValue))
+                    (parser.peekError(ErrorCode.EofWhileParsingValue)).raise()
                 } else {
-                    throw SerdeException(parser.peekError(ErrorCode.KeyMustBeAString))
+                    (parser.peekError(ErrorCode.KeyMustBeAString)).raise()
                 }
             }
-            else -> throw SerdeException(parser.peekError(ErrorCode.ExpectedObjectCommaOrEnd))
+            else -> (parser.peekError(ErrorCode.ExpectedObjectCommaOrEnd)).raise()
         }
     }
 
@@ -1665,11 +1667,11 @@ internal class JsonMapKey(
             parser.eatChar() // consume opening '"'
             val peek = parser.peekOrNull()
             if (peek.toChar() !in '0'..'9' && peek != '-'.code) {
-                throw SerdeException(parser.error(ErrorCode.ExpectedNumericKey))
+                (parser.error(ErrorCode.ExpectedNumericKey)).raise()
             }
             val result = delegate(visitor).getOrThrow()
             val after = parser.peekOrNull()
-            if (after != '"'.code) throw SerdeException(parser.peekError(ErrorCode.ExpectedDoubleQuote))
+            if (after != '"'.code) (parser.peekError(ErrorCode.ExpectedDoubleQuote)).raise()
             parser.eatChar() // consume closing '"'
             result
         }
@@ -1678,7 +1680,7 @@ internal class JsonMapKey(
         serdeCatching {
             parser.eatChar() // consume opening '"'
             val peek = parser.nextCharOrNull()
-            if (peek < 0) throw SerdeException(parser.peekError(ErrorCode.EofWhileParsingValue))
+            if (peek < 0) (parser.peekError(ErrorCode.EofWhileParsingValue)).raise()
             when (peek.toChar()) {
                 't' -> {
                     parser.parseIdent("rue\"")
@@ -1691,7 +1693,7 @@ internal class JsonMapKey(
                 else -> {
                     // Not a bool — parse as string and return invalidType error
                     val s = parser.parseStr()
-                    throw SerdeException(SerdeError.invalidType(Unexpected.Str(s), visitor))
+                    (SerdeError.invalidType(Unexpected.Str(s), visitor)).raise()
                 }
             }
         }.flatMap { visitor.visitBool(it) }
@@ -1844,22 +1846,24 @@ fun <T> deserializeFromSlice(json: ByteArray, deserialize: io.github.kotlinmania
 /**
  * Parse a JSON string into a [Value].
  */
-fun fromStr(json: String): SerdeResult<Value> =
-    JsonParser(json).parseValue()
+fun fromStr(json: String): JsonValueOutcome =
+    JsonValueOutcome.fromResult(serdeCatching {
+        val parser = JsonParser(json)
+        val value = parser.parseValue().getOrThrow()
+        parser.end().getOrThrow()
+        value
+    })
 
 /**
  * Parse a JSON string into a type T using the given [io.github.kotlinmania.serdecore.de.Deserialize] implementation.
  */
-fun <T> fromStr(json: String, deserialize: io.github.kotlinmania.serdecore.de.Deserialize<T>): SerdeResult<T> {
-    val parser = JsonParser(json)
-    val deserializer = JsonDeserializer(parser)
-    return deserialize.deserialize(deserializer)
-}
+fun <T> fromStr(json: String, deserialize: io.github.kotlinmania.serdecore.de.Deserialize<T>): SerdeResult<T> =
+    deserializeFromStr(json, deserialize)
 
 /**
  * Parse a JSON byte array into a [Value].
  */
-fun fromSlice(json: ByteArray): SerdeResult<Value> =
+fun fromSlice(json: ByteArray): JsonValueOutcome =
     fromStr(json.decodeToString())
 
 /**

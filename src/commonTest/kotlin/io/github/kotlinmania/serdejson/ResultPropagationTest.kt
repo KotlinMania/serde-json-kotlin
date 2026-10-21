@@ -1,7 +1,6 @@
 package io.github.kotlinmania.serdejson
 
 import io.github.kotlinmania.serde.SerdeError
-import io.github.kotlinmania.serde.SerdeException
 import io.github.kotlinmania.serde.SerdeResult
 import io.github.kotlinmania.serdecore.de.Deserialize
 import io.github.kotlinmania.serdecore.de.DeserializeSeed
@@ -112,7 +111,7 @@ class ResultPropagationTest {
     fun newtypeVariantPreservesEndFailure() {
         val error = SerdeError.custom("closing object failed")
         val writer = IoWrite { bytes ->
-            if (bytes.contentEquals(byteArrayOf('}'.code.toByte()))) throw SerdeException(error)
+            if (bytes.contentEquals(byteArrayOf('}'.code.toByte()))) (error).raise()
             IoResult.ok(Unit)
         }
         val result = JsonSerializer(writer).serializeNewtypeVariant("Enum", 0u, "State", TextValue)
@@ -126,8 +125,9 @@ class ResultPropagationTest {
             deserializer.deserializeEnum("ScrollDirection", listOf("Forward"), object : Visitor<String> {
                 override fun expecting(): String = "ScrollDirection"
 
-                override fun visitEnum(data: EnumAccess): SerdeResult<String> =
-                    data.variantSeed(object : DeserializeSeed<String> {
+                override fun <A> visitEnum(access: A): SerdeResult<String>
+                    where A : EnumAccess =
+                    access.variantSeed(object : DeserializeSeed<String> {
                         override fun <D> deserialize(deserializer: D): SerdeResult<String>
                             where D : Deserializer = StringDeserialize.deserialize(deserializer)
                     }).flatMap { (name, variant) ->

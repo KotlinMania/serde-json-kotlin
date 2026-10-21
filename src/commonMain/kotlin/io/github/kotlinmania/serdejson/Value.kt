@@ -219,10 +219,8 @@ sealed class Value : Serialize {
 /**
  * Convert a [Serialize] value into a [Value] which is an enum that can represent any valid JSON data.
  */
-fun toValue(value: Serialize): SerdeResult<Value> {
-    val writer = Serializer()
-    return value.serialize(writer).map { writer.result }
-}
+fun toValue(value: Serialize): JsonValueOutcome =
+    JsonValueOutcome.fromResult(value.serialize(io.github.kotlinmania.serdejson.Serializer()))
 
 /**
  * Interpret a [Value] as an instance of type T.

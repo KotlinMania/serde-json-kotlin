@@ -636,7 +636,7 @@ open class RawValueEmitter : io.github.kotlinmania.serdecore.ser.Serializer<Valu
 
     override fun serializeChar(v: Char): SerdeResult<Value> = SerdeResult.failure(invalidRawValue())
 
-    override fun serializeStr(v: String): SerdeResult<Value> = fromStr(v)
+    override fun serializeStr(v: String): SerdeResult<Value> = fromStr(v).toSerdeResult()
 
     override fun serializeBytes(v: ByteArray): SerdeResult<Value> = SerdeResult.failure(invalidRawValue())
 

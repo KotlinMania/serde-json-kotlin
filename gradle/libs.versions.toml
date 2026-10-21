@@ -18,11 +18,11 @@ kotlin-allopen = { id = "org.jetbrains.kotlin.plugin.allopen", version.ref = "ko
 
 [libraries]
 kotlinx-benchmark-runtime = { module = "org.jetbrains.kotlinx:kotlinx-benchmark-runtime", version.ref = "kotlinxBenchmark" }
-serde-kotlin = { module = "io.github.kotlinmania:serde-kotlin", version.ref = "serdeKotlin" }
+serde-core = { module = "io.github.kotlinmania:serde-core", version.ref = "serdeKotlin" }
 indexmap-kotlin = { module = "io.github.kotlinmania:indexmap-kotlin", version.ref = "indexmapKotlin" }
 
 [bundles]
 serde-json-commonMain = [
-  "serde-kotlin",
+  "serde-core",
   "indexmap-kotlin",
 ]

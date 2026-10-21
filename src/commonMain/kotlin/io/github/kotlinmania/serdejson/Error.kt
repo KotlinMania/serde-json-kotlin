@@ -253,8 +253,3 @@ class JsonError(
         }
     }
 }
-
-/**
- * Alias for a result with the error type [JsonError].
- */
-typealias JsonResult<T> = kotlin.Result<T>

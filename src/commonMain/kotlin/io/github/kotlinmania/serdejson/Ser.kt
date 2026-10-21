@@ -2,7 +2,6 @@
 package io.github.kotlinmania.serdejson
 
 import io.github.kotlinmania.serde.SerdeError
-import io.github.kotlinmania.serde.SerdeException
 import io.github.kotlinmania.serde.SerdeResult
 import io.github.kotlinmania.serde.serdeCatching
 import io.github.kotlinmania.serdecore.ser.Serialize
@@ -107,7 +106,7 @@ internal class JsonSerializer(
             if (v.isFinite()) {
                 writer.writeAll(formatFinite(v).encodeToByteArray())
             } else {
-                throw SerdeException(SerdeError.custom("cannot serialize non-finite float"))
+                writer.writeAll(NULL_BYTES)
             }
         }
 
@@ -391,35 +390,35 @@ private class JsonStructVariantSerialize(
 /**
  * Serialize a [Serialize] value to a JSON string.
  */
-fun toStr(value: Serialize): SerdeResult<String> =
-    serdeCatching {
+fun toStr(value: Serialize): JsonStringOutcome =
+    JsonStringOutcome.fromResult(serdeCatching {
         val writer = VecIoWrite()
         val serializer = JsonSerializer(writer)
         value.serialize(serializer).getOrThrow()
         writer.bytes.decodeToString()
-    }
+    })
 
 /**
  * Serialize a [Serialize] value to a JSON string with pretty-printing.
  */
-fun toStrPretty(value: Serialize): SerdeResult<String> =
-    serdeCatching {
+fun toStrPretty(value: Serialize): JsonStringOutcome =
+    JsonStringOutcome.fromResult(serdeCatching {
         val writer = VecIoWrite()
         val serializer = JsonSerializer(writer, pretty = true)
         value.serialize(serializer).getOrThrow()
         writer.bytes.decodeToString()
-    }
+    })
 
 /**
  * Serialize a [Serialize] value to a byte array.
  */
-fun toVec(value: Serialize): SerdeResult<ByteArray> =
-    serdeCatching {
+fun toVec(value: Serialize): JsonBytesOutcome =
+    JsonBytesOutcome.fromResult(serdeCatching {
         val writer = VecIoWrite()
         val serializer = JsonSerializer(writer)
         value.serialize(serializer).getOrThrow()
         writer.bytes
-    }
+    })
 
 /**
  * Serialize a [Value] to a JSON string.
