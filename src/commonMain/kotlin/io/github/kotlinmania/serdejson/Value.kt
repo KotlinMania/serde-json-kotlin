@@ -230,7 +230,5 @@ fun toValue(value: Serialize): JsonValueOutcome =
 /**
  * Interpret a [Value] as an instance of type T.
  */
-fun <T> fromValue(value: Value, deserialize: Deserialize<T>): SerdeResult<T> {
-    val json = valueToStr(value)
-    return fromStr(json, deserialize)
-}
+fun <T> fromValue(value: Value, deserialize: Deserialize<T>): SerdeResult<T> =
+    deserialize.deserialize(ValueDeserializer(value))
