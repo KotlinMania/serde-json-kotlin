@@ -48,13 +48,6 @@ version = providers.gradleProperty("project.version").getOrElse("0.1.0-SNAPSHOT"
 val frameworkName = providers.gradleProperty("project.frameworkName").getOrElse("Unnamed")
 val projectNamespace = providers.gradleProperty("project.namespace").getOrElse("io.github.kotlinmania")
 val kotlinVersion = libs.versions.kotlin.get()
-val commonMainBundleName = providers.gradleProperty("project.dependencies.commonMainBundle").get()
-val commonMainDependencyBundle =
-    extensions
-        .getByType(VersionCatalogsExtension::class.java)
-        .named("libs")
-        .findBundle(commonMainBundleName)
-        .orElseThrow { GradleException("Missing libs bundle '$commonMainBundleName'") }
 
 fun csvProperty(name: String): Set<String> =
     providers
@@ -482,7 +475,8 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            implementation(commonMainDependencyBundle)
+            api(libs.serde.core)
+            api(libs.indexmap.kotlin)
         }
         commonTest.dependencies {
             implementation(kotlin("test"))
