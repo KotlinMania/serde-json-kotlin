@@ -121,11 +121,12 @@ class ValueMapKeyParityTest {
                             override fun expecting(): String = "a direction"
 
                             override fun <A : EnumAccess> visitEnum(access: A): SerdeResult<String> =
-                                access.variantSeed(
-                                    object : DeserializeSeed<String> {
-                                        override fun <D : Deserializer> deserialize(deserializer: D): SerdeResult<String> = StringDeserialize.deserialize(deserializer)
-                                    },
-                                ).flatMap { (name, variant) -> variant.unitVariant().map { name } }
+                                access
+                                    .variantSeed(
+                                        object : DeserializeSeed<String> {
+                                            override fun <D : Deserializer> deserialize(deserializer: D): SerdeResult<String> = StringDeserialize.deserialize(deserializer)
+                                        },
+                                    ).flatMap { (name, variant) -> variant.unitVariant().map { name } }
                         },
                     )
             }
