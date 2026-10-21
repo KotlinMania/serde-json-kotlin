@@ -1004,7 +1004,10 @@ tasks.register("swiftExportSmokeTest") {
                         "FRAMEWORKS_FOLDER_PATH" to "Frameworks",
                         "MACOSX_DEPLOYMENT_TARGET" to "15.0",
                         "DEPLOYMENT_TARGET_SETTING_NAME" to "MACOSX_DEPLOYMENT_TARGET",
-                        "XCODE_XCCONFIG_FILE" to layout.projectDirectory.file("swift-test-harness/Strict.xcconfig").asFile.absolutePath,
+                        "XCODE_XCCONFIG_FILE" to
+                            layout.projectDirectory
+                                .file("swift-test-harness/Strict.xcconfig")
+                                .asFile.absolutePath,
                     ),
                 )
             }.assertNormalExitValue()
