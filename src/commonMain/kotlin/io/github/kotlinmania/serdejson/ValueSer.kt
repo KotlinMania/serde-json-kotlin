@@ -174,7 +174,7 @@ open class Serializer : io.github.kotlinmania.serdecore.ser.Serializer<Value> {
         val values =
             io.github.kotlinmania.serdejson
                 .JsonMap()
-        val inner = toValue(value).getOrElse { return SerdeResult.failure(it) }
+        val inner = toValue(value).toSerdeResult().getOrElse { return SerdeResult.failure(it) }
         values.insert(variant, inner)
         val res = Value.Object(values)
         result = res
@@ -254,7 +254,7 @@ class SerializeVec internal constructor(
     constructor() : this(mutableListOf())
 
     override fun <T : Serialize> serializeElement(value: T): SerdeResult<Unit> {
-        val v = toValue(value).getOrElse { return SerdeResult.failure(it) }
+        val v = toValue(value).toSerdeResult().getOrElse { return SerdeResult.failure(it) }
         vec.add(v)
         return SerdeResult.success(Unit)
     }
@@ -283,7 +283,7 @@ class SerializeTupleVariant internal constructor(
     constructor(name: String) : this(name, mutableListOf())
 
     override fun <T : Serialize> serializeField(value: T): SerdeResult<Unit> {
-        val v = toValue(value).getOrElse { return SerdeResult.failure(it) }
+        val v = toValue(value).toSerdeResult().getOrElse { return SerdeResult.failure(it) }
         vec.add(v)
         return SerdeResult.success(Unit)
     }
@@ -340,7 +340,7 @@ sealed class SerializeMap :
             is Map -> {
                 val k = nextKey ?: error("serialize_value called before serialize_key")
                 nextKey = null
-                val v = toValue(value).getOrElse { return SerdeResult.failure(it) }
+                val v = toValue(value).toSerdeResult().getOrElse { return SerdeResult.failure(it) }
                 map.insert(k, v)
                 SerdeResult.success(Unit)
             }
@@ -403,7 +403,7 @@ class SerializeStructVariant internal constructor(
     )
 
     override fun <T : Serialize> serializeField(key: String, value: T): SerdeResult<Unit> {
-        val v = toValue(value).getOrElse { return SerdeResult.failure(it) }
+        val v = toValue(value).toSerdeResult().getOrElse { return SerdeResult.failure(it) }
         map.insert(key, v)
         return SerdeResult.success(Unit)
     }
