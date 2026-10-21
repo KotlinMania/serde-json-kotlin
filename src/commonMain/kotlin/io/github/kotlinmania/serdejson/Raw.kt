@@ -25,11 +25,104 @@ import io.github.kotlinmania.serdecore.ser.Serializer
 class RawValue(
     /** The raw JSON text underlying this value. */
     val json: String,
-) : Serialize {
+) : Serialize, Deserializer {
     override fun <Ok> serialize(serializer: Serializer<Ok>): SerdeResult<Ok> =
         serializer.serializeStruct(TOKEN, 1).flatMap { fields ->
             fields.serializeField(TOKEN, RawValueSerialize(this)).flatMap { fields.end() }
         }
+
+    override fun <V> deserializeAny(visitor: Visitor<V>): SerdeResult<V> =
+        JsonDeserializer(JsonParser(json)).deserializeAny(visitor)
+
+    override fun <V> deserializeBool(visitor: Visitor<V>): SerdeResult<V> =
+        JsonDeserializer(JsonParser(json)).deserializeBool(visitor)
+
+    override fun <V> deserializeI8(visitor: Visitor<V>): SerdeResult<V> =
+        JsonDeserializer(JsonParser(json)).deserializeI8(visitor)
+
+    override fun <V> deserializeI16(visitor: Visitor<V>): SerdeResult<V> =
+        JsonDeserializer(JsonParser(json)).deserializeI16(visitor)
+
+    override fun <V> deserializeI32(visitor: Visitor<V>): SerdeResult<V> =
+        JsonDeserializer(JsonParser(json)).deserializeI32(visitor)
+
+    override fun <V> deserializeI64(visitor: Visitor<V>): SerdeResult<V> =
+        JsonDeserializer(JsonParser(json)).deserializeI64(visitor)
+
+    override fun <V> deserializeI128(visitor: Visitor<V>): SerdeResult<V> =
+        JsonDeserializer(JsonParser(json)).deserializeI128(visitor)
+
+    override fun <V> deserializeU8(visitor: Visitor<V>): SerdeResult<V> =
+        JsonDeserializer(JsonParser(json)).deserializeU8(visitor)
+
+    override fun <V> deserializeU16(visitor: Visitor<V>): SerdeResult<V> =
+        JsonDeserializer(JsonParser(json)).deserializeU16(visitor)
+
+    override fun <V> deserializeU32(visitor: Visitor<V>): SerdeResult<V> =
+        JsonDeserializer(JsonParser(json)).deserializeU32(visitor)
+
+    override fun <V> deserializeU64(visitor: Visitor<V>): SerdeResult<V> =
+        JsonDeserializer(JsonParser(json)).deserializeU64(visitor)
+
+    override fun <V> deserializeU128(visitor: Visitor<V>): SerdeResult<V> =
+        JsonDeserializer(JsonParser(json)).deserializeU128(visitor)
+
+    override fun <V> deserializeF32(visitor: Visitor<V>): SerdeResult<V> =
+        JsonDeserializer(JsonParser(json)).deserializeF32(visitor)
+
+    override fun <V> deserializeF64(visitor: Visitor<V>): SerdeResult<V> =
+        JsonDeserializer(JsonParser(json)).deserializeF64(visitor)
+
+    override fun <V> deserializeChar(visitor: Visitor<V>): SerdeResult<V> =
+        JsonDeserializer(JsonParser(json)).deserializeChar(visitor)
+
+    override fun <V> deserializeStr(visitor: Visitor<V>): SerdeResult<V> =
+        JsonDeserializer(JsonParser(json)).deserializeStr(visitor)
+
+    override fun <V> deserializeString(visitor: Visitor<V>): SerdeResult<V> =
+        JsonDeserializer(JsonParser(json)).deserializeString(visitor)
+
+    override fun <V> deserializeBytes(visitor: Visitor<V>): SerdeResult<V> =
+        JsonDeserializer(JsonParser(json)).deserializeBytes(visitor)
+
+    override fun <V> deserializeByteBuf(visitor: Visitor<V>): SerdeResult<V> =
+        JsonDeserializer(JsonParser(json)).deserializeByteBuf(visitor)
+
+    override fun <V> deserializeOption(visitor: Visitor<V>): SerdeResult<V> =
+        JsonDeserializer(JsonParser(json)).deserializeOption(visitor)
+
+    override fun <V> deserializeUnit(visitor: Visitor<V>): SerdeResult<V> =
+        JsonDeserializer(JsonParser(json)).deserializeUnit(visitor)
+
+    override fun <V> deserializeUnitStruct(name: String, visitor: Visitor<V>): SerdeResult<V> =
+        JsonDeserializer(JsonParser(json)).deserializeUnitStruct(name, visitor)
+
+    override fun <V> deserializeNewtypeStruct(name: String, visitor: Visitor<V>): SerdeResult<V> =
+        JsonDeserializer(JsonParser(json)).deserializeNewtypeStruct(name, visitor)
+
+    override fun <V> deserializeSeq(visitor: Visitor<V>): SerdeResult<V> =
+        JsonDeserializer(JsonParser(json)).deserializeSeq(visitor)
+
+    override fun <V> deserializeTuple(len: Int, visitor: Visitor<V>): SerdeResult<V> =
+        JsonDeserializer(JsonParser(json)).deserializeTuple(len, visitor)
+
+    override fun <V> deserializeTupleStruct(name: String, len: Int, visitor: Visitor<V>): SerdeResult<V> =
+        JsonDeserializer(JsonParser(json)).deserializeTupleStruct(name, len, visitor)
+
+    override fun <V> deserializeMap(visitor: Visitor<V>): SerdeResult<V> =
+        JsonDeserializer(JsonParser(json)).deserializeMap(visitor)
+
+    override fun <V> deserializeStruct(name: String, fields: List<String>, visitor: Visitor<V>): SerdeResult<V> =
+        JsonDeserializer(JsonParser(json)).deserializeStruct(name, fields, visitor)
+
+    override fun <V> deserializeEnum(name: String, variants: List<String>, visitor: Visitor<V>): SerdeResult<V> =
+        JsonDeserializer(JsonParser(json)).deserializeEnum(name, variants, visitor)
+
+    override fun <V> deserializeIdentifier(visitor: Visitor<V>): SerdeResult<V> =
+        JsonDeserializer(JsonParser(json)).deserializeIdentifier(visitor)
+
+    override fun <V> deserializeIgnoredAny(visitor: Visitor<V>): SerdeResult<V> =
+        JsonDeserializer(JsonParser(json)).deserializeIgnoredAny(visitor)
 
     override fun equals(other: Any?): Boolean =
         other is RawValue && other.json == this.json

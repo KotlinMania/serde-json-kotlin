@@ -2,8 +2,10 @@ package io.github.kotlinmania.serdejson
 
 import io.github.kotlinmania.serde.SerdeError
 import io.github.kotlinmania.serde.SerdeResult
+import io.github.kotlinmania.serdecore.de.BooleanDeserialize
 import io.github.kotlinmania.serdecore.de.DeserializeSeed
 import io.github.kotlinmania.serdecore.de.Deserializer
+import io.github.kotlinmania.serdecore.de.I64Deserialize
 import io.github.kotlinmania.serdecore.de.MapAccess
 import io.github.kotlinmania.serdecore.de.StringDeserialize
 import io.github.kotlinmania.serdecore.de.Visitor
@@ -15,6 +17,21 @@ import kotlin.test.assertSame
 import kotlin.test.assertTrue
 
 class RawValueProtocolParityTest {
+    @Test
+    fun rawValuesDriveFreshTypedDeserializers() {
+        val number = rawValueFromString("7").getOrThrow()
+        assertEquals(7L, I64Deserialize.deserialize(number).getOrThrow())
+        assertEquals(7L, I64Deserialize.deserialize(number).getOrThrow())
+        val boolean = rawValueFromString("true").getOrThrow()
+        assertEquals(true, BooleanDeserialize.deserialize(boolean).getOrThrow())
+        assertEquals(true, BooleanDeserialize.deserialize(boolean).getOrThrow())
+        assertTrue(I64Deserialize.deserialize(boolean).isFailure)
+        val sequence = rawValueFromString("[true,null]").getOrThrow()
+        val array = assertIs<Value.Array>(ValueDeserialize.deserialize(sequence).getOrThrow())
+        assertEquals(true, assertIs<Value.Bool>(array.value[0]).value)
+        assertSame(Value.Null, array.value[1])
+    }
+
     @Test
     fun ownedRawInputTrimsOutsideWhitespaceAndPreservesContents() {
         val contents = "{ \"value\" : [ 1, 2 ] }"
