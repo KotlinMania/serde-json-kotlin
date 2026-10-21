@@ -1422,13 +1422,13 @@ class JsonDeserializer(
 
     /**
      * Deserializes a raw JSON value — the raw text of any valid JSON value
-     * is captured and passed to the visitor as a string.
+     * is captured and passed to the visitor in a single-entry map.
      */
     internal fun <V> deserializeRawValue(visitor: Visitor<V>): SerdeResult<V> =
         serdeCatching {
             parser.parseRawValue()
         }.flatMap { raw ->
-            visitor.visitStr(raw)
+            visitor.visitMap(OwnedRawDeserializer(raw))
         }
 }
 
@@ -1852,14 +1852,7 @@ fun <T> deserializeFromSlice(json: ByteArray, deserialize: io.github.kotlinmania
  * Parse a JSON string into a [Value].
  */
 fun fromStr(json: String): JsonValueOutcome =
-    JsonValueOutcome.fromResult(
-        serdeCatching {
-            val parser = JsonParser(json)
-            val value = parser.parseValue().getOrThrow()
-            parser.end().getOrThrow()
-            value
-        },
-    )
+    JsonValueOutcome.fromResult(deserializeFromStr(json, ValueDeserialize))
 
 /**
  * Parse a JSON string into a type T using the given [io.github.kotlinmania.serdecore.de.Deserialize] implementation.

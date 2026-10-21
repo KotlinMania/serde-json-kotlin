@@ -11,6 +11,7 @@ import io.github.kotlinmania.serdecore.de.EnumAccess
 import io.github.kotlinmania.serdecore.de.Expected
 import io.github.kotlinmania.serdecore.de.MapAccess
 import io.github.kotlinmania.serdecore.de.SeqAccess
+import io.github.kotlinmania.serdecore.de.StringDeserialize
 import io.github.kotlinmania.serdecore.de.Unexpected
 import io.github.kotlinmania.serdecore.de.VariantAccess
 import io.github.kotlinmania.serdecore.de.Visitor
@@ -62,8 +63,24 @@ private object ValueVisitor : Visitor<Value> {
         return SerdeResult.success(Value.Array(values))
     }
 
-    override fun <A : MapAccess> visitMap(access: A): SerdeResult<Value> =
-        MapVisitor.visitMap(access).map { Value.Object(it) }
+    override fun <A : MapAccess> visitMap(access: A): SerdeResult<Value> {
+        val firstKey = access.nextKey(StringDeserialize).getOrElse { return SerdeResult.failure(it) }
+        if (firstKey == RawValue.TOKEN) {
+            val raw = access.nextValueSeed(BoxedFromString).getOrElse { return SerdeResult.failure(it) }
+            val parsed = fromStr(raw.json)
+            return parsed.toSerdeResult()
+        }
+        val values = JsonMap()
+        if (firstKey != null) {
+            val firstValue = access.nextValue(ValueDeserialize).getOrElse { return SerdeResult.failure(it) }
+            values.insert(firstKey, firstValue)
+            while (true) {
+                val entry = access.nextEntry(StringDeserialize, ValueDeserialize).getOrElse { return SerdeResult.failure(it) } ?: break
+                values.insert(entry.first, entry.second)
+            }
+        }
+        return SerdeResult.success(Value.Object(values))
+    }
 }
 
 /**
@@ -140,7 +157,7 @@ class ValueDeserializer(
 
     override fun <V> deserializeBytes(visitor: Visitor<V>): SerdeResult<V> =
         when (value) {
-            is Value.Str -> visitor.visitBytes(value.value.encodeToByteArray())
+            is Value.Str -> visitor.visitStr(value.value)
             is Value.Array -> visitArray(value.value, visitor)
             else -> SerdeResult.failure(typeError("bytes or array"))
         }
@@ -163,7 +180,11 @@ class ValueDeserializer(
         deserializeUnit(visitor)
 
     override fun <V> deserializeNewtypeStruct(name: String, visitor: Visitor<V>): SerdeResult<V> =
-        visitor.visitNewtypeStruct(this)
+        if (name == RawValue.TOKEN) {
+            toStr(value).toSerdeResult().flatMap { visitor.visitMap(OwnedRawDeserializer(it)) }
+        } else {
+            visitor.visitNewtypeStruct(this)
+        }
 
     override fun <V> deserializeSeq(visitor: Visitor<V>): SerdeResult<V> =
         when (value) {

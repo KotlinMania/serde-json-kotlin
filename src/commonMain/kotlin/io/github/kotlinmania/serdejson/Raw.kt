@@ -1,8 +1,14 @@
 // port-lint: source raw.rs
 package io.github.kotlinmania.serdejson
 
+import io.github.kotlinmania.serde.SerdeError
 import io.github.kotlinmania.serde.SerdeResult
-import io.github.kotlinmania.serde.serdeCatching
+import io.github.kotlinmania.serdecore.de.Deserialize
+import io.github.kotlinmania.serdecore.de.DeserializeSeed
+import io.github.kotlinmania.serdecore.de.Deserializer
+import io.github.kotlinmania.serdecore.de.MapAccess
+import io.github.kotlinmania.serdecore.de.Unexpected
+import io.github.kotlinmania.serdecore.de.Visitor
 import io.github.kotlinmania.serdecore.ser.Serialize
 import io.github.kotlinmania.serdecore.ser.Serializer
 
@@ -32,7 +38,20 @@ class RawValue(
 
     override fun toString(): String = json
 
-    companion object {
+    companion object : Deserialize<RawValue> {
+        override fun <D : Deserializer> deserialize(deserializer: D): SerdeResult<RawValue> =
+            deserializer.deserializeNewtypeStruct(TOKEN, BoxedVisitor)
+
+        private object BoxedVisitor : Visitor<RawValue> {
+            override fun expecting(): String = "any valid JSON value"
+
+            override fun <A : MapAccess> visitMap(access: A): SerdeResult<RawValue> {
+                val key = access.nextKey(RawKey).getOrElse { return SerdeResult.failure(it) }
+                if (key == null) return SerdeResult.failure(SerdeError.invalidType(Unexpected.Map, this))
+                return access.nextValueSeed(BoxedFromString)
+            }
+        }
+
         /** A constant [RawValue] with the JSON value `null`. */
         val NULL: RawValue = RawValue("null")
 
@@ -63,10 +82,37 @@ private class RawValueSerialize(
  * This function validates that the string is valid JSON.
  */
 fun rawValueFromString(json: String): JsonRawValueOutcome =
-    JsonRawValueOutcome.fromResult(
-        serdeCatching {
-            // Validate by parsing
-            fromStr(json).getOrThrow()
-            RawValue(json)
-        },
-    )
+    JsonRawValueOutcome.fromResult(deserializeFromStr(json, RawValue))
+
+private object RawKey : Deserialize<Unit> {
+    override fun <D : Deserializer> deserialize(deserializer: D): SerdeResult<Unit> =
+        deserializer.deserializeIdentifier(
+            object : Visitor<Unit> {
+                override fun expecting(): String = "raw value"
+
+                override fun visitStr(v: String): SerdeResult<Unit> =
+                    if (v == RawValue.TOKEN) SerdeResult.success(Unit) else SerdeResult.failure(SerdeError.custom("unexpected raw value"))
+            },
+        )
+}
+
+internal object BoxedFromString : DeserializeSeed<RawValue>, Visitor<RawValue> {
+    override fun <D : Deserializer> deserialize(deserializer: D): SerdeResult<RawValue> = deserializer.deserializeStr(this)
+
+    override fun expecting(): String = "raw value"
+
+    override fun visitStr(v: String): SerdeResult<RawValue> = SerdeResult.success(RawValue(v))
+}
+
+internal class OwnedRawDeserializer(
+    private var rawValue: String?,
+) : MapAccess {
+    override fun <K> nextKeySeed(seed: DeserializeSeed<K>): SerdeResult<K?> =
+        if (rawValue == null) SerdeResult.success(null) else seed.deserialize(ValueDeserializer(Value.Str(RawValue.TOKEN))).map { it }
+
+    override fun <V> nextValueSeed(seed: DeserializeSeed<V>): SerdeResult<V> {
+        val raw = rawValue ?: return SerdeResult.failure(SerdeError.custom("value is missing"))
+        rawValue = null
+        return seed.deserialize(ValueDeserializer(Value.Str(raw)))
+    }
+}
