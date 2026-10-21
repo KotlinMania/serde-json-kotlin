@@ -25,7 +25,8 @@ import io.github.kotlinmania.serdecore.ser.Serializer
 class RawValue(
     /** The raw JSON text underlying this value. */
     val json: String,
-) : Serialize, Deserializer {
+) : Serialize,
+    Deserializer {
     override fun <Ok> serialize(serializer: Serializer<Ok>): SerdeResult<Ok> =
         serializer.serializeStruct(TOKEN, 1).flatMap { fields ->
             fields.serializeField(TOKEN, RawValueSerialize(this)).flatMap { fields.end() }
