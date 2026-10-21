@@ -129,10 +129,10 @@ class JsonMap(
     fun isNotEmpty(): Boolean = !isEmpty()
 
     /** Gets an iterator over the entries of the map. */
-    fun iter(): Iter = Iter(map.iterator())
+    fun iter(): Iter = Iter(map.iterator(), len())
 
     /** Gets a mutable iterator over the entries of the map. */
-    fun iterMut(): IterMut = IterMut(map.iterator())
+    fun iterMut(): IterMut = IterMut(map.iterator(), len())
 
     /** Gets an iterator over the keys of the map. */
     fun keys(): Keys = Keys(map.keys())
@@ -178,16 +178,16 @@ class JsonMap(
     fun fmt(): String = toString()
 
     override fun <Ok> serialize(serializer: Serializer<Ok>): SerdeResult<Ok> {
-        val serMap = serializer.serializeMap(len()).getOrThrow()
+        val serMap = serializer.serializeMap(len()).getOrElse { return SerdeResult.failure(it) }
         for ((k, v) in this) {
-            serMap.serializeEntry(Value.Str(k), v).getOrThrow()
+            serMap.serializeEntry(Value.Str(k), v).getOrElse { return SerdeResult.failure(it) }
         }
         return serMap.end()
     }
 
     override fun iterator(): Iterator<Pair<String, Value>> = map.iterator()
 
-    fun intoIter(): IntoIter = IntoIter(map.iterator())
+    fun intoIter(): IntoIter = IntoIter(map.iterator(), len())
 
     fun extend(iter: Iterable<Pair<String, Value>>) {
         map.extend(iter)
@@ -210,7 +210,7 @@ class JsonMap(
 
     override fun hashCode(): Int {
         var h = 0
-        for ((k, v) in this) {
+        for ((k, v) in entries().sortedBy { it.first }) {
             h = 31 * h + (k.hashCode() xor v.hashCode())
         }
         return h
@@ -393,8 +393,15 @@ class OccupiedEntry internal constructor(
 /** An iterator over a [JsonMap]'s entries. */
 class Iter internal constructor(
     private val iter: Iterator<Pair<String, Value>>,
+    private var remaining: Int,
 ) : Iterator<Pair<String, Value>> by iter {
-    fun len(): Int = 0
+    override fun next(): Pair<String, Value> {
+        val entry = iter.next()
+        remaining -= 1
+        return entry
+    }
+
+    fun len(): Int = remaining
 
     fun intoIter(): Iter = this
 }
@@ -402,8 +409,15 @@ class Iter internal constructor(
 /** A mutable iterator over a [JsonMap]'s entries. */
 class IterMut internal constructor(
     private val iter: Iterator<Pair<String, Value>>,
+    private var remaining: Int,
 ) : Iterator<Pair<String, Value>> by iter {
-    fun len(): Int = 0
+    override fun next(): Pair<String, Value> {
+        val entry = iter.next()
+        remaining -= 1
+        return entry
+    }
+
+    fun len(): Int = remaining
 
     fun intoIter(): IterMut = this
 }
@@ -411,8 +425,15 @@ class IterMut internal constructor(
 /** An owning iterator over a [JsonMap]'s entries. */
 class IntoIter internal constructor(
     private val iter: Iterator<Pair<String, Value>>,
+    private var remaining: Int,
 ) : Iterator<Pair<String, Value>> by iter {
-    fun len(): Int = 0
+    override fun next(): Pair<String, Value> {
+        val entry = iter.next()
+        remaining -= 1
+        return entry
+    }
+
+    fun len(): Int = remaining
 
     fun intoIter(): IntoIter = this
 }
