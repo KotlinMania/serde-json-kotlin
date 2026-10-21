@@ -801,9 +801,11 @@ class JsonParser(
             while (true) {
                 val p = parseWhitespace()
                 if (p < 0) {
-                    (peekError(
+                    (
+                        peekError(
                             if (currentFrame == '[') ErrorCode.EofWhileParsingList else ErrorCode.EofWhileParsingObject,
-                        )).raise()
+                        )
+                    ).raise()
                 }
                 when (p.toChar()) {
                     ',' -> {
@@ -830,9 +832,11 @@ class JsonParser(
                     }
                     else -> {
                         if (acceptComma) {
-                            (peekError(
+                            (
+                                peekError(
                                     if (currentFrame == '[') ErrorCode.ExpectedListCommaOrEnd else ErrorCode.ExpectedObjectCommaOrEnd,
-                                )).raise()
+                                )
+                            ).raise()
                         } else {
                             break
                         }
@@ -1556,7 +1560,8 @@ internal class JsonVariantAccess(
         }
 
     override fun unitVariant(): SerdeResult<Unit> =
-        io.github.kotlinmania.serdecore.de.UnitDeserialize.deserialize(de)
+        io.github.kotlinmania.serdecore.de.UnitDeserialize
+            .deserialize(de)
 
     override fun <T> newtypeVariantSeed(seed: DeserializeSeed<T>): SerdeResult<T> =
         seed.deserialize(de)
@@ -1847,12 +1852,14 @@ fun <T> deserializeFromSlice(json: ByteArray, deserialize: io.github.kotlinmania
  * Parse a JSON string into a [Value].
  */
 fun fromStr(json: String): JsonValueOutcome =
-    JsonValueOutcome.fromResult(serdeCatching {
-        val parser = JsonParser(json)
-        val value = parser.parseValue().getOrThrow()
-        parser.end().getOrThrow()
-        value
-    })
+    JsonValueOutcome.fromResult(
+        serdeCatching {
+            val parser = JsonParser(json)
+            val value = parser.parseValue().getOrThrow()
+            parser.end().getOrThrow()
+            value
+        },
+    )
 
 /**
  * Parse a JSON string into a type T using the given [io.github.kotlinmania.serdecore.de.Deserialize] implementation.

@@ -63,8 +63,10 @@ private class RawValueSerialize(
  * This function validates that the string is valid JSON.
  */
 fun rawValueFromString(json: String): JsonRawValueOutcome =
-    JsonRawValueOutcome.fromResult(serdeCatching {
-        // Validate by parsing
-        fromStr(json).getOrThrow()
-        RawValue(json)
-    })
+    JsonRawValueOutcome.fromResult(
+        serdeCatching {
+            // Validate by parsing
+            fromStr(json).getOrThrow()
+            RawValue(json)
+        },
+    )

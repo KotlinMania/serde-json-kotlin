@@ -398,10 +398,13 @@ private class JsonRawStructSerialize(
             SerdeResult.failure(invalidRawValue())
         } else {
             serdeCatching {
-                value.serialize(object : RawValueEmitter() {
-                    override fun serializeStr(v: String): SerdeResult<Value> =
-                        fromStr(v).toSerdeResult().onSuccess { writer.writeAll(v.encodeToByteArray()) }
-                }).getOrThrow()
+                value
+                    .serialize(
+                        object : RawValueEmitter() {
+                            override fun serializeStr(v: String): SerdeResult<Value> =
+                                fromStr(v).toSerdeResult().onSuccess { writer.writeAll(v.encodeToByteArray()) }
+                        },
+                    ).getOrThrow()
                 written = true
             }
         }
@@ -540,34 +543,40 @@ private class JsonStructVariantSerialize(
  * Serialize a [Serialize] value to a JSON string.
  */
 fun toStr(value: Serialize): JsonStringOutcome =
-    JsonStringOutcome.fromResult(serdeCatching {
-        val writer = VecIoWrite()
-        val serializer = JsonSerializer(writer)
-        value.serialize(serializer).getOrThrow()
-        writer.bytes.decodeToString()
-    })
+    JsonStringOutcome.fromResult(
+        serdeCatching {
+            val writer = VecIoWrite()
+            val serializer = JsonSerializer(writer)
+            value.serialize(serializer).getOrThrow()
+            writer.bytes.decodeToString()
+        },
+    )
 
 /**
  * Serialize a [Serialize] value to a JSON string with pretty-printing.
  */
 fun toStrPretty(value: Serialize): JsonStringOutcome =
-    JsonStringOutcome.fromResult(serdeCatching {
-        val writer = VecIoWrite()
-        val serializer = JsonSerializer(writer, pretty = true)
-        value.serialize(serializer).getOrThrow()
-        writer.bytes.decodeToString()
-    })
+    JsonStringOutcome.fromResult(
+        serdeCatching {
+            val writer = VecIoWrite()
+            val serializer = JsonSerializer(writer, pretty = true)
+            value.serialize(serializer).getOrThrow()
+            writer.bytes.decodeToString()
+        },
+    )
 
 /**
  * Serialize a [Serialize] value to a byte array.
  */
 fun toVec(value: Serialize): JsonBytesOutcome =
-    JsonBytesOutcome.fromResult(serdeCatching {
-        val writer = VecIoWrite()
-        val serializer = JsonSerializer(writer)
-        value.serialize(serializer).getOrThrow()
-        writer.bytes
-    })
+    JsonBytesOutcome.fromResult(
+        serdeCatching {
+            val writer = VecIoWrite()
+            val serializer = JsonSerializer(writer)
+            value.serialize(serializer).getOrThrow()
+            writer.bytes
+        },
+    )
 
 /**
  * Serialize a [Value] to a JSON string.

@@ -13,8 +13,23 @@ import kotlin.test.assertTrue
 
 class MapKeyAndIoTest {
     private enum class Kind {
-        Text, Boolean, Signed, Unsigned, WideSigned, WideUnsigned, Float, Double,
-        Character, Variant, Newtype, Some, Bytes, None, Unit, Sequence, Map,
+        Text,
+        Boolean,
+        Signed,
+        Unsigned,
+        WideSigned,
+        WideUnsigned,
+        Float,
+        Double,
+        Character,
+        Variant,
+        Newtype,
+        Some,
+        Bytes,
+        None,
+        Unit,
+        Sequence,
+        Map,
     }
 
     private class Key(
@@ -61,20 +76,21 @@ class MapKeyAndIoTest {
 
     @Test
     fun scalarKeysAreQuotedInEntryAndSplitPaths() {
-        val cases = listOf(
-            Key(Kind.Text, "key") to "key",
-            Key(Kind.Boolean, "true") to "true",
-            Key(Kind.Signed, "-12") to "-12",
-            Key(Kind.Unsigned, "18446744073709551615") to "18446744073709551615",
-            Key(Kind.Float, "1.5") to "1.5",
-            Key(Kind.Double, "1.5") to "1.5",
-            Key(Kind.Character, "x") to "x",
-            Key(Kind.Variant, "Forward") to "Forward",
-            Key(Kind.Newtype, "wrapped") to "wrapped",
-            Key(Kind.Some, "present") to "present",
-            Key(Kind.WideSigned, "-170141183460469231731687303715884105728") to "-170141183460469231731687303715884105728",
-            Key(Kind.WideUnsigned, "340282366920938463463374607431768211455") to "340282366920938463463374607431768211455",
-        )
+        val cases =
+            listOf(
+                Key(Kind.Text, "key") to "key",
+                Key(Kind.Boolean, "true") to "true",
+                Key(Kind.Signed, "-12") to "-12",
+                Key(Kind.Unsigned, "18446744073709551615") to "18446744073709551615",
+                Key(Kind.Float, "1.5") to "1.5",
+                Key(Kind.Double, "1.5") to "1.5",
+                Key(Kind.Character, "x") to "x",
+                Key(Kind.Variant, "Forward") to "Forward",
+                Key(Kind.Newtype, "wrapped") to "wrapped",
+                Key(Kind.Some, "present") to "present",
+                Key(Kind.WideSigned, "-170141183460469231731687303715884105728") to "-170141183460469231731687303715884105728",
+                Key(Kind.WideUnsigned, "340282366920938463463374607431768211455") to "340282366920938463463374607431768211455",
+            )
         for ((key, expected) in cases) {
             for (split in listOf(false, true)) {
                 assertEquals("{\"$expected\":null}", toStr(Entry(key, split)).getOrThrow())
@@ -132,10 +148,11 @@ class MapKeyAndIoTest {
 
     @Test
     fun bytesAreUnsignedAndFloatPrecisionRemainsSingle() {
-        val bytes = object : Serialize {
-            override fun <Ok> serialize(serializer: Serializer<Ok>): SerdeResult<Ok> =
-                serializer.serializeBytes(byteArrayOf(0, 127, -128, -1))
-        }
+        val bytes =
+            object : Serialize {
+                override fun <Ok> serialize(serializer: Serializer<Ok>): SerdeResult<Ok> =
+                    serializer.serializeBytes(byteArrayOf(0, 127, -128, -1))
+            }
         assertEquals("[0,127,128,255]", toStr(bytes).getOrThrow())
         assertEquals("0.1", toStr(Key(Kind.Float, "0.1")).getOrThrow())
     }
@@ -153,13 +170,14 @@ class MapKeyAndIoTest {
 
     @Test
     fun returnedWriterErrorsStopEverySerializationPath() {
-        val values = listOf(
-            Value.Null,
-            Value.Str("a\"b\nc"),
-            Value.Array(listOf(Value.Str("element"), Value.Null)),
-            Entry(Key(Kind.Text, "field"), false),
-            RawValue("{ \"value\" : [ 1, 2 ] }"),
-        )
+        val values =
+            listOf(
+                Value.Null,
+                Value.Str("a\"b\nc"),
+                Value.Array(listOf(Value.Str("element"), Value.Null)),
+                Entry(Key(Kind.Text, "field"), false),
+                RawValue("{ \"value\" : [ 1, 2 ] }"),
+            )
         for (value in values) {
             val successful = FailingWriter(null)
             assertTrue(value.serialize(JsonSerializer(successful)).isSuccess)
@@ -175,13 +193,14 @@ class MapKeyAndIoTest {
 
     @Test
     fun returnedClosingDelimiterErrorIsNotLost() {
-        val writer = IoWrite { bytes ->
-            if (bytes.contentEquals(byteArrayOf(']'.code.toByte()))) {
-                IoResult.err(IoError(IoErrorKind.Other, "closing bracket failed"))
-            } else {
-                IoResult.ok(Unit)
+        val writer =
+            IoWrite { bytes ->
+                if (bytes.contentEquals(byteArrayOf(']'.code.toByte()))) {
+                    IoResult.err(IoError(IoErrorKind.Other, "closing bracket failed"))
+                } else {
+                    IoResult.ok(Unit)
+                }
             }
-        }
         val result = JsonSerializer(writer).serializeBytes(byteArrayOf(1, 2))
         assertTrue(result.isFailure)
         assertEquals("closing bracket failed", result.exceptionOrNull()?.message)

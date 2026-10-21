@@ -37,83 +37,96 @@ class ResultPropagationTest {
     }
 
     @Test
-    fun sequencePreservesNestedFailure() = assertFailure { serializer, value ->
-        serializer.serializeSeq(1).getOrThrow().serializeElement(value)
-    }
+    fun sequencePreservesNestedFailure() =
+        assertFailure { serializer, value ->
+            serializer.serializeSeq(1).getOrThrow().serializeElement(value)
+        }
 
     @Test
-    fun tuplePreservesNestedFailure() = assertFailure { serializer, value ->
-        serializer.serializeTuple(1).getOrThrow().serializeElement(value)
-    }
+    fun tuplePreservesNestedFailure() =
+        assertFailure { serializer, value ->
+            serializer.serializeTuple(1).getOrThrow().serializeElement(value)
+        }
 
     @Test
-    fun tupleStructPreservesNestedFailure() = assertFailure { serializer, value ->
-        serializer.serializeTupleStruct("Tuple", 1).getOrThrow().serializeField(value)
-    }
+    fun tupleStructPreservesNestedFailure() =
+        assertFailure { serializer, value ->
+            serializer.serializeTupleStruct("Tuple", 1).getOrThrow().serializeField(value)
+        }
 
     @Test
-    fun tupleVariantPreservesNestedFailure() = assertFailure { serializer, value ->
-        serializer.serializeTupleVariant("Enum", 0u, "Tuple", 1).getOrThrow().serializeField(value)
-    }
+    fun tupleVariantPreservesNestedFailure() =
+        assertFailure { serializer, value ->
+            serializer.serializeTupleVariant("Enum", 0u, "Tuple", 1).getOrThrow().serializeField(value)
+        }
 
     @Test
-    fun mapKeyPreservesNestedFailure() = assertFailure { serializer, value ->
-        serializer.serializeMap(1).getOrThrow().serializeKey(value)
-    }
+    fun mapKeyPreservesNestedFailure() =
+        assertFailure { serializer, value ->
+            serializer.serializeMap(1).getOrThrow().serializeKey(value)
+        }
 
     @Test
-    fun mapValuePreservesNestedFailure() = assertFailure { serializer, value ->
-        val map = serializer.serializeMap(1).getOrThrow()
-        map.serializeKey(TextValue).getOrThrow()
-        map.serializeValue(value)
-    }
+    fun mapValuePreservesNestedFailure() =
+        assertFailure { serializer, value ->
+            val map = serializer.serializeMap(1).getOrThrow()
+            map.serializeKey(TextValue).getOrThrow()
+            map.serializeValue(value)
+        }
 
     @Test
-    fun mapEntryKeyPreservesNestedFailure() = assertFailure { serializer, value ->
-        serializer.serializeMap(1).getOrThrow().serializeEntry(value, TextValue)
-    }
+    fun mapEntryKeyPreservesNestedFailure() =
+        assertFailure { serializer, value ->
+            serializer.serializeMap(1).getOrThrow().serializeEntry(value, TextValue)
+        }
 
     @Test
-    fun mapEntryValuePreservesNestedFailure() = assertFailure { serializer, value ->
-        serializer.serializeMap(1).getOrThrow().serializeEntry(TextValue, value)
-    }
+    fun mapEntryValuePreservesNestedFailure() =
+        assertFailure { serializer, value ->
+            serializer.serializeMap(1).getOrThrow().serializeEntry(TextValue, value)
+        }
 
     @Test
-    fun structFieldPreservesNestedFailure() = assertFailure { serializer, value ->
-        serializer.serializeStruct("State", 1).getOrThrow().serializeField("offset", value)
-    }
+    fun structFieldPreservesNestedFailure() =
+        assertFailure { serializer, value ->
+            serializer.serializeStruct("State", 1).getOrThrow().serializeField("offset", value)
+        }
 
     @Test
     fun stringSerializationPreservesStructFailure() {
         val error = SerdeError.custom("negative offset")
-        val state = object : Serialize {
-            override fun <Ok> serialize(serializer: Serializer<Ok>): SerdeResult<Ok> =
-                serializer.serializeStruct("State", 1).flatMap { fields ->
-                    fields.serializeField("offset", FailedValue(error)).flatMap { fields.end() }
-                }
-        }
+        val state =
+            object : Serialize {
+                override fun <Ok> serialize(serializer: Serializer<Ok>): SerdeResult<Ok> =
+                    serializer.serializeStruct("State", 1).flatMap { fields ->
+                        fields.serializeField("offset", FailedValue(error)).flatMap { fields.end() }
+                    }
+            }
         val result = toStr(state)
         assertTrue(result.isFailure)
         assertSame(error, result.exceptionOrNull())
     }
 
     @Test
-    fun structVariantPreservesNestedFailure() = assertFailure { serializer, value ->
-        serializer.serializeStructVariant("Enum", 0u, "State", 1).getOrThrow().serializeField("offset", value)
-    }
+    fun structVariantPreservesNestedFailure() =
+        assertFailure { serializer, value ->
+            serializer.serializeStructVariant("Enum", 0u, "State", 1).getOrThrow().serializeField("offset", value)
+        }
 
     @Test
-    fun newtypeVariantPreservesNestedFailure() = assertFailure { serializer, value ->
-        serializer.serializeNewtypeVariant("Enum", 0u, "State", value)
-    }
+    fun newtypeVariantPreservesNestedFailure() =
+        assertFailure { serializer, value ->
+            serializer.serializeNewtypeVariant("Enum", 0u, "State", value)
+        }
 
     @Test
     fun newtypeVariantPreservesEndFailure() {
         val error = SerdeError.custom("closing object failed")
-        val writer = IoWrite { bytes ->
-            if (bytes.contentEquals(byteArrayOf('}'.code.toByte()))) (error).raise()
-            IoResult.ok(Unit)
-        }
+        val writer =
+            IoWrite { bytes ->
+                if (bytes.contentEquals(byteArrayOf('}'.code.toByte()))) (error).raise()
+                IoResult.ok(Unit)
+            }
         val result = JsonSerializer(writer).serializeNewtypeVariant("Enum", 0u, "State", TextValue)
         assertTrue(result.isFailure)
         assertSame(error, result.exceptionOrNull())
@@ -122,22 +135,29 @@ class ResultPropagationTest {
     private object Forward : Deserialize<String> {
         override fun <D> deserialize(deserializer: D): SerdeResult<String>
             where D : Deserializer =
-            deserializer.deserializeEnum("ScrollDirection", listOf("Forward"), object : Visitor<String> {
-                override fun expecting(): String = "ScrollDirection"
+            deserializer.deserializeEnum(
+                "ScrollDirection",
+                listOf("Forward"),
+                object : Visitor<String> {
+                    override fun expecting(): String = "ScrollDirection"
 
-                override fun <A> visitEnum(access: A): SerdeResult<String>
+                    override fun <A> visitEnum(access: A): SerdeResult<String>
                     where A : EnumAccess =
-                    access.variantSeed(object : DeserializeSeed<String> {
-                        override fun <D> deserialize(deserializer: D): SerdeResult<String>
-                            where D : Deserializer = StringDeserialize.deserialize(deserializer)
-                    }).flatMap { (name, variant) ->
-                        if (name == "Forward") {
-                            variant.unitVariant().map { name }
-                        } else {
-                            SerdeResult.failure(SerdeError.unknownVariant(name, listOf("Forward")))
-                        }
-                    }
-            })
+                        access
+                            .variantSeed(
+                                object : DeserializeSeed<String> {
+                                    override fun <D> deserialize(deserializer: D): SerdeResult<String>
+                                    where D : Deserializer = StringDeserialize.deserialize(deserializer)
+                                },
+                            ).flatMap { (name, variant) ->
+                                if (name == "Forward") {
+                                    variant.unitVariant().map { name }
+                                } else {
+                                    SerdeResult.failure(SerdeError.unknownVariant(name, listOf("Forward")))
+                                }
+                            }
+                },
+            )
     }
 
     @Test

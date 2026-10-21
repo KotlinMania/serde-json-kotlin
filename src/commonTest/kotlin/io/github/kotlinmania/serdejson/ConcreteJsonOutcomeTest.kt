@@ -70,15 +70,17 @@ class ConcreteJsonOutcomeTest {
     @Test
     fun nonfiniteFloatsSerializeAsNull() {
         for (number in listOf(Double.NaN, Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY)) {
-            val value = object : Serialize {
-                override fun <Ok> serialize(serializer: Serializer<Ok>): SerdeResult<Ok> = serializer.serializeF64(number)
-            }
+            val value =
+                object : Serialize {
+                    override fun <Ok> serialize(serializer: Serializer<Ok>): SerdeResult<Ok> = serializer.serializeF64(number)
+                }
             assertEquals("null", toStr(value).getOrThrow())
         }
         for (number in listOf(Float.NaN, Float.POSITIVE_INFINITY, Float.NEGATIVE_INFINITY)) {
-            val value = object : Serialize {
-                override fun <Ok> serialize(serializer: Serializer<Ok>): SerdeResult<Ok> = serializer.serializeF32(number)
-            }
+            val value =
+                object : Serialize {
+                    override fun <Ok> serialize(serializer: Serializer<Ok>): SerdeResult<Ok> = serializer.serializeF32(number)
+                }
             assertEquals("null", toStr(value).getOrThrow())
         }
     }
