@@ -1,0 +1,6 @@
+array|[]|ok
+array|[null]|ok
+array|[null,7,null,9]|ok
+error|[null,"bad",9]|invalid type: string "bad", expected i64 at line 1 column 11
+error|[null,]|trailing comma at line 1 column 7
+recovery|2|1|7|0|true

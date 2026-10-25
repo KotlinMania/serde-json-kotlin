@@ -11,6 +11,7 @@ import io.github.kotlinmania.serdecore.de.EnumAccess
 import io.github.kotlinmania.serdecore.de.Expected
 import io.github.kotlinmania.serdecore.de.MapAccess
 import io.github.kotlinmania.serdecore.de.SeqAccess
+import io.github.kotlinmania.serdecore.de.SeqElement
 import io.github.kotlinmania.serdecore.de.StringDeserialize
 import io.github.kotlinmania.serdecore.de.Unexpected
 import io.github.kotlinmania.serdecore.de.VariantAccess
@@ -54,13 +55,18 @@ private object ValueVisitor : Visitor<Value> {
 
     override fun visitUnit(): SerdeResult<Value> = SerdeResult.success(Value.Null)
 
-    override fun <A : SeqAccess> visitSeq(access: A): SerdeResult<Value> {
+    override fun <A : SeqAccess> visitSeq(access: A): SerdeResult<Value> = serdeCatching {
         val values = mutableListOf<Value>()
         while (true) {
-            val element = access.nextElement(ValueDeserialize).getOrElse { return SerdeResult.failure(it) } ?: break
-            values.add(element)
+            when (val `__serdeNext0` = `access`.nextElement(`ValueDeserialize`).getOrThrow()) {
+                is io.github.kotlinmania.serdecore.de.SeqElement.Some -> {
+                    val `elem` = `__serdeNext0`.value
+                    `values`.add(`elem`)
+                }
+                io.github.kotlinmania.serdecore.de.SeqElement.None -> break
+            }
         }
-        return SerdeResult.success(Value.Array(values))
+        Value.Array(values)
     }
 
     override fun <A : MapAccess> visitMap(access: A): SerdeResult<Value> {
@@ -282,13 +288,14 @@ private class ValueSeqAccess(
     private val iter = list.iterator()
     private var remaining = list.size
 
-    override fun <T> nextElementSeed(seed: DeserializeSeed<T>): SerdeResult<T?> =
+    override fun <T> nextElementSeed(seed: DeserializeSeed<T>): SerdeResult<SeqElement<T>> =
         if (iter.hasNext()) {
             val value = iter.next()
             remaining -= 1
-            seed.deserialize(ValueDeserializer(value)).map { it }
+            val deserializer = ValueDeserializer(value)
+            `seed`.deserialize(`deserializer`).map { `__serdeValue0` -> io.github.kotlinmania.serdecore.de.SeqElement.Some(`__serdeValue0`) }
         } else {
-            SerdeResult.success(null)
+            io.github.kotlinmania.serde.SerdeResult.success(io.github.kotlinmania.serdecore.de.SeqElement.None)
         }
 
     override fun sizeHint(): Int = remaining

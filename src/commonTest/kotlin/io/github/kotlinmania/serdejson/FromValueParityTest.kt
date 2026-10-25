@@ -9,6 +9,7 @@ import io.github.kotlinmania.serdecore.de.F64Deserialize
 import io.github.kotlinmania.serdecore.de.I64Deserialize
 import io.github.kotlinmania.serdecore.de.MapAccess
 import io.github.kotlinmania.serdecore.de.SeqAccess
+import io.github.kotlinmania.serdecore.de.SeqElement
 import io.github.kotlinmania.serdecore.de.StringDeserialize
 import io.github.kotlinmania.serdecore.de.U64Deserialize
 import io.github.kotlinmania.serdecore.de.Visitor
@@ -58,7 +59,7 @@ class FromValueParityTest {
 
                         override fun <A : SeqAccess> visitSeq(access: A): SerdeResult<Unit> {
                             assertEquals(2, access.sizeHint())
-                            assertEquals(1L, access.nextElement(I64Deserialize).getOrThrow())
+                            assertEquals(SeqElement.Some(1L), access.nextElement(I64Deserialize).getOrThrow())
                             assertEquals(1, access.sizeHint())
                             return SerdeResult.success(Unit)
                         }

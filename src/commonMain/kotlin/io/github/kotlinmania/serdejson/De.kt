@@ -10,6 +10,7 @@ import io.github.kotlinmania.serdecore.de.EnumAccess
 import io.github.kotlinmania.serdecore.de.Expected
 import io.github.kotlinmania.serdecore.de.MapAccess
 import io.github.kotlinmania.serdecore.de.SeqAccess
+import io.github.kotlinmania.serdecore.de.SeqElement
 import io.github.kotlinmania.serdecore.de.Unexpected
 import io.github.kotlinmania.serdecore.de.VariantAccess
 import io.github.kotlinmania.serdecore.de.Visitor
@@ -161,8 +162,14 @@ class JsonParser(
         SerdeError.custom(JsonError.syntax(code, line, col).toString())
 
     /** Error caused by a byte from peek(). */
-    internal fun peekError(code: ErrorCode): SerdeError =
-        SerdeError.custom(JsonError.syntax(code, line, col).toString())
+    internal fun peekError(code: ErrorCode): SerdeError {
+        val position = when {
+            pos >= input.length -> line to col
+            input[pos] == '\n' -> (line + 1) to 0
+            else -> line to (col + 1)
+        }
+        return SerdeError.custom(JsonError.syntax(code, position.first, position.second).toString())
+    }
 
     // ── Identifier parsing ──
 
@@ -1376,7 +1383,7 @@ class JsonDeserializer(
      */
     private fun <V> peekInvalidType(visitor: Visitor<V>): SerdeError {
         val peek = parser.peekOrNull()
-        return when (peek.toChar()) {
+        val error = when (peek.toChar()) {
             'n' -> {
                 parser.eatChar()
                 parser.parseIdent("ull")
@@ -1416,6 +1423,8 @@ class JsonDeserializer(
             '{' -> SerdeError.invalidType(Unexpected.Map, visitor)
             else -> parser.peekError(ErrorCode.ExpectedSomeValue)
         }
+        val positioned = JsonError.custom(error.message)
+        return if (positioned.line() == 0) parser.error(positioned.code) else error
     }
 
     // ── Raw value deserialization ──
@@ -1446,12 +1455,12 @@ internal class JsonSeqAccess(
 ) : SeqAccess {
     private var first = true
 
-    override fun <T> nextElementSeed(seed: DeserializeSeed<T>): SerdeResult<T?> =
+    override fun <T> nextElementSeed(seed: DeserializeSeed<T>): SerdeResult<SeqElement<T>> =
         serdeCatching { hasNextElement() }.flatMap { hasNext ->
             if (hasNext) {
-                seed.deserialize(de)
+                `seed`.deserialize(`de`).map { `__serdeValue0` -> io.github.kotlinmania.serdecore.de.SeqElement.Some(`__serdeValue0`) }
             } else {
-                SerdeResult.success(null)
+                io.github.kotlinmania.serde.SerdeResult.success(io.github.kotlinmania.serdecore.de.SeqElement.None)
             }
         }
 

@@ -1,0 +1,1000 @@
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.8.2/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+> Task :kmpPartiallyResolvedDependenciesChecker
+> Task :checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :jvmProcessResources NO-SOURCE
+> Task :processJvmMainResources SKIPPED
+> Task :jvmTestProcessResources NO-SOURCE
+> Task :processJvmTestResources SKIPPED
+> Task :downloadKotlinNativeDistribution UP-TO-DATE
+> Task :compileKotlinMacosArm64
+> Task :macosArm64ProcessResources NO-SOURCE
+> Task :macosArm64MainKlibrary
+> Task :compileTestKotlinMacosArm64
+> Task :validateLocalSwiftPMDependencies
+> Task :computeLocalPackageDependencyInputFiles UP-TO-DATE
+> Task :fingerprintSyntheticPackage UP-TO-DATE
+> Task :generateSyntheticLinkageSwiftPMImportProjectForCinteropsAndLdDump SKIPPED
+> Task :serializeSwiftPMDependenciesMetadataForLockFiles UP-TO-DATE
+> Task :generateUmbrellaPackageIdentifierBasedResolutionForDefault SKIPPED
+> Task :fetchUmbrellaPackageIdentifierForDefault SKIPPED
+> Task :syncPersistedPackageResolvedToSynthetic SKIPPED
+> Task :fetchSyntheticImportProjectPackages SKIPPED
+> Task :fingerprintXcodebuildMacosx UP-TO-DATE
+> Task :dumpXcodebuildArgsMacosx SKIPPED
+> Task :convertSyntheticImportProjectIntoDefFileMacosx UP-TO-DATE
+> Task :compileKotlinJvm
+> Task :linkDebugTestMacosArm64
+> Task :compileJvmMainJava NO-SOURCE
+> Task :jvmMainClasses
+> Task :jvmJar
+
+io.github.kotlinmania.serdejson.ConcreteJsonOutcomeTest.parsedValueHasConcreteTypeAndOriginalIdentity[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.ConcreteJsonOutcomeTest.parsedValueHasConcreteTypeAndOriginalIdentity[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.ConcreteJsonOutcomeTest.concreteFailureRetainsOriginalDiagnostic[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.ConcreteJsonOutcomeTest.concreteFailureRetainsOriginalDiagnostic[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.ConcreteJsonOutcomeTest.serializationHasConcreteTextAndBytes[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.ConcreteJsonOutcomeTest.serializationHasConcreteTextAndBytes[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.ConcreteJsonOutcomeTest.nullIsAValueRatherThanAnAbsentOutcome[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.ConcreteJsonOutcomeTest.nullIsAValueRatherThanAnAbsentOutcome[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.ConcreteJsonOutcomeTest.trailingInputFailsForValueAndTypedDecoders[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.ConcreteJsonOutcomeTest.trailingInputFailsForValueAndTypedDecoders[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.ConcreteJsonOutcomeTest.trailingWhitespaceRemainsValid[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.ConcreteJsonOutcomeTest.trailingWhitespaceRemainsValid[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.ConcreteJsonOutcomeTest.nonfiniteFloatsSerializeAsNull[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.ConcreteJsonOutcomeTest.nonfiniteFloatsSerializeAsNull[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.ConcreteJsonOutcomeTest.formatInputSupportsConcretePrimitiveOperations[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.ConcreteJsonOutcomeTest.formatInputSupportsConcretePrimitiveOperations[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.ConcreteJsonOutcomeTest.sequenceVisitorFailurePrecedesTerminatorValidation[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.ConcreteJsonOutcomeTest.sequenceVisitorFailurePrecedesTerminatorValidation[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.ConcreteJsonOutcomeTest.mapAndEnumVisitorFailuresPrecedeTerminatorValidation[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.ConcreteJsonOutcomeTest.mapAndEnumVisitorFailuresPrecedeTerminatorValidation[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.DeSerTest.testParsePrimitives[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.DeSerTest.testParsePrimitives[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.DeSerTest.testParseArray[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.DeSerTest.testParseArray[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.DeSerTest.testParseObject[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.DeSerTest.testParseObject[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.DeSerTest.testRoundTrip[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.DeSerTest.testRoundTrip[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.DeSerTest.testEscapeStrings[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.DeSerTest.testEscapeStrings[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.DeSerTest.testConvenienceHelpers[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.DeSerTest.testConvenienceHelpers[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.DebugTest.testNumber[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.DebugTest.testNumber[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.DebugTest.testValueNull[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.DebugTest.testValueNull[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.DebugTest.testValueBool[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.DebugTest.testValueBool[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.DebugTest.testValueNumber[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.DebugTest.testValueNumber[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.DebugTest.testValueString[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.DebugTest.testValueString[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.DebugTest.testValueArray[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.DebugTest.testValueArray[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.DebugTest.testValueObject[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.DebugTest.testValueObject[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.DebugTest.testParseError[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.DebugTest.testParseError[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.DebugTest.testIndented[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.DebugTest.testIndented[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.FromValueParityTest.stringDecodingRetainsTheSuppliedString[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.FromValueParityTest.stringDecodingRetainsTheSuppliedString[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.FromValueParityTest.floatingPointDecodingRetainsExactBits[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.FromValueParityTest.floatingPointDecodingRetainsExactBits[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.FromValueParityTest.existingNestedValuesDoNotAcquireATextParserDepthLimit[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.FromValueParityTest.existingNestedValuesDoNotAcquireATextParserDepthLimit[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.FromValueParityTest.sequenceDecodingReportsRemainingElementsAndExactSizeHints[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.FromValueParityTest.sequenceDecodingReportsRemainingElementsAndExactSizeHints[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.FromValueParityTest.mapDecodingReportsRemainingEntriesAndExactSizeHints[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.FromValueParityTest.mapDecodingReportsRemainingEntriesAndExactSizeHints[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.FromValueParityTest.visitorFailurePreservesOriginalDiagnosticAndCause[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.FromValueParityTest.visitorFailurePreservesOriginalDiagnosticAndCause[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.FromValueParityTest.genericDecodingRetainsConcreteTypesAndRejectsMismatches[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.FromValueParityTest.genericDecodingRetainsConcreteTypesAndRejectsMismatches[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.MapContractParityTest.iteratorsReportRemainingEntries[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.MapContractParityTest.iteratorsReportRemainingEntries[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.MapContractParityTest.equalMapsHaveEqualHashesRegardlessOfInsertionOrder[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.MapContractParityTest.equalMapsHaveEqualHashesRegardlessOfInsertionOrder[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.MapContractParityTest.mapCreationFailureReturnsOriginalDiagnostic[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.MapContractParityTest.mapCreationFailureReturnsOriginalDiagnostic[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.MapContractParityTest.entryFailureStopsBeforeNextEntryAndEnd[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.MapContractParityTest.entryFailureStopsBeforeNextEntryAndEnd[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.MapContractParityTest.endFailureReturnsOriginalDiagnostic[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.MapContractParityTest.endFailureReturnsOriginalDiagnostic[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.MapContractParityTest.successfulSerializationRetainsEveryEntry[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.MapContractParityTest.successfulSerializationRetainsEveryEntry[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.MapKeyAndIoTest.scalarKeysAreQuotedInEntryAndSplitPaths[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.MapKeyAndIoTest.scalarKeysAreQuotedInEntryAndSplitPaths[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.MapKeyAndIoTest.stringKeysUseTheNormalEscapingRules[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.MapKeyAndIoTest.stringKeysUseTheNormalEscapingRules[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.MapKeyAndIoTest.unsupportedKeysFailInsteadOfWritingInvalidJson[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.MapKeyAndIoTest.unsupportedKeysFailInsteadOfWritingInvalidJson[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.MapKeyAndIoTest.nonfiniteMapKeysFailWhileOrdinaryValuesRemainNull[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.MapKeyAndIoTest.nonfiniteMapKeysFailWhileOrdinaryValuesRemainNull[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.MapKeyAndIoTest.wideIntegerKeysRejectInvalidOrOutOfRangeRepresentations[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.MapKeyAndIoTest.wideIntegerKeysRejectInvalidOrOutOfRangeRepresentations[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.MapKeyAndIoTest.rawValuesPreserveFormattingAndRejectInvalidInput[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.MapKeyAndIoTest.rawValuesPreserveFormattingAndRejectInvalidInput[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.MapKeyAndIoTest.bytesAreUnsignedAndFloatPrecisionRemainsSingle[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.MapKeyAndIoTest.bytesAreUnsignedAndFloatPrecisionRemainsSingle[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.MapKeyAndIoTest.returnedWriterErrorsStopEverySerializationPath[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.MapKeyAndIoTest.returnedWriterErrorsStopEverySerializationPath[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.MapKeyAndIoTest.returnedClosingDelimiterErrorIsNotLost[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.MapKeyAndIoTest.returnedClosingDelimiterErrorIsNotLost[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.MapTest.testPreserveOrder[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.MapTest.testPreserveOrder[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.MapTest.testShiftInsert[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.MapTest.testShiftInsert[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.MapTest.testAppend[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.MapTest.testAppend[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.MapTest.testRetain[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.MapTest.testRetain[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.NumberTest.testIntNumbers[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.NumberTest.testIntNumbers[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.NumberTest.testFloatNumbers[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.NumberTest.testFloatNumbers[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.NumberTest.testNumberEquality[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.NumberTest.testNumberEquality[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.RawValueProtocolParityTest.serializableValuesConvertToOwnedRawJson[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.RawValueProtocolParityTest.serializableValuesConvertToOwnedRawJson[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.RawValueProtocolParityTest.rawConversionRetainsExistingRawFormatting[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.RawValueProtocolParityTest.rawConversionRetainsExistingRawFormatting[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.RawValueProtocolParityTest.rawConversionPreservesSerializerFailureIdentity[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.RawValueProtocolParityTest.rawConversionPreservesSerializerFailureIdentity[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.RawValueProtocolParityTest.rawConversionRejectsSequenceMapKeys[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.RawValueProtocolParityTest.rawConversionRejectsSequenceMapKeys[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.RawValueProtocolParityTest.rawValuesDriveFreshTypedDeserializers[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.RawValueProtocolParityTest.rawValuesDriveFreshTypedDeserializers[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.RawValueProtocolParityTest.ownedRawInputTrimsOutsideWhitespaceAndPreservesContents[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.RawValueProtocolParityTest.ownedRawInputTrimsOutsideWhitespaceAndPreservesContents[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.RawValueProtocolParityTest.rawNewtypeUsesASingleEntryMap[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.RawValueProtocolParityTest.rawNewtypeUsesASingleEntryMap[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.RawValueProtocolParityTest.valuesDeserializeIntoOwnedRawText[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.RawValueProtocolParityTest.valuesDeserializeIntoOwnedRawText[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.RawValueProtocolParityTest.reservedRawMapDecodesItsJsonContents[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.RawValueProtocolParityTest.reservedRawMapDecodesItsJsonContents[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.RawValueProtocolParityTest.invalidReservedRawPayloadsAreRejected[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.RawValueProtocolParityTest.invalidReservedRawPayloadsAreRejected[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.RawValueProtocolParityTest.ordinaryKeysAndTheBoundedNumberProfileRemainOrdinary[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.RawValueProtocolParityTest.ordinaryKeysAndTheBoundedNumberProfileRemainOrdinary[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.RawValueProtocolParityTest.rawVisitorFailuresPreserveTheirDiagnosticIdentity[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.RawValueProtocolParityTest.rawVisitorFailuresPreserveTheirDiagnosticIdentity[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.RawValueProtocolParityTest.valueByteHintsPreserveStringVisitorDispatch[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.RawValueProtocolParityTest.valueByteHintsPreserveStringVisitorDispatch[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.ResultPropagationTest.sequencePreservesNestedFailure[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.ResultPropagationTest.sequencePreservesNestedFailure[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.ResultPropagationTest.tuplePreservesNestedFailure[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.ResultPropagationTest.tuplePreservesNestedFailure[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.ResultPropagationTest.tupleStructPreservesNestedFailure[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.ResultPropagationTest.tupleStructPreservesNestedFailure[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.ResultPropagationTest.tupleVariantPreservesNestedFailure[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.ResultPropagationTest.tupleVariantPreservesNestedFailure[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.ResultPropagationTest.mapKeyPreservesNestedFailure[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.ResultPropagationTest.mapKeyPreservesNestedFailure[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.ResultPropagationTest.mapValuePreservesNestedFailure[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.ResultPropagationTest.mapValuePreservesNestedFailure[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.ResultPropagationTest.mapEntryKeyPreservesNestedFailure[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.ResultPropagationTest.mapEntryKeyPreservesNestedFailure[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.ResultPropagationTest.mapEntryValuePreservesNestedFailure[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.ResultPropagationTest.mapEntryValuePreservesNestedFailure[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.ResultPropagationTest.structFieldPreservesNestedFailure[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.ResultPropagationTest.structFieldPreservesNestedFailure[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.ResultPropagationTest.stringSerializationPreservesStructFailure[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.ResultPropagationTest.stringSerializationPreservesStructFailure[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.ResultPropagationTest.structVariantPreservesNestedFailure[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.ResultPropagationTest.structVariantPreservesNestedFailure[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.ResultPropagationTest.newtypeVariantPreservesNestedFailure[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.ResultPropagationTest.newtypeVariantPreservesNestedFailure[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.ResultPropagationTest.newtypeVariantPreservesEndFailure[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.ResultPropagationTest.newtypeVariantPreservesEndFailure[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.ResultPropagationTest.unitEnumRejectsNonUnitPayload[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.ResultPropagationTest.unitEnumRejectsNonUnitPayload[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.ResultPropagationTest.unitEnumAcceptsNullPayload[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.ResultPropagationTest.unitEnumAcceptsNullPayload[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.ResultPropagationTest.unitEnumAcceptsBareVariant[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.ResultPropagationTest.unitEnumAcceptsBareVariant[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.SequenceElementParityTest.nullableElementsAndEndOfSequenceRemainDistinct[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.SequenceElementParityTest.nullableElementsAndEndOfSequenceRemainDistinct[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.SequenceElementParityTest.failuresAfterNullAreNotMistakenForEndOfSequence[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.SequenceElementParityTest.failuresAfterNullAreNotMistakenForEndOfSequence[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.SequenceElementParityTest.valueSequenceConsumesTheFailedItemAndRetainsRemainingState[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.SequenceElementParityTest.valueSequenceConsumesTheFailedItemAndRetainsRemainingState[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.ValueDeserializationParityTest.mapDeserializationRetainsEveryValueKind[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.ValueDeserializationParityTest.mapDeserializationRetainsEveryValueKind[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.ValueDeserializationParityTest.mapKeyAndValueFailuresRetainTheirIdentity[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.ValueDeserializationParityTest.mapKeyAndValueFailuresRetainTheirIdentity[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.ValueDeserializationParityTest.integerDecodingRejectsFloatingPointValuesWithoutTruncation[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.ValueDeserializationParityTest.integerDecodingRejectsFloatingPointValuesWithoutTruncation[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.ValueDeserializationParityTest.integerDecodingChecksBoundsAndPreservesValidValues[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.ValueDeserializationParityTest.integerDecodingChecksBoundsAndPreservesValidValues[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.ValueDeserializationParityTest.numericHintsPreserveTheOriginalNumberKind[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.ValueDeserializationParityTest.numericHintsPreserveTheOriginalNumberKind[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.ValueDeserializationParityTest.nonfiniteAndOptionalValuesDecodeThroughTheVisitor[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.ValueDeserializationParityTest.nonfiniteAndOptionalValuesDecodeThroughTheVisitor[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.ValueDeserializationParityTest.wideIntegerValuesRespectTheNumberRange[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.ValueDeserializationParityTest.wideIntegerValuesRespectTheNumberRange[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.ValueDeserializationParityTest.partialSequenceConsumptionFailsAndReportsExactSizeHints[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.ValueDeserializationParityTest.partialSequenceConsumptionFailsAndReportsExactSizeHints[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.ValueDeserializationParityTest.partialMapConsumptionFailsAndReportsExactSizeHints[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.ValueDeserializationParityTest.partialMapConsumptionFailsAndReportsExactSizeHints[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.ValueDeserializationParityTest.containerVisitorFailureTakesPrecedenceOverRemainingElements[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.ValueDeserializationParityTest.containerVisitorFailureTakesPrecedenceOverRemainingElements[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.ValueMapKeyParityTest.scalarMapKeysDecodeFromValues[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.ValueMapKeyParityTest.scalarMapKeysDecodeFromValues[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.ValueMapKeyParityTest.invalidNumericAndBooleanKeysAreRejected[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.ValueMapKeyParityTest.invalidNumericAndBooleanKeysAreRejected[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.ValueMapKeyParityTest.wideMapKeysDecodeWithActualIntegerBounds[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.ValueMapKeyParityTest.wideMapKeysDecodeWithActualIntegerBounds[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.ValueMapKeyParityTest.optionAndNewtypeMapKeysUseTheKeyDeserializer[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.ValueMapKeyParityTest.optionAndNewtypeMapKeysUseTheKeyDeserializer[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.ValueMapKeyParityTest.enumMapKeysRetainUnitVariantBehavior[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.ValueMapKeyParityTest.enumMapKeysRetainUnitVariantBehavior[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.ValueMapKeyParityTest.keyVisitorFailuresRetainTheirIdentity[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.ValueMapKeyParityTest.keyVisitorFailuresRetainTheirIdentity[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.ValueResultPropagationTest.newtypeVariantPreservesFailureAndSuccessfulPayload[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.ValueResultPropagationTest.newtypeVariantPreservesFailureAndSuccessfulPayload[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.ValueResultPropagationTest.sequenceFailureDoesNotAppendAnElement[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.ValueResultPropagationTest.sequenceFailureDoesNotAppendAnElement[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.ValueResultPropagationTest.tupleVariantFailureDoesNotAppendAField[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.ValueResultPropagationTest.tupleVariantFailureDoesNotAppendAField[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.ValueResultPropagationTest.mapFailureConsumesTheKeyWithoutInsertingAValue[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.ValueResultPropagationTest.mapFailureConsumesTheKeyWithoutInsertingAValue[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.ValueResultPropagationTest.structVariantFailureDoesNotInsertAField[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.ValueResultPropagationTest.structVariantFailureDoesNotInsertAField[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.ValueScalarParityTest.nonfiniteSinglePrecisionValuesBecomeNull[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.ValueScalarParityTest.nonfiniteSinglePrecisionValuesBecomeNull[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.ValueScalarParityTest.nonfiniteDoublePrecisionValuesBecomeNull[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.ValueScalarParityTest.nonfiniteDoublePrecisionValuesBecomeNull[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.ValueScalarParityTest.serializedBytesKeepTheirUnsignedValues[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.ValueScalarParityTest.serializedBytesKeepTheirUnsignedValues[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.ValueTest.testValueTypePredicates[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.ValueTest.testValueTypePredicates[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.ValueTest.testValueEquality[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.ValueTest.testValueEquality[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.ValueTest.testPartialEq[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.ValueTest.testPartialEq[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.ValueTest.testPointer[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.ValueTest.testPointer[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.ValueTest.testIndex[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.ValueTest.testIndex[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.lexical.LexicalMathTest.testCompare[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.lexical.LexicalMathTest.testCompare[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.lexical.LexicalMathTest.testBitLength[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.lexical.LexicalMathTest.testBitLength[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.lexical.LexicalMathTest.testIaddSmall[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.lexical.LexicalMathTest.testIaddSmall[macosArm64] PASSED
+
+io.github.kotlinmania.serdejson.lexical.LexicalMathTest.testImulSmall[macosArm64] STARTED
+
+io.github.kotlinmania.serdejson.lexical.LexicalMathTest.testImulSmall[macosArm64] PASSED
+> Task :macosArm64Test
+> Task :compileTestKotlinJvm
+> Task :compileJvmTestJava NO-SOURCE
+> Task :jvmTestClasses
+
+> Task :jvmTest
+
+ConcreteJsonOutcomeTest[jvm] > nonfiniteFloatsSerializeAsNull[jvm] STARTED
+
+ConcreteJsonOutcomeTest[jvm] > nonfiniteFloatsSerializeAsNull[jvm] PASSED
+
+ConcreteJsonOutcomeTest[jvm] > parsedValueHasConcreteTypeAndOriginalIdentity[jvm] STARTED
+
+ConcreteJsonOutcomeTest[jvm] > parsedValueHasConcreteTypeAndOriginalIdentity[jvm] PASSED
+
+ConcreteJsonOutcomeTest[jvm] > serializationHasConcreteTextAndBytes[jvm] STARTED
+
+ConcreteJsonOutcomeTest[jvm] > serializationHasConcreteTextAndBytes[jvm] PASSED
+
+ConcreteJsonOutcomeTest[jvm] > concreteFailureRetainsOriginalDiagnostic[jvm] STARTED
+
+ConcreteJsonOutcomeTest[jvm] > concreteFailureRetainsOriginalDiagnostic[jvm] PASSED
+
+ConcreteJsonOutcomeTest[jvm] > trailingInputFailsForValueAndTypedDecoders[jvm] STARTED
+
+ConcreteJsonOutcomeTest[jvm] > trailingInputFailsForValueAndTypedDecoders[jvm] PASSED
+
+ConcreteJsonOutcomeTest[jvm] > nullIsAValueRatherThanAnAbsentOutcome[jvm] STARTED
+
+ConcreteJsonOutcomeTest[jvm] > nullIsAValueRatherThanAnAbsentOutcome[jvm] PASSED
+
+ConcreteJsonOutcomeTest[jvm] > trailingWhitespaceRemainsValid[jvm] STARTED
+
+ConcreteJsonOutcomeTest[jvm] > trailingWhitespaceRemainsValid[jvm] PASSED
+
+ConcreteJsonOutcomeTest[jvm] > sequenceVisitorFailurePrecedesTerminatorValidation[jvm] STARTED
+
+ConcreteJsonOutcomeTest[jvm] > sequenceVisitorFailurePrecedesTerminatorValidation[jvm] PASSED
+
+ConcreteJsonOutcomeTest[jvm] > mapAndEnumVisitorFailuresPrecedeTerminatorValidation[jvm] STARTED
+
+ConcreteJsonOutcomeTest[jvm] > mapAndEnumVisitorFailuresPrecedeTerminatorValidation[jvm] PASSED
+
+ConcreteJsonOutcomeTest[jvm] > formatInputSupportsConcretePrimitiveOperations[jvm] STARTED
+
+ConcreteJsonOutcomeTest[jvm] > formatInputSupportsConcretePrimitiveOperations[jvm] PASSED
+
+DeSerTest[jvm] > testParseArray[jvm] STARTED
+
+DeSerTest[jvm] > testParseArray[jvm] PASSED
+
+DeSerTest[jvm] > testParseObject[jvm] STARTED
+
+DeSerTest[jvm] > testParseObject[jvm] PASSED
+
+DeSerTest[jvm] > testEscapeStrings[jvm] STARTED
+
+DeSerTest[jvm] > testEscapeStrings[jvm] PASSED
+
+DeSerTest[jvm] > testRoundTrip[jvm] STARTED
+
+DeSerTest[jvm] > testRoundTrip[jvm] PASSED
+
+DeSerTest[jvm] > testConvenienceHelpers[jvm] STARTED
+
+DeSerTest[jvm] > testConvenienceHelpers[jvm] PASSED
+
+DeSerTest[jvm] > testParsePrimitives[jvm] STARTED
+
+DeSerTest[jvm] > testParsePrimitives[jvm] PASSED
+
+DebugTest[jvm] > testValueString[jvm] STARTED
+
+DebugTest[jvm] > testValueString[jvm] PASSED
+
+DebugTest[jvm] > testParseError[jvm] STARTED
+
+DebugTest[jvm] > testParseError[jvm] PASSED
+
+DebugTest[jvm] > testValueBool[jvm] STARTED
+
+DebugTest[jvm] > testValueBool[jvm] PASSED
+
+DebugTest[jvm] > testValueNull[jvm] STARTED
+
+DebugTest[jvm] > testValueNull[jvm] PASSED
+
+DebugTest[jvm] > testIndented[jvm] STARTED
+
+DebugTest[jvm] > testIndented[jvm] PASSED
+
+DebugTest[jvm] > testValueArray[jvm] STARTED
+
+DebugTest[jvm] > testValueArray[jvm] PASSED
+
+DebugTest[jvm] > testNumber[jvm] STARTED
+
+DebugTest[jvm] > testNumber[jvm] PASSED
+
+DebugTest[jvm] > testValueNumber[jvm] STARTED
+
+DebugTest[jvm] > testValueNumber[jvm] PASSED
+
+DebugTest[jvm] > testValueObject[jvm] STARTED
+
+DebugTest[jvm] > testValueObject[jvm] PASSED
+
+FromValueParityTest[jvm] > mapDecodingReportsRemainingEntriesAndExactSizeHints[jvm] STARTED
+
+FromValueParityTest[jvm] > mapDecodingReportsRemainingEntriesAndExactSizeHints[jvm] PASSED
+
+FromValueParityTest[jvm] > sequenceDecodingReportsRemainingElementsAndExactSizeHints[jvm] STARTED
+
+FromValueParityTest[jvm] > sequenceDecodingReportsRemainingElementsAndExactSizeHints[jvm] PASSED
+
+FromValueParityTest[jvm] > existingNestedValuesDoNotAcquireATextParserDepthLimit[jvm] STARTED
+
+FromValueParityTest[jvm] > existingNestedValuesDoNotAcquireATextParserDepthLimit[jvm] PASSED
+
+FromValueParityTest[jvm] > visitorFailurePreservesOriginalDiagnosticAndCause[jvm] STARTED
+
+FromValueParityTest[jvm] > visitorFailurePreservesOriginalDiagnosticAndCause[jvm] PASSED
+
+FromValueParityTest[jvm] > genericDecodingRetainsConcreteTypesAndRejectsMismatches[jvm] STARTED
+
+FromValueParityTest[jvm] > genericDecodingRetainsConcreteTypesAndRejectsMismatches[jvm] PASSED
+
+FromValueParityTest[jvm] > floatingPointDecodingRetainsExactBits[jvm] STARTED
+
+FromValueParityTest[jvm] > floatingPointDecodingRetainsExactBits[jvm] PASSED
+
+FromValueParityTest[jvm] > stringDecodingRetainsTheSuppliedString[jvm] STARTED
+
+FromValueParityTest[jvm] > stringDecodingRetainsTheSuppliedString[jvm] PASSED
+
+MapContractParityTest[jvm] > iteratorsReportRemainingEntries[jvm] STARTED
+
+MapContractParityTest[jvm] > iteratorsReportRemainingEntries[jvm] PASSED
+
+MapContractParityTest[jvm] > endFailureReturnsOriginalDiagnostic[jvm] STARTED
+
+MapContractParityTest[jvm] > endFailureReturnsOriginalDiagnostic[jvm] PASSED
+
+MapContractParityTest[jvm] > entryFailureStopsBeforeNextEntryAndEnd[jvm] STARTED
+
+MapContractParityTest[jvm] > entryFailureStopsBeforeNextEntryAndEnd[jvm] PASSED
+
+MapContractParityTest[jvm] > equalMapsHaveEqualHashesRegardlessOfInsertionOrder[jvm] STARTED
+
+MapContractParityTest[jvm] > equalMapsHaveEqualHashesRegardlessOfInsertionOrder[jvm] PASSED
+
+MapContractParityTest[jvm] > mapCreationFailureReturnsOriginalDiagnostic[jvm] STARTED
+
+MapContractParityTest[jvm] > mapCreationFailureReturnsOriginalDiagnostic[jvm] PASSED
+
+MapContractParityTest[jvm] > successfulSerializationRetainsEveryEntry[jvm] STARTED
+
+MapContractParityTest[jvm] > successfulSerializationRetainsEveryEntry[jvm] PASSED
+
+MapKeyAndIoTest[jvm] > nonfiniteMapKeysFailWhileOrdinaryValuesRemainNull[jvm] STARTED
+
+MapKeyAndIoTest[jvm] > nonfiniteMapKeysFailWhileOrdinaryValuesRemainNull[jvm] PASSED
+
+MapKeyAndIoTest[jvm] > returnedWriterErrorsStopEverySerializationPath[jvm] STARTED
+
+MapKeyAndIoTest[jvm] > returnedWriterErrorsStopEverySerializationPath[jvm] PASSED
+
+MapKeyAndIoTest[jvm] > rawValuesPreserveFormattingAndRejectInvalidInput[jvm] STARTED
+
+MapKeyAndIoTest[jvm] > rawValuesPreserveFormattingAndRejectInvalidInput[jvm] PASSED
+
+MapKeyAndIoTest[jvm] > bytesAreUnsignedAndFloatPrecisionRemainsSingle[jvm] STARTED
+
+MapKeyAndIoTest[jvm] > bytesAreUnsignedAndFloatPrecisionRemainsSingle[jvm] PASSED
+
+MapKeyAndIoTest[jvm] > unsupportedKeysFailInsteadOfWritingInvalidJson[jvm] STARTED
+
+MapKeyAndIoTest[jvm] > unsupportedKeysFailInsteadOfWritingInvalidJson[jvm] PASSED
+
+MapKeyAndIoTest[jvm] > scalarKeysAreQuotedInEntryAndSplitPaths[jvm] STARTED
+
+MapKeyAndIoTest[jvm] > scalarKeysAreQuotedInEntryAndSplitPaths[jvm] PASSED
+
+MapKeyAndIoTest[jvm] > stringKeysUseTheNormalEscapingRules[jvm] STARTED
+
+MapKeyAndIoTest[jvm] > stringKeysUseTheNormalEscapingRules[jvm] PASSED
+
+MapKeyAndIoTest[jvm] > returnedClosingDelimiterErrorIsNotLost[jvm] STARTED
+
+MapKeyAndIoTest[jvm] > returnedClosingDelimiterErrorIsNotLost[jvm] PASSED
+
+MapKeyAndIoTest[jvm] > wideIntegerKeysRejectInvalidOrOutOfRangeRepresentations[jvm] STARTED
+
+MapKeyAndIoTest[jvm] > wideIntegerKeysRejectInvalidOrOutOfRangeRepresentations[jvm] PASSED
+
+MapTest[jvm] > testPreserveOrder[jvm] STARTED
+
+MapTest[jvm] > testPreserveOrder[jvm] PASSED
+
+MapTest[jvm] > testShiftInsert[jvm] STARTED
+
+MapTest[jvm] > testShiftInsert[jvm] PASSED
+
+MapTest[jvm] > testAppend[jvm] STARTED
+
+MapTest[jvm] > testAppend[jvm] PASSED
+
+MapTest[jvm] > testRetain[jvm] STARTED
+
+MapTest[jvm] > testRetain[jvm] PASSED
+
+NumberTest[jvm] > testNumberEquality[jvm] STARTED
+
+NumberTest[jvm] > testNumberEquality[jvm] PASSED
+
+NumberTest[jvm] > testIntNumbers[jvm] STARTED
+
+NumberTest[jvm] > testIntNumbers[jvm] PASSED
+
+NumberTest[jvm] > testFloatNumbers[jvm] STARTED
+
+NumberTest[jvm] > testFloatNumbers[jvm] PASSED
+
+RawValueProtocolParityTest[jvm] > reservedRawMapDecodesItsJsonContents[jvm] STARTED
+
+RawValueProtocolParityTest[jvm] > reservedRawMapDecodesItsJsonContents[jvm] PASSED
+
+RawValueProtocolParityTest[jvm] > invalidReservedRawPayloadsAreRejected[jvm] STARTED
+
+RawValueProtocolParityTest[jvm] > invalidReservedRawPayloadsAreRejected[jvm] PASSED
+
+RawValueProtocolParityTest[jvm] > rawConversionRejectsSequenceMapKeys[jvm] STARTED
+
+RawValueProtocolParityTest[jvm] > rawConversionRejectsSequenceMapKeys[jvm] PASSED
+
+RawValueProtocolParityTest[jvm] > rawConversionRetainsExistingRawFormatting[jvm] STARTED
+
+RawValueProtocolParityTest[jvm] > rawConversionRetainsExistingRawFormatting[jvm] PASSED
+
+RawValueProtocolParityTest[jvm] > serializableValuesConvertToOwnedRawJson[jvm] STARTED
+
+RawValueProtocolParityTest[jvm] > serializableValuesConvertToOwnedRawJson[jvm] PASSED
+
+RawValueProtocolParityTest[jvm] > rawValuesDriveFreshTypedDeserializers[jvm] STARTED
+
+RawValueProtocolParityTest[jvm] > rawValuesDriveFreshTypedDeserializers[jvm] PASSED
+
+RawValueProtocolParityTest[jvm] > rawNewtypeUsesASingleEntryMap[jvm] STARTED
+
+RawValueProtocolParityTest[jvm] > rawNewtypeUsesASingleEntryMap[jvm] PASSED
+
+RawValueProtocolParityTest[jvm] > valueByteHintsPreserveStringVisitorDispatch[jvm] STARTED
+
+RawValueProtocolParityTest[jvm] > valueByteHintsPreserveStringVisitorDispatch[jvm] PASSED
+
+RawValueProtocolParityTest[jvm] > ordinaryKeysAndTheBoundedNumberProfileRemainOrdinary[jvm] STARTED
+
+RawValueProtocolParityTest[jvm] > ordinaryKeysAndTheBoundedNumberProfileRemainOrdinary[jvm] PASSED
+
+RawValueProtocolParityTest[jvm] > rawVisitorFailuresPreserveTheirDiagnosticIdentity[jvm] STARTED
+
+RawValueProtocolParityTest[jvm] > rawVisitorFailuresPreserveTheirDiagnosticIdentity[jvm] PASSED
+
+RawValueProtocolParityTest[jvm] > ownedRawInputTrimsOutsideWhitespaceAndPreservesContents[jvm] STARTED
+
+RawValueProtocolParityTest[jvm] > ownedRawInputTrimsOutsideWhitespaceAndPreservesContents[jvm] PASSED
+
+RawValueProtocolParityTest[jvm] > rawConversionPreservesSerializerFailureIdentity[jvm] STARTED
+
+RawValueProtocolParityTest[jvm] > rawConversionPreservesSerializerFailureIdentity[jvm] PASSED
+
+RawValueProtocolParityTest[jvm] > valuesDeserializeIntoOwnedRawText[jvm] STARTED
+
+RawValueProtocolParityTest[jvm] > valuesDeserializeIntoOwnedRawText[jvm] PASSED
+
+ResultPropagationTest[jvm] > tuplePreservesNestedFailure[jvm] STARTED
+
+ResultPropagationTest[jvm] > tuplePreservesNestedFailure[jvm] PASSED
+
+ResultPropagationTest[jvm] > tupleVariantPreservesNestedFailure[jvm] STARTED
+
+ResultPropagationTest[jvm] > tupleVariantPreservesNestedFailure[jvm] PASSED
+
+ResultPropagationTest[jvm] > mapKeyPreservesNestedFailure[jvm] STARTED
+
+ResultPropagationTest[jvm] > mapKeyPreservesNestedFailure[jvm] PASSED
+
+ResultPropagationTest[jvm] > stringSerializationPreservesStructFailure[jvm] STARTED
+
+ResultPropagationTest[jvm] > stringSerializationPreservesStructFailure[jvm] PASSED
+
+ResultPropagationTest[jvm] > sequencePreservesNestedFailure[jvm] STARTED
+
+ResultPropagationTest[jvm] > sequencePreservesNestedFailure[jvm] PASSED
+
+ResultPropagationTest[jvm] > tupleStructPreservesNestedFailure[jvm] STARTED
+
+ResultPropagationTest[jvm] > tupleStructPreservesNestedFailure[jvm] PASSED
+
+ResultPropagationTest[jvm] > mapEntryValuePreservesNestedFailure[jvm] STARTED
+
+ResultPropagationTest[jvm] > mapEntryValuePreservesNestedFailure[jvm] PASSED
+
+ResultPropagationTest[jvm] > unitEnumRejectsNonUnitPayload[jvm] STARTED
+
+ResultPropagationTest[jvm] > unitEnumRejectsNonUnitPayload[jvm] PASSED
+
+ResultPropagationTest[jvm] > mapValuePreservesNestedFailure[jvm] STARTED
+
+ResultPropagationTest[jvm] > mapValuePreservesNestedFailure[jvm] PASSED
+
+ResultPropagationTest[jvm] > structFieldPreservesNestedFailure[jvm] STARTED
+
+ResultPropagationTest[jvm] > structFieldPreservesNestedFailure[jvm] PASSED
+
+ResultPropagationTest[jvm] > newtypeVariantPreservesEndFailure[jvm] STARTED
+
+ResultPropagationTest[jvm] > newtypeVariantPreservesEndFailure[jvm] PASSED
+
+ResultPropagationTest[jvm] > structVariantPreservesNestedFailure[jvm] STARTED
+
+ResultPropagationTest[jvm] > structVariantPreservesNestedFailure[jvm] PASSED
+
+ResultPropagationTest[jvm] > unitEnumAcceptsBareVariant[jvm] STARTED
+
+ResultPropagationTest[jvm] > unitEnumAcceptsBareVariant[jvm] PASSED
+
+ResultPropagationTest[jvm] > mapEntryKeyPreservesNestedFailure[jvm] STARTED
+
+ResultPropagationTest[jvm] > mapEntryKeyPreservesNestedFailure[jvm] PASSED
+
+ResultPropagationTest[jvm] > newtypeVariantPreservesNestedFailure[jvm] STARTED
+
+ResultPropagationTest[jvm] > newtypeVariantPreservesNestedFailure[jvm] PASSED
+
+ResultPropagationTest[jvm] > unitEnumAcceptsNullPayload[jvm] STARTED
+
+ResultPropagationTest[jvm] > unitEnumAcceptsNullPayload[jvm] PASSED
+
+SequenceElementParityTest[jvm] > nullableElementsAndEndOfSequenceRemainDistinct[jvm] STARTED
+
+SequenceElementParityTest[jvm] > nullableElementsAndEndOfSequenceRemainDistinct[jvm] PASSED
+
+SequenceElementParityTest[jvm] > valueSequenceConsumesTheFailedItemAndRetainsRemainingState[jvm] STARTED
+
+SequenceElementParityTest[jvm] > valueSequenceConsumesTheFailedItemAndRetainsRemainingState[jvm] PASSED
+
+SequenceElementParityTest[jvm] > failuresAfterNullAreNotMistakenForEndOfSequence[jvm] STARTED
+
+SequenceElementParityTest[jvm] > failuresAfterNullAreNotMistakenForEndOfSequence[jvm] PASSED
+
+ValueDeserializationParityTest[jvm] > integerDecodingChecksBoundsAndPreservesValidValues[jvm] STARTED
+
+ValueDeserializationParityTest[jvm] > integerDecodingChecksBoundsAndPreservesValidValues[jvm] PASSED
+
+ValueDeserializationParityTest[jvm] > containerVisitorFailureTakesPrecedenceOverRemainingElements[jvm] STARTED
+
+ValueDeserializationParityTest[jvm] > containerVisitorFailureTakesPrecedenceOverRemainingElements[jvm] PASSED
+
+ValueDeserializationParityTest[jvm] > numericHintsPreserveTheOriginalNumberKind[jvm] STARTED
+
+ValueDeserializationParityTest[jvm] > numericHintsPreserveTheOriginalNumberKind[jvm] PASSED
+
+ValueDeserializationParityTest[jvm] > nonfiniteAndOptionalValuesDecodeThroughTheVisitor[jvm] STARTED
+
+ValueDeserializationParityTest[jvm] > nonfiniteAndOptionalValuesDecodeThroughTheVisitor[jvm] PASSED
+
+ValueDeserializationParityTest[jvm] > partialSequenceConsumptionFailsAndReportsExactSizeHints[jvm] STARTED
+
+ValueDeserializationParityTest[jvm] > partialSequenceConsumptionFailsAndReportsExactSizeHints[jvm] PASSED
+
+ValueDeserializationParityTest[jvm] > integerDecodingRejectsFloatingPointValuesWithoutTruncation[jvm] STARTED
+
+ValueDeserializationParityTest[jvm] > integerDecodingRejectsFloatingPointValuesWithoutTruncation[jvm] PASSED
+
+ValueDeserializationParityTest[jvm] > mapKeyAndValueFailuresRetainTheirIdentity[jvm] STARTED
+
+ValueDeserializationParityTest[jvm] > mapKeyAndValueFailuresRetainTheirIdentity[jvm] PASSED
+
+ValueDeserializationParityTest[jvm] > mapDeserializationRetainsEveryValueKind[jvm] STARTED
+
+ValueDeserializationParityTest[jvm] > mapDeserializationRetainsEveryValueKind[jvm] PASSED
+
+ValueDeserializationParityTest[jvm] > wideIntegerValuesRespectTheNumberRange[jvm] STARTED
+
+ValueDeserializationParityTest[jvm] > wideIntegerValuesRespectTheNumberRange[jvm] PASSED
+
+ValueDeserializationParityTest[jvm] > partialMapConsumptionFailsAndReportsExactSizeHints[jvm] STARTED
+
+ValueDeserializationParityTest[jvm] > partialMapConsumptionFailsAndReportsExactSizeHints[jvm] PASSED
+
+ValueMapKeyParityTest[jvm] > optionAndNewtypeMapKeysUseTheKeyDeserializer[jvm] STARTED
+
+ValueMapKeyParityTest[jvm] > optionAndNewtypeMapKeysUseTheKeyDeserializer[jvm] PASSED
+
+ValueMapKeyParityTest[jvm] > invalidNumericAndBooleanKeysAreRejected[jvm] STARTED
+
+ValueMapKeyParityTest[jvm] > invalidNumericAndBooleanKeysAreRejected[jvm] PASSED
+
+ValueMapKeyParityTest[jvm] > enumMapKeysRetainUnitVariantBehavior[jvm] STARTED
+
+ValueMapKeyParityTest[jvm] > enumMapKeysRetainUnitVariantBehavior[jvm] PASSED
+
+ValueMapKeyParityTest[jvm] > scalarMapKeysDecodeFromValues[jvm] STARTED
+
+ValueMapKeyParityTest[jvm] > scalarMapKeysDecodeFromValues[jvm] PASSED
+
+ValueMapKeyParityTest[jvm] > wideMapKeysDecodeWithActualIntegerBounds[jvm] STARTED
+
+ValueMapKeyParityTest[jvm] > wideMapKeysDecodeWithActualIntegerBounds[jvm] PASSED
+
+ValueMapKeyParityTest[jvm] > keyVisitorFailuresRetainTheirIdentity[jvm] STARTED
+
+ValueMapKeyParityTest[jvm] > keyVisitorFailuresRetainTheirIdentity[jvm] PASSED
+
+ValueResultPropagationTest[jvm] > structVariantFailureDoesNotInsertAField[jvm] STARTED
+
+ValueResultPropagationTest[jvm] > structVariantFailureDoesNotInsertAField[jvm] PASSED
+
+ValueResultPropagationTest[jvm] > sequenceFailureDoesNotAppendAnElement[jvm] STARTED
+
+ValueResultPropagationTest[jvm] > sequenceFailureDoesNotAppendAnElement[jvm] PASSED
+
+ValueResultPropagationTest[jvm] > newtypeVariantPreservesFailureAndSuccessfulPayload[jvm] STARTED
+
+ValueResultPropagationTest[jvm] > newtypeVariantPreservesFailureAndSuccessfulPayload[jvm] PASSED
+
+ValueResultPropagationTest[jvm] > tupleVariantFailureDoesNotAppendAField[jvm] STARTED
+
+ValueResultPropagationTest[jvm] > tupleVariantFailureDoesNotAppendAField[jvm] PASSED
+
+ValueResultPropagationTest[jvm] > mapFailureConsumesTheKeyWithoutInsertingAValue[jvm] STARTED
+
+ValueResultPropagationTest[jvm] > mapFailureConsumesTheKeyWithoutInsertingAValue[jvm] PASSED
+
+ValueScalarParityTest[jvm] > nonfiniteSinglePrecisionValuesBecomeNull[jvm] STARTED
+
+ValueScalarParityTest[jvm] > nonfiniteSinglePrecisionValuesBecomeNull[jvm] PASSED
+
+ValueScalarParityTest[jvm] > serializedBytesKeepTheirUnsignedValues[jvm] STARTED
+
+ValueScalarParityTest[jvm] > serializedBytesKeepTheirUnsignedValues[jvm] PASSED
+
+ValueScalarParityTest[jvm] > nonfiniteDoublePrecisionValuesBecomeNull[jvm] STARTED
+
+ValueScalarParityTest[jvm] > nonfiniteDoublePrecisionValuesBecomeNull[jvm] PASSED
+
+ValueTest[jvm] > testIndex[jvm] STARTED
+
+ValueTest[jvm] > testIndex[jvm] PASSED
+
+ValueTest[jvm] > testPartialEq[jvm] STARTED
+
+ValueTest[jvm] > testPartialEq[jvm] PASSED
+
+ValueTest[jvm] > testPointer[jvm] STARTED
+
+ValueTest[jvm] > testPointer[jvm] PASSED
+
+ValueTest[jvm] > testValueTypePredicates[jvm] STARTED
+
+ValueTest[jvm] > testValueTypePredicates[jvm] PASSED
+
+ValueTest[jvm] > testValueEquality[jvm] STARTED
+
+ValueTest[jvm] > testValueEquality[jvm] PASSED
+
+LexicalMathTest[jvm] > testIaddSmall[jvm] STARTED
+
+LexicalMathTest[jvm] > testIaddSmall[jvm] PASSED
+
+LexicalMathTest[jvm] > testBitLength[jvm] STARTED
+
+LexicalMathTest[jvm] > testBitLength[jvm] PASSED
+
+LexicalMathTest[jvm] > testImulSmall[jvm] STARTED
+
+LexicalMathTest[jvm] > testImulSmall[jvm] PASSED
+
+LexicalMathTest[jvm] > testCompare[jvm] STARTED
+
+LexicalMathTest[jvm] > testCompare[jvm] PASSED
+Kotlin build report is written to file:///Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/build/reports/kotlin-build/serde-json-kotlin-build-2026-10-24-21-13-01-0.txt
+
+[Incubating] Problems report is available at: file:///Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 10.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/9.8.2/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 20s
+16 actionable tasks: 10 executed, 6 up-to-date

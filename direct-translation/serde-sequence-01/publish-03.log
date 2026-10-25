@@ -1,0 +1,249 @@
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.8.2/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+Mocha test framework for Wasm target is not supported. For KotlinWasmNode used
+Configuration 'jsNpmAggregated' was resolved during configuration time.
+This is a build performance and scalability issue.
+See https://github.com/gradle/gradle/issues/2298
+Run with --info for a stacktrace.
+Configuration 'jsTestNpmAggregated' was resolved during configuration time.
+This is a build performance and scalability issue.
+See https://github.com/gradle/gradle/issues/2298
+Run with --info for a stacktrace.
+Build was configured to prefer settings repositories over project repositories but repository 'Distributions at https://nodejs.org/dist' was added by unknown code
+Build was configured to prefer settings repositories over project repositories but repository 'Distributions at https://github.com/yarnpkg/yarn/releases/download' was added by unknown code
+Configuration 'wasmJsNpmAggregated' was resolved during configuration time.
+This is a build performance and scalability issue.
+See https://github.com/gradle/gradle/issues/2298
+Run with --info for a stacktrace.
+Configuration 'wasmJsTestNpmAggregated' was resolved during configuration time.
+This is a build performance and scalability issue.
+See https://github.com/gradle/gradle/issues/2298
+Run with --info for a stacktrace.
+Build was configured to prefer settings repositories over project repositories but repository 'Distributions at https://nodejs.org/dist' was added by unknown code
+Build was configured to prefer settings repositories over project repositories but repository 'Distributions at https://github.com/yarnpkg/yarn/releases/download' was added by unknown code
+> Task :kmpPartiallyResolvedDependenciesChecker
+> Task :checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :downloadKotlinNativeDistribution UP-TO-DATE
+> Task :compileKotlinAndroidNativeArm64
+> Task :androidNativeArm64Klib
+> Task :androidNativeArm64SourcesJar
+> Task :emptyJavadocJar
+> Task :generateMetadataFileForAndroidNativeArm64Publication
+> Task :generatePomFileForAndroidNativeArm64Publication
+> Task :publishAndroidNativeArm64PublicationToMavenLocal
+> Task :compileKotlinAndroidNativeX64
+> Task :androidNativeX64Klib
+> Task :androidNativeX64SourcesJar
+> Task :generateMetadataFileForAndroidNativeX64Publication
+> Task :generatePomFileForAndroidNativeX64Publication
+> Task :publishAndroidNativeX64PublicationToMavenLocal
+> Task :ensureAndroidSdk SKIPPED
+> Task :androidSourcesJar
+> Task :androidPreBuild UP-TO-DATE
+> Task :preAndroidMainBuild UP-TO-DATE
+> Task :checkAndroidMainAarMetadata
+> Task :mergeAndroidMainJniLibFolders
+> Task :mergeAndroidMainNativeLibs NO-SOURCE
+> Task :copyAndroidMainJniLibsProjectOnly
+> Task :extractAndroidMainAnnotations
+> Task :generateAndroidMainEmptyResourceFiles
+> Task :prepareAndroidMainArtProfile
+> Task :prepareLintJarForPublish
+> Task :writeAndroidMainAarMetadata
+> Task :generatePomFileForAndroidPublication
+> Task :processAndroidMainManifest
+> Task :compileKotlinIosArm64
+> Task :iosArm64Klib
+> Task :commonizeNativeDistribution
+> Task :transformCommonMainDependenciesMetadata
+> Task :metadataCommonMainProcessResources NO-SOURCE
+> Task :transformNativeMainDependenciesMetadata
+> Task :metadataNativeMainProcessResources NO-SOURCE
+> Task :transformPosixMainDependenciesMetadata
+> Task :metadataPosixMainProcessResources NO-SOURCE
+> Task :transformAppleMainDependenciesMetadata
+> Task :metadataAppleMainProcessResources NO-SOURCE
+> Task :transformIosMainDependenciesMetadata
+> Task :transformTvosMainDependenciesMetadata
+> Task :transformWatchosMainDependenciesMetadata
+> Task :metadataIosMainProcessResources NO-SOURCE
+> Task :metadataTvosMainProcessResources NO-SOURCE
+> Task :metadataWatchosMainProcessResources NO-SOURCE
+> Task :iosArm64SourcesJar
+> Task :generatePomFileForIosArm64Publication
+> Task :compileKotlinIosSimulatorArm64
+> Task :iosSimulatorArm64Klib
+> Task :iosSimulatorArm64SourcesJar
+> Task :generatePomFileForIosSimulatorArm64Publication
+> Task :kotlinKotlinNpmCachesSetup
+> Task :kotlinNodeJsSetup
+> Task :kotlinRestoreYarnLock
+> Task :kotlinYarnSetup
+> Task :jsPackageJson
+> Task :jsTestPackageJson
+> Task :jsPublicPackageJson
+> Task :jsTestPublicPackageJson
+> Task :kotlinPackageJsonUmbrella
+> Task :rootPackageJson
+> Task :compileCommonMainKotlinMetadata
+> Task :kotlinNpmInstall
+> Task :metadataCommonMainClasses
+> Task :compileNativeMainKotlinMetadata NO-SOURCE
+> Task :metadataNativeMainClasses UP-TO-DATE
+> Task :compilePosixMainKotlinMetadata NO-SOURCE
+> Task :metadataPosixMainClasses UP-TO-DATE
+> Task :compileAppleMainKotlinMetadata NO-SOURCE
+> Task :metadataAppleMainClasses UP-TO-DATE
+> Task :compileIosMainKotlinMetadata NO-SOURCE
+> Task :compileTvosMainKotlinMetadata NO-SOURCE
+> Task :compileWatchosMainKotlinMetadata NO-SOURCE
+> Task :metadataIosMainClasses UP-TO-DATE
+> Task :metadataTvosMainClasses UP-TO-DATE
+> Task :metadataWatchosMainClasses UP-TO-DATE
+> Task :iosArm64MetadataElements
+> Task :generateMetadataFileForIosArm64Publication
+> Task :publishIosArm64PublicationToMavenLocal
+> Task :iosSimulatorArm64MetadataElements
+> Task :generateMetadataFileForIosSimulatorArm64Publication
+> Task :publishIosSimulatorArm64PublicationToMavenLocal
+> Task :kotlinUpgradeYarnLock
+> Task :jsProcessResources NO-SOURCE
+> Task :jsSourcesJar
+> Task :generatePomFileForJsPublication
+> Task :compileKotlinJvm UP-TO-DATE
+> Task :compileJvmMainJava NO-SOURCE
+> Task :jvmProcessResources NO-SOURCE
+> Task :processJvmMainResources SKIPPED
+> Task :jvmMainClasses UP-TO-DATE
+> Task :jvmJar UP-TO-DATE
+> Task :jvmSourcesJar
+> Task :generateMetadataFileForJvmPublication
+> Task :generatePomFileForJvmPublication
+> Task :publishJvmPublicationToMavenLocal
+> Task :transformAndroidNativeMainDependenciesMetadata
+> Task :compileAndroidNativeMainKotlinMetadata NO-SOURCE
+> Task :transformLinuxMainDependenciesMetadata
+> Task :compileLinuxMainKotlinMetadata NO-SOURCE
+> Task :transformWebMainDependenciesMetadata
+> Task :compileWebMainKotlinMetadata NO-SOURCE
+> Task :generateProjectStructureMetadata
+> Task :metadataAndroidNativeMainProcessResources NO-SOURCE
+> Task :metadataAndroidNativeMainClasses UP-TO-DATE
+> Task :metadataLinuxMainProcessResources NO-SOURCE
+> Task :metadataLinuxMainClasses UP-TO-DATE
+> Task :metadataWebMainProcessResources NO-SOURCE
+> Task :metadataWebMainClasses UP-TO-DATE
+> Task :allMetadataJar
+> Task :buildKotlinToolingMetadata
+> Task :sourcesJar
+> Task :generateMetadataFileForKotlinMultiplatformPublication
+> Task :generatePomFileForKotlinMultiplatformPublication
+> Task :publishKotlinMultiplatformPublicationToMavenLocal
+> Task :compileAndroidMain
+> Task :compileKotlinLinuxArm64
+> Task :mergeAndroidMainGeneratedProguardFiles
+> Task :mergeAndroidMainConsumerProguardFiles
+> Task :processAndroidMainJavaRes
+> Task :linuxArm64Klib
+> Task :linuxArm64SourcesJar
+> Task :generateMetadataFileForLinuxArm64Publication
+> Task :generatePomFileForLinuxArm64Publication
+> Task :publishLinuxArm64PublicationToMavenLocal
+> Task :mergeAndroidMainJavaResource
+> Task :compileKotlinLinuxX64
+> Task :syncAndroidMainLibJars
+> Task :bundleAndroidMainAar
+> Task :generateMetadataFileForAndroidPublication
+> Task :publishAndroidPublicationToMavenLocal
+> Task :linuxX64Klib
+> Task :linuxX64SourcesJar
+> Task :generateMetadataFileForLinuxX64Publication
+> Task :generatePomFileForLinuxX64Publication
+> Task :publishLinuxX64PublicationToMavenLocal
+> Task :compileKotlinMacosArm64 UP-TO-DATE
+> Task :macosArm64Klib
+> Task :macosArm64MetadataElements
+> Task :macosArm64SourcesJar
+> Task :generateMetadataFileForMacosArm64Publication
+> Task :generatePomFileForMacosArm64Publication
+> Task :publishMacosArm64PublicationToMavenLocal
+> Task :compileKotlinJs
+> Task :compileKotlinMingwX64
+> Task :jsMainClasses
+> Task :jsJar
+> Task :generateMetadataFileForJsPublication
+> Task :publishJsPublicationToMavenLocal
+> Task :mingwX64Klib
+> Task :mingwX64SourcesJar
+> Task :generateMetadataFileForMingwX64Publication
+> Task :generatePomFileForMingwX64Publication
+> Task :publishMingwX64PublicationToMavenLocal
+> Task :compileKotlinTvosArm64
+> Task :tvosArm64Klib
+> Task :tvosArm64MetadataElements
+> Task :tvosArm64SourcesJar
+> Task :generateMetadataFileForTvosArm64Publication
+> Task :generatePomFileForTvosArm64Publication
+> Task :publishTvosArm64PublicationToMavenLocal
+> Task :compileKotlinTvosSimulatorArm64
+> Task :tvosSimulatorArm64Klib
+> Task :tvosSimulatorArm64MetadataElements
+> Task :tvosSimulatorArm64SourcesJar
+> Task :generateMetadataFileForTvosSimulatorArm64Publication
+> Task :generatePomFileForTvosSimulatorArm64Publication
+> Task :publishTvosSimulatorArm64PublicationToMavenLocal
+> Task :kotlinWasmKotlinNpmCachesSetup
+> Task :kotlinWasmNodeJsSetup
+> Task :kotlinWasmRestoreYarnLock
+> Task :kotlinWasmYarnSetup
+> Task :wasmJsPackageJson
+> Task :wasmJsTestPackageJson
+> Task :wasmJsPublicPackageJson
+> Task :wasmJsTestPublicPackageJson
+> Task :kotlinWasmPackageJsonUmbrella
+> Task :wasmRootPackageJson
+> Task :kotlinWasmNpmInstall
+> Task :kotlinWasmUpgradeYarnLock
+> Task :wasmJsProcessResources NO-SOURCE
+> Task :wasmJsSourcesJar
+> Task :generatePomFileForWasmJsPublication
+> Task :wasmWasiProcessResources NO-SOURCE
+> Task :wasmWasiSourcesJar
+> Task :generatePomFileForWasmWasiPublication
+> Task :compileKotlinWatchosDeviceArm64
+> Task :watchosDeviceArm64Klib
+> Task :watchosDeviceArm64MetadataElements
+> Task :watchosDeviceArm64SourcesJar
+> Task :generateMetadataFileForWatchosDeviceArm64Publication
+> Task :generatePomFileForWatchosDeviceArm64Publication
+> Task :publishWatchosDeviceArm64PublicationToMavenLocal
+> Task :compileKotlinWasmWasi
+> Task :compileKotlinWasmJs
+> Task :compileKotlinWatchosSimulatorArm64
+> Task :wasmJsMainClasses
+> Task :wasmJsJar
+> Task :generateMetadataFileForWasmJsPublication
+> Task :publishWasmJsPublicationToMavenLocal
+> Task :wasmWasiMainClasses
+> Task :wasmWasiJar
+> Task :generateMetadataFileForWasmWasiPublication
+> Task :publishWasmWasiPublicationToMavenLocal
+> Task :watchosSimulatorArm64Klib
+> Task :watchosSimulatorArm64MetadataElements
+> Task :watchosSimulatorArm64SourcesJar
+> Task :generateMetadataFileForWatchosSimulatorArm64Publication
+> Task :generatePomFileForWatchosSimulatorArm64Publication
+> Task :publishWatchosSimulatorArm64PublicationToMavenLocal
+> Task :publishToMavenLocal
+Kotlin build report is written to file:///Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/build/reports/kotlin-build/serde-json-kotlin-build-2026-10-24-21-14-04-0.txt
+
+[Incubating] Problems report is available at: file:///Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 10.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/9.8.2/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 31s
+167 actionable tasks: 163 executed, 4 up-to-date

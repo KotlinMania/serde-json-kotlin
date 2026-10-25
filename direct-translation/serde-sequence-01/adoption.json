@@ -1,0 +1,31 @@
+{
+  "generated_fragments": [
+    {
+      "name": "loop",
+      "sha256": "277f6a68d1beeb2055f6b81569d76e1517ccdddef0657ef816e7539fc68d63f9"
+    },
+    {
+      "name": "text-some",
+      "sha256": "928b48c9415577f4fc48bb6c1192d83e6487804fac67ce7867f5b094acea7a11"
+    },
+    {
+      "name": "text-none",
+      "sha256": "ea7072a404914d157ed0ce68377255a5eb52ff356de377c01b5e347d35b4d5f2"
+    },
+    {
+      "name": "value-some",
+      "sha256": "11452bb0674fac11dc48c2c6cb2e04be9ec8c595aca004171e08ed5c588cf25f"
+    },
+    {
+      "name": "value-none",
+      "sha256": "ea7072a404914d157ed0ce68377255a5eb52ff356de377c01b5e347d35b4d5f2"
+    }
+  ],
+  "adaptations": [
+    "Fragment indentation only; generated text retained.",
+    "SeqAccess override return type updated to existing SeqElement<T> contract.",
+    "ValueDeserializer(value) explicitly bound before the generated seed expression.",
+    "Consumer loop wrapped in existing serdeCatching for Rust Result propagation.",
+    "Existing test assertions now explicitly expect Some(1); size/state expectations unchanged."
+  ]
+}
