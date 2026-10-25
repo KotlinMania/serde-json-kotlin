@@ -1,0 +1,19 @@
+kind	rust_name	kotlin_representation
+type	crate::lexical::cached::ExtendedFloatArray	ExtendedFloatArray
+type	crate::lexical::cached::ModeratePathPowers	ModeratePathPowers
+type	super::cached::ExtendedFloatArray	ExtendedFloatArray
+type	super::cached::ModeratePathPowers	ModeratePathPowers
+constant-record	crate::lexical::cached::ExtendedFloatArray	ExtendedFloatArray; read-only static data, not method/trait translation; /Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/tmp/serde_json/src/lexical/cached.rs:12
+constant-field	crate::lexical::cached::ExtendedFloatArray::mant	StaticSlice(element=Primitive(rust=u64))
+constant-field	crate::lexical::cached::ExtendedFloatArray::exp	StaticSlice(element=Primitive(rust=i32))
+constant-record	crate::lexical::cached::ModeratePathPowers	ModeratePathPowers; read-only static data, not method/trait translation; /Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/tmp/serde_json/src/lexical/cached.rs:38
+constant-field	crate::lexical::cached::ModeratePathPowers::small	Record(path=crate::lexical::cached::ExtendedFloatArray)
+constant-field	crate::lexical::cached::ModeratePathPowers::large	Record(path=crate::lexical::cached::ExtendedFloatArray)
+constant-field	crate::lexical::cached::ModeratePathPowers::small_int	StaticSlice(element=Primitive(rust=u64))
+constant-field	crate::lexical::cached::ModeratePathPowers::step	Primitive(rust=i32)
+constant-field	crate::lexical::cached::ModeratePathPowers::bias	Primitive(rust=i32)
+source-snapshot	record-source-0.rs	/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/tmp/serde_json/src/lexical/cached.rs
+source-snapshot	record-source-1.rs	/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/tmp/serde_json/src/lexical/cached_float80.rs
+source-snapshot	record-source-2.rs	/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/tmp/serde_json/src/lexical/float.rs
+source-snapshot	record-source-3.rs	/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/tmp/serde_json/src/lexical/mod.rs
+source-snapshot	record-source-4.rs	/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/tmp/serde_json/src/lib.rs

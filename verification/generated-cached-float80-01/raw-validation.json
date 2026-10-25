@@ -1,0 +1,64 @@
+{
+  "status": "passed",
+  "source_sha256": "0f8f74a22cb7d871322a9893bffd0255ca10bf9dffd13afb2462dd3d7f51805f",
+  "generated_sha256": "eae9a0f663dc5a5bdd243754e18b5aa607ccb7136bdb87975bcfa4c1c4c8fbb7",
+  "source_modules": {
+    "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/tmp/serde_json/src/lexical/cached.rs": "0e127398691f8042c19cde209e7f4b0161f0f3150342430145929f711e6fdac8",
+    "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/tmp/serde_json/src/lexical/cached_float80.rs": "0f8f74a22cb7d871322a9893bffd0255ca10bf9dffd13afb2462dd3d7f51805f",
+    "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/tmp/serde_json/src/lexical/float.rs": "fe356213c92a049f4bef2f58bc0e3a26866ca06b8c1d74d0f961c5b883852cad",
+    "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/tmp/serde_json/src/lexical/num.rs": "2d06111d28616221995f7b4d4f13625b8d902884921268b0e02e544f871a5339",
+    "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/tmp/serde_json/src/lexical/rounding.rs": "4762af3612880b17468ff2a1bb800c8e99f08330ae439699dd53d8dc5463ad13",
+    "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/tmp/serde_json/src/lexical/shift.rs": "bc1ed053dd63d45ac9c35302f18de9f00d94027f28af4ab749c9248439de832a"
+  },
+  "rows": 169,
+  "values": 164,
+  "lengths": 5,
+  "adopted": false,
+  "limitations": [
+    "No pointer identity or unsafe mutation claim.",
+    "Record dependency declarations are read-only static-data contracts; cached.rs methods/traits are not translated.",
+    "Kotlin/Native macOS ARM64 only.",
+    "Existing port Cached.kt types require separate adoption integration."
+  ],
+  "commands": [
+    {
+      "label": "rust-compile",
+      "args": [
+        "rustc",
+        "--edition=2021",
+        "/Volumes/stuff/Projects/kotlinmania/rust-kotlin/tmp/foundation-record-constants-01/oracle.rs",
+        "-C",
+        "overflow-checks=yes",
+        "-o",
+        "/Volumes/stuff/Projects/kotlinmania/rust-kotlin/tmp/foundation-record-constants-01/oracle"
+      ],
+      "exit": 0
+    },
+    {
+      "label": "rust-run",
+      "args": [
+        "/Volumes/stuff/Projects/kotlinmania/rust-kotlin/tmp/foundation-record-constants-01/oracle"
+      ],
+      "exit": 0
+    },
+    {
+      "label": "native-compile",
+      "args": [
+        "/Users/sydney/.konan/kotlin-native-prebuilt-macos-aarch64-2.4.21/bin/konanc",
+        "/Volumes/stuff/Projects/kotlinmania/rust-kotlin/tmp/foundation-record-constants-01/cached-probe-04/generated.kt",
+        "/Volumes/stuff/Projects/kotlinmania/rust-kotlin/tmp/foundation-record-constants-01/Runner.kt",
+        "-Werror",
+        "-o",
+        "/Volumes/stuff/Projects/kotlinmania/rust-kotlin/tmp/foundation-record-constants-01/cached-native"
+      ],
+      "exit": 0
+    },
+    {
+      "label": "native-run",
+      "args": [
+        "/Volumes/stuff/Projects/kotlinmania/rust-kotlin/tmp/foundation-record-constants-01/cached-native.kexe"
+      ],
+      "exit": 0
+    }
+  ]
+}

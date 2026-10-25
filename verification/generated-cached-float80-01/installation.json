@@ -1,0 +1,10 @@
+{
+  "generator_commit": "959f4e987872db79a90ac1956800d5a3c840030a",
+  "port_baseline": "08cfbb61b8010e7fc796c57062b00375f5f34f3d",
+  "raw_sha256": "eae9a0f663dc5a5bdd243754e18b5aa607ccb7136bdb87975bcfa4c1c4c8fbb7",
+  "destination": "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/src/commonMain/kotlin/io/github/kotlinmania/serdejson/lexical/generated/cachedfloat80/CachedFloat80.kt",
+  "package_prefix": "package io.github.kotlinmania.serdejson.lexical.generated.cachedfloat80\n\n",
+  "body_unmodified": true,
+  "adapter": "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/src/commonMain/kotlin/io/github/kotlinmania/serdejson/lexical/CachedFloat80.kt",
+  "no_dependencies_or_configuration_changed": true
+}

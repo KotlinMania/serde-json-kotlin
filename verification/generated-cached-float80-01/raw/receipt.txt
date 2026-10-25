@@ -1,0 +1,3 @@
+complete input parsed by proc-macro2-kotlin:0.1.7 and syn-kotlin:0.4.0
+10 top-level items emitted; 0 top-level items and 0 nested nodes configured out (not translated)
+TranslationProfile(pointerWidth=64, overflowChecks=null, panic=null, debugAssertions=null, cfgTest=null, cfgFeatures={float_roundtrip=true, std=true}, sourceModule=crate::lexical::cached_float80, helperPrefix=__rtk, cfgFlags={docsrs=false}, cfgValues={})
