@@ -1,0 +1,10 @@
+allprojects { project ->
+    afterEvaluate {
+        tasks.register('printDirectShiftNativeInputs') {
+            dependsOn('compileKotlinMacosArm64')
+            doLast {
+                project.extensions.getByName('kotlin').targets.getByName('macosArm64').compilations.getByName('main').compileDependencyFiles.files.findAll { it.name.endsWith('.klib') }.sort().each { println('NATIVE_INPUT=' + it.absolutePath) }
+            }
+        }
+    }
+}

@@ -1,0 +1,25 @@
+{
+  "status": "adopted",
+  "source": "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/tmp/serde_json/src/lexical/shift.rs",
+  "source_sha256": "bc1ed053dd63d45ac9c35302f18de9f00d94027f28af4ab749c9248439de832a",
+  "raw_body_sha256": "1fd7b02f9d3689943d0315f298c52ffe5bb815db3119e9009c21ba13bff56346",
+  "installed_file": "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/src/commonMain/kotlin/io/github/kotlinmania/serdejson/lexical/generated/shift/Shift.kt",
+  "installed_sha256": "36ec9d1332b2645cd285c057a45aa2c25b709e7006b4657fb3fac62a990092d5",
+  "raw_unchanged": true,
+  "generator_commit": "08cb478c6a189d047ec76e6c7c5906c532fe0ecd",
+  "target": "macos_arm64",
+  "profile": "usize64, overflow-checks on, debug assertions on, panic unwind",
+  "tests": {
+    "tests": 131,
+    "failures": 0,
+    "errors": 0
+  },
+  "full_production_klib_rust_observations": 2106,
+  "batch_04_adopted": 1,
+  "limitations": [
+    "Other targets not runtime-validated",
+    "Unchecked output separately verified but not installed",
+    "Host panic hooks/ABI and allocation failure not modeled"
+  ],
+  "existing_multiplication_failure": "Unchanged: [u64::MAX,1]*5^2048 remains outside this adoption."
+}

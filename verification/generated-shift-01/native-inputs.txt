@@ -1,0 +1,38 @@
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.8.2/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+> Task :kmpPartiallyResolvedDependenciesChecker
+> Task :checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :downloadKotlinNativeDistribution UP-TO-DATE
+> Task :compileKotlinMacosArm64 UP-TO-DATE
+
+> Task :printDirectShiftNativeInputs
+NATIVE_INPUT=/Users/sydney/.gradle/caches/modules-2/files-2.1/io.github.kotlinmania/indexmap-kotlin-macosarm64/0.1.5/2811c0e1a8fc1f8e81e32d5af405472c60873511/indexmap-kotlin-macosArm64Main-0.1.5.klib
+NATIVE_INPUT=/Users/sydney/.gradle/caches/modules-2/files-2.1/io.github.kotlinmania/num-traits-kotlin-macosarm64/0.2.15/ea8d7d3d6bcd5c528a08a1abf72d01b99293dd02/num-traits-kotlin-macosArm64Main-0.2.15.klib
+NATIVE_INPUT=/Users/sydney/.gradle/caches/modules-2/files-2.1/io.github.kotlinmania/proc-macro-kotlin-macosarm64/0.1.4/adafe5ddabb8941c269a909961fed1a489055002/proc-macro-kotlin-macosArm64Main-0.1.4.klib
+NATIVE_INPUT=/Users/sydney/.gradle/caches/modules-2/files-2.1/io.github.kotlinmania/proc-macro2-kotlin-macosarm64/0.1.7/4710ab7bc00be6aa9d189258d83f1db2b70d0f4c/proc-macro2-kotlin-macosArm64Main-0.1.7.klib
+NATIVE_INPUT=/Users/sydney/.gradle/caches/modules-2/files-2.1/io.github.kotlinmania/quote-kotlin-macosarm64/0.2.5/92b78014c314f5da1a2c204fafdf7d4e1ce8b701/quote-kotlin-macosArm64Main-0.2.5.klib
+NATIVE_INPUT=/Users/sydney/.gradle/caches/modules-2/files-2.1/io.github.kotlinmania/serde-core-macosarm64/0.1.12/64b853c25de39bef8da478148aca73ba09993b5d/serde-core-macosArm64Main-0.1.12.klib
+NATIVE_INPUT=/Users/sydney/.gradle/caches/modules-2/files-2.1/io.github.kotlinmania/serde-derive-macosarm64/0.1.12/4e5c9be837557560a1f8200ffef3bd505debf62b/serde-derive-macosArm64Main-0.1.12.klib
+NATIVE_INPUT=/Users/sydney/.gradle/caches/modules-2/files-2.1/io.github.kotlinmania/serde-kotlin-macosarm64/0.1.12/7c27940e4ae3340d94c1f35ab1a4e1490fd4b89d/serde-kotlin-macosArm64Main-0.1.12.klib
+NATIVE_INPUT=/Users/sydney/.gradle/caches/modules-2/files-2.1/io.github.kotlinmania/syn-kotlin-macosarm64/0.4.0/3767db89a3c032445354188bf14d07e71b27275b/syn-kotlin-macosArm64Main-0.4.0.klib
+NATIVE_INPUT=/Users/sydney/.gradle/caches/modules-2/files-2.1/io.github.kotlinmania/threadlocal-kotlin-macosarm64/0.3.3/f7fa46be3b5855168d3bbc67ff3233b00da01982/threadlocal-kotlin-macosArm64Main-0.3.3.klib
+NATIVE_INPUT=/Users/sydney/.gradle/caches/modules-2/files-2.1/io.github.kotlinmania/unicode-ident-kotlin-macosarm64/0.1.1/ebd44a5d790b5cc03690b43ccdc00cc6bd7dfcc5/unicode-ident-kotlin-macosArm64Main-0.1.1.klib
+NATIVE_INPUT=/Users/sydney/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlinx/atomicfu-macosarm64/0.32.1/4a274f829f780c332d10ba8adaf076c5b251ca1/atomicfu-macosArm64Main-0.32.1.klib
+NATIVE_INPUT=/Users/sydney/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlinx/atomicfu-macosarm64/0.32.1/a6d990b552bf9396503f8318ae1188aa961de542/atomicfu-macosArm64Cinterop-interopMain-0.32.1.klib
+NATIVE_INPUT=/Users/sydney/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlinx/kotlinx-collections-immutable-macosarm64/0.5.2/b09976aca9970c8c0a3808a4a6664000ec045c4a/kotlinx-collections-immutable-macosArm64Main-0.5.2.klib
+NATIVE_INPUT=/Users/sydney/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlinx/kotlinx-coroutines-core-macosarm64/1.11.0/baededf132ba29f88ec444a7209692951f6bc020/kotlinx-coroutines-core-macosArm64Main-1.11.0.klib
+NATIVE_INPUT=/Users/sydney/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlinx/kotlinx-datetime-macosarm64/0.8.0/35281d8b2dad073b4ede91fc70a699c0baeab910/kotlinx-datetime-macosArm64Main-0.8.0.klib
+NATIVE_INPUT=/Users/sydney/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlinx/kotlinx-serialization-core-macosarm64/1.11.0/f22385c39763fb7c0cf6e129c511b811d18d224d/kotlinx-serialization-core-macosArm64Main-1.11.0.klib
+NATIVE_INPUT=/Users/sydney/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlinx/kotlinx-serialization-json-macosarm64/1.11.0/4e81b4c063ba690bf3cbc23cd4e06291f44d865d/kotlinx-serialization-json-macosArm64Main-1.11.0.klib
+Kotlin build report is written to file:///Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/build/reports/kotlin-build/serde-json-kotlin-build-2026-10-25-14-17-50-0.txt
+
+[Incubating] Problems report is available at: file:///Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 10.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/9.8.2/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 5s
+4 actionable tasks: 2 executed, 2 up-to-date
