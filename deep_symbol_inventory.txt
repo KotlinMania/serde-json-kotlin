@@ -1,0 +1,245 @@
+
+=== Complete Source Symbol Inventory ===
+Types, API declarations, functions, properties/constants, enum variants and aliases.
+Name/owner presence is distinct from parameter/body/overload parity reported above. Parser warnings remain review requirements.
+MISSING_FILE compiletest.rs
+MISSING_SYMBOL function ui at tmp/serde_json/tests/compiletest.rs:4
+MISSING_FILE debug.rs
+MISSING_SYMBOL function number at tmp/serde_json/tests/debug.rs:7
+MISSING_SYMBOL function value_null at tmp/serde_json/tests/debug.rs:17
+MISSING_SYMBOL function value_bool at tmp/serde_json/tests/debug.rs:22
+MISSING_SYMBOL function value_number at tmp/serde_json/tests/debug.rs:28
+MISSING_SYMBOL function value_string at tmp/serde_json/tests/debug.rs:37
+MISSING_SYMBOL function value_array at tmp/serde_json/tests/debug.rs:42
+MISSING_SYMBOL function value_object at tmp/serde_json/tests/debug.rs:47
+MISSING_SYMBOL function error at tmp/serde_json/tests/debug.rs:52
+MISSING_SYMBOL function indented at tmp/serde_json/tests/debug.rs:59
+MISSING_FILE lexical.rs
+MISSING_FILE lexical/algorithm.rs
+MISSING_SYMBOL function float_fast_path_test at tmp/serde_json/tests/lexical/algorithm.rs:7
+MISSING_SYMBOL function double_fast_path_test at tmp/serde_json/tests/lexical/algorithm.rs:38
+MISSING_SYMBOL function moderate_path_test at tmp/serde_json/tests/lexical/algorithm.rs:63
+MISSING_FILE lexical/exponent.rs
+MISSING_SYMBOL function scientific_exponent_test at tmp/serde_json/tests/lexical/exponent.rs:6
+MISSING_SYMBOL function mantissa_exponent_test at tmp/serde_json/tests/lexical/exponent.rs:29
+MISSING_FILE lexical/float.rs
+MISSING_SYMBOL function check_normalize at tmp/serde_json/tests/lexical/float.rs:9
+MISSING_SYMBOL function normalize_test at tmp/serde_json/tests/lexical/float.rs:22
+MISSING_SYMBOL function check_round_to_f32 at tmp/serde_json/tests/lexical/float.rs:86
+MISSING_SYMBOL function round_to_f32_test at tmp/serde_json/tests/lexical/float.rs:99
+MISSING_SYMBOL function check_round_to_f64 at tmp/serde_json/tests/lexical/float.rs:127
+MISSING_SYMBOL function round_to_f64_test at tmp/serde_json/tests/lexical/float.rs:140
+MISSING_SYMBOL function assert_normalized_eq at tmp/serde_json/tests/lexical/float.rs:187
+MISSING_SYMBOL function from_float at tmp/serde_json/tests/lexical/float.rs:194
+MISSING_SYMBOL property INTEGERS at tmp/serde_json/tests/lexical/float.rs:210
+MISSING_SYMBOL function to_f32_test at tmp/serde_json/tests/lexical/float.rs:246
+MISSING_SYMBOL function to_f64_test at tmp/serde_json/tests/lexical/float.rs:332
+MISSING_SYMBOL function check_mul at tmp/serde_json/tests/lexical/float.rs:474
+MISSING_SYMBOL function mul_test at tmp/serde_json/tests/lexical/float.rs:480
+MISSING_SYMBOL function check_imul at tmp/serde_json/tests/lexical/float.rs:527
+MISSING_SYMBOL function imul_test at tmp/serde_json/tests/lexical/float.rs:533
+MISSING_FILE lexical/math.rs
+MISSING_SYMBOL type Bigint at tmp/serde_json/tests/lexical/math.rs:7
+MISSING_SYMBOL function data at tmp/serde_json/tests/lexical/math.rs:12
+MISSING_SYMBOL function data_mut at tmp/serde_json/tests/lexical/math.rs:16
+MISSING_SYMBOL function from_u32 at tmp/serde_json/tests/lexical/math.rs:22
+MISSING_SYMBOL function from_u32 at tmp/serde_json/tests/lexical/math.rs:27
+MISSING_SYMBOL function compare_test at tmp/serde_json/tests/lexical/math.rs:41
+MISSING_SYMBOL function hi64_test at tmp/serde_json/tests/lexical/math.rs:88
+MISSING_SYMBOL function bit_length_test at tmp/serde_json/tests/lexical/math.rs:102
+MISSING_SYMBOL function iadd_small_test at tmp/serde_json/tests/lexical/math.rs:120
+MISSING_SYMBOL function imul_small_test at tmp/serde_json/tests/lexical/math.rs:151
+MISSING_SYMBOL function shl_test at tmp/serde_json/tests/lexical/math.rs:183
+MISSING_FILE lexical/num.rs
+MISSING_SYMBOL function check_as_primitive at tmp/serde_json/tests/lexical/num.rs:5
+MISSING_SYMBOL function as_primitive_test at tmp/serde_json/tests/lexical/num.rs:15
+MISSING_SYMBOL function check_number at tmp/serde_json/tests/lexical/num.rs:24
+MISSING_SYMBOL function number_test at tmp/serde_json/tests/lexical/num.rs:37
+MISSING_SYMBOL function check_integer at tmp/serde_json/tests/lexical/num.rs:46
+MISSING_SYMBOL function integer_test at tmp/serde_json/tests/lexical/num.rs:52
+MISSING_SYMBOL function check_float at tmp/serde_json/tests/lexical/num.rs:59
+MISSING_SYMBOL function float_test at tmp/serde_json/tests/lexical/num.rs:72
+MISSING_FILE lexical/parse.rs
+MISSING_SYMBOL function check_concise_float at tmp/serde_json/tests/lexical/parse.rs:8
+MISSING_SYMBOL function check_truncated_float at tmp/serde_json/tests/lexical/parse.rs:15
+MISSING_SYMBOL function parse_f32_test at tmp/serde_json/tests/lexical/parse.rs:28
+MISSING_SYMBOL function parse_f64_test at tmp/serde_json/tests/lexical/parse.rs:72
+MISSING_FILE lexical/rounding.rs
+MISSING_SYMBOL function lower_n_mask_test at tmp/serde_json/tests/lexical/rounding.rs:10
+MISSING_SYMBOL function lower_n_halfway_test at tmp/serde_json/tests/lexical/rounding.rs:19
+MISSING_SYMBOL function nth_bit_test at tmp/serde_json/tests/lexical/rounding.rs:28
+MISSING_SYMBOL function internal_n_mask_test at tmp/serde_json/tests/lexical/rounding.rs:37
+MISSING_SYMBOL function round_nearest_test at tmp/serde_json/tests/lexical/rounding.rs:53
+MISSING_SYMBOL function round_downward_test at tmp/serde_json/tests/lexical/rounding.rs:79
+MISSING_SYMBOL function round_nearest_tie_even_test at tmp/serde_json/tests/lexical/rounding.rs:102
+MISSING_SYMBOL function round_to_float_test at tmp/serde_json/tests/lexical/rounding.rs:135
+MISSING_SYMBOL function avoid_overflow_test at tmp/serde_json/tests/lexical/rounding.rs:199
+MISSING_SYMBOL function round_to_native_test at tmp/serde_json/tests/lexical/rounding.rs:220
+MISSING_FILE macros/mod.rs
+MISSING_FILE map.rs
+MISSING_SYMBOL function test_preserve_order at tmp/serde_json/tests/map.rs:4
+MISSING_SYMBOL function test_shift_insert at tmp/serde_json/tests/map.rs:20
+MISSING_SYMBOL function test_append at tmp/serde_json/tests/map.rs:30
+MISSING_SYMBOL function test_retain at tmp/serde_json/tests/map.rs:50
+MISSING_FILE regression.rs
+MISSING_FILE regression/issue1004.rs
+MISSING_SYMBOL function test at tmp/serde_json/tests/regression/issue1004.rs:4
+MISSING_FILE regression/issue520.rs
+MISSING_SYMBOL type E at tmp/serde_json/tests/regression/issue520.rs:7
+MISSING_SYMBOL enum_variant E::Float at tmp/serde_json/tests/regression/issue520.rs:8
+MISSING_SYMBOL function test at tmp/serde_json/tests/regression/issue520.rs:12
+MISSING_FILE regression/issue795.rs
+MISSING_SYMBOL type Enum at tmp/serde_json/tests/regression/issue795.rs:10
+MISSING_SYMBOL enum_variant Enum::Variant at tmp/serde_json/tests/regression/issue795.rs:11
+MISSING_SYMBOL function deserialize at tmp/serde_json/tests/regression/issue795.rs:18
+MISSING_SYMBOL function test at tmp/serde_json/tests/regression/issue795.rs:56
+MISSING_FILE regression/issue845.rs
+MISSING_SYMBOL type NumberVisitor at tmp/serde_json/tests/regression/issue845.rs:8
+MISSING_SYMBOL type_alias Value at tmp/serde_json/tests/regression/issue845.rs:19
+MISSING_SYMBOL function expecting at tmp/serde_json/tests/regression/issue845.rs:21
+MISSING_SYMBOL function visit_u64 at tmp/serde_json/tests/regression/issue845.rs:25
+MISSING_SYMBOL function visit_i64 at tmp/serde_json/tests/regression/issue845.rs:32
+MISSING_SYMBOL function visit_str at tmp/serde_json/tests/regression/issue845.rs:39
+MISSING_SYMBOL function deserialize_integer_or_string at tmp/serde_json/tests/regression/issue845.rs:47
+MISSING_SYMBOL type Struct at tmp/serde_json/tests/regression/issue845.rs:61
+MISSING_SYMBOL function test at tmp/serde_json/tests/regression/issue845.rs:68
+MISSING_FILE regression/issue953.rs
+MISSING_SYMBOL function test at tmp/serde_json/tests/regression/issue953.rs:4
+MISSING_FILE stream.rs
+MISSING_SYMBOL function test_json_stream_newlines at tmp/serde_json/tests/stream.rs:32
+MISSING_SYMBOL function test_json_stream_trailing_whitespaces at tmp/serde_json/tests/stream.rs:54
+MISSING_SYMBOL function test_json_stream_truncated at tmp/serde_json/tests/stream.rs:67
+MISSING_SYMBOL function test_json_stream_truncated_decimal at tmp/serde_json/tests/stream.rs:80
+MISSING_SYMBOL function test_json_stream_truncated_negative at tmp/serde_json/tests/stream.rs:90
+MISSING_SYMBOL function test_json_stream_truncated_exponent at tmp/serde_json/tests/stream.rs:100
+MISSING_SYMBOL function test_json_stream_empty at tmp/serde_json/tests/stream.rs:110
+MISSING_SYMBOL function test_json_stream_primitive at tmp/serde_json/tests/stream.rs:120
+MISSING_SYMBOL function test_json_stream_invalid_literal at tmp/serde_json/tests/stream.rs:154
+MISSING_SYMBOL function test_json_stream_invalid_number at tmp/serde_json/tests/stream.rs:164
+MISSING_SYMBOL function test_error at tmp/serde_json/tests/stream.rs:174
+MISSING_FILE test.rs
+MISSING_SYMBOL type Animal at tmp/serde_json/tests/test.rs:67
+MISSING_SYMBOL enum_variant Animal::Dog at tmp/serde_json/tests/test.rs:68
+MISSING_SYMBOL enum_variant Animal::Frog at tmp/serde_json/tests/test.rs:69
+MISSING_SYMBOL enum_variant Animal::Cat at tmp/serde_json/tests/test.rs:70
+MISSING_SYMBOL enum_variant Animal::AntHive at tmp/serde_json/tests/test.rs:71
+MISSING_SYMBOL type Inner at tmp/serde_json/tests/test.rs:75
+MISSING_SYMBOL type Outer at tmp/serde_json/tests/test.rs:82
+MISSING_SYMBOL function test_encode_ok at tmp/serde_json/tests/test.rs:86
+MISSING_SYMBOL function test_pretty_encode_ok at tmp/serde_json/tests/test.rs:102
+MISSING_SYMBOL function test_write_null at tmp/serde_json/tests/test.rs:119
+MISSING_SYMBOL function test_write_u64 at tmp/serde_json/tests/test.rs:126
+MISSING_SYMBOL function test_write_i64 at tmp/serde_json/tests/test.rs:133
+MISSING_SYMBOL function test_write_f64 at tmp/serde_json/tests/test.rs:145
+MISSING_SYMBOL function test_encode_nonfinite_float_yields_null at tmp/serde_json/tests/test.rs:160
+MISSING_SYMBOL function test_write_str at tmp/serde_json/tests/test.rs:187
+MISSING_SYMBOL function test_write_bool at tmp/serde_json/tests/test.rs:194
+MISSING_SYMBOL function test_write_char at tmp/serde_json/tests/test.rs:201
+MISSING_SYMBOL function test_write_list at tmp/serde_json/tests/test.rs:220
+MISSING_SYMBOL function test_write_object at tmp/serde_json/tests/test.rs:270
+MISSING_SYMBOL function test_write_tuple at tmp/serde_json/tests/test.rs:482
+MISSING_SYMBOL function test_write_enum at tmp/serde_json/tests/test.rs:493
+MISSING_SYMBOL function test_write_option at tmp/serde_json/tests/test.rs:559
+MISSING_SYMBOL function test_write_newtype_struct at tmp/serde_json/tests/test.rs:576
+MISSING_SYMBOL function test_deserialize_number_to_untagged_enum at tmp/serde_json/tests/test.rs:589
+MISSING_SYMBOL function test_parse_ok at tmp/serde_json/tests/test.rs:599
+MISSING_SYMBOL function test_parse_unusual_ok at tmp/serde_json/tests/test.rs:645
+MISSING_SYMBOL function test_parse_err at tmp/serde_json/tests/test.rs:665
+MISSING_SYMBOL function test_parse_slice_err at tmp/serde_json/tests/test.rs:675
+MISSING_SYMBOL function test_fromstr_parse_err at tmp/serde_json/tests/test.rs:684
+MISSING_SYMBOL function test_parse_null at tmp/serde_json/tests/test.rs:696
+MISSING_SYMBOL function test_parse_bool at tmp/serde_json/tests/test.rs:707
+MISSING_SYMBOL function test_parse_char at tmp/serde_json/tests/test.rs:726
+MISSING_SYMBOL function test_parse_number_errors at tmp/serde_json/tests/test.rs:755
+MISSING_SYMBOL function test_parse_i64 at tmp/serde_json/tests/test.rs:810
+MISSING_SYMBOL function test_parse_u64 at tmp/serde_json/tests/test.rs:821
+MISSING_SYMBOL function test_parse_negative_zero at tmp/serde_json/tests/test.rs:831
+MISSING_SYMBOL function test_parse_f64 at tmp/serde_json/tests/test.rs:854
+MISSING_SYMBOL function test_value_as_f64 at tmp/serde_json/tests/test.rs:947
+MISSING_SYMBOL function test_roundtrip_f64 at tmp/serde_json/tests/test.rs:961
+MISSING_SYMBOL function test_roundtrip_f32 at tmp/serde_json/tests/test.rs:984
+MISSING_SYMBOL function test_serialize_char at tmp/serde_json/tests/test.rs:994
+MISSING_SYMBOL function test_malicious_number at tmp/serde_json/tests/test.rs:1007
+MISSING_SYMBOL function test_parse_number at tmp/serde_json/tests/test.rs:1022
+MISSING_SYMBOL function test_parse_string at tmp/serde_json/tests/test.rs:1067
+MISSING_SYMBOL function test_parse_list at tmp/serde_json/tests/test.rs:1141
+MISSING_SYMBOL function test_parse_object at tmp/serde_json/tests/test.rs:1175
+MISSING_SYMBOL function test_parse_struct at tmp/serde_json/tests/test.rs:1220
+MISSING_SYMBOL function test_parse_option at tmp/serde_json/tests/test.rs:1290
+MISSING_SYMBOL function test_parse_enum_errors at tmp/serde_json/tests/test.rs:1311
+MISSING_SYMBOL function test_parse_enum at tmp/serde_json/tests/test.rs:1342
+MISSING_SYMBOL function test_parse_trailing_whitespace at tmp/serde_json/tests/test.rs:1394
+MISSING_SYMBOL function test_multiline_errors at tmp/serde_json/tests/test.rs:1404
+MISSING_SYMBOL function test_missing_option_field at tmp/serde_json/tests/test.rs:1412
+MISSING_SYMBOL function test_missing_nonoption_field at tmp/serde_json/tests/test.rs:1432
+MISSING_SYMBOL function test_missing_renamed_field at tmp/serde_json/tests/test.rs:1442
+MISSING_SYMBOL function test_serialize_seq_with_no_len at tmp/serde_json/tests/test.rs:1463
+MISSING_SYMBOL function test_serialize_map_with_no_len at tmp/serde_json/tests/test.rs:1545
+MISSING_SYMBOL function test_deserialize_from_stream at tmp/serde_json/tests/test.rs:1634
+MISSING_SYMBOL function test_serialize_rejects_adt_keys at tmp/serde_json/tests/test.rs:1674
+MISSING_SYMBOL function test_bytes_ser at tmp/serde_json/tests/test.rs:1686
+MISSING_SYMBOL function test_byte_buf_ser at tmp/serde_json/tests/test.rs:1697
+MISSING_SYMBOL function test_byte_buf_de at tmp/serde_json/tests/test.rs:1706
+MISSING_SYMBOL function test_byte_buf_de_invalid_surrogates at tmp/serde_json/tests/test.rs:1717
+MISSING_SYMBOL function test_byte_buf_de_surrogate_pair at tmp/serde_json/tests/test.rs:1763
+MISSING_SYMBOL function test_raw_de_invalid_surrogates at tmp/serde_json/tests/test.rs:1777
+MISSING_SYMBOL function test_raw_de_surrogate_pair at tmp/serde_json/tests/test.rs:1794
+MISSING_SYMBOL function test_byte_buf_de_multiple at tmp/serde_json/tests/test.rs:1801
+MISSING_SYMBOL function test_json_pointer at tmp/serde_json/tests/test.rs:1809
+MISSING_SYMBOL function test_json_pointer_mut at tmp/serde_json/tests/test.rs:1846
+MISSING_SYMBOL function test_stack_overflow at tmp/serde_json/tests/test.rs:1905
+MISSING_SYMBOL function test_disable_recursion_limit at tmp/serde_json/tests/test.rs:1918
+MISSING_SYMBOL function test_integer_key at tmp/serde_json/tests/test.rs:1930
+MISSING_SYMBOL function test_integer128_key at tmp/serde_json/tests/test.rs:1966
+MISSING_SYMBOL function test_float_key at tmp/serde_json/tests/test.rs:1976
+MISSING_SYMBOL function test_deny_non_finite_f32_key at tmp/serde_json/tests/test.rs:2011
+MISSING_SYMBOL function test_deny_non_finite_f64_key at tmp/serde_json/tests/test.rs:2040
+MISSING_SYMBOL function test_boolean_key at tmp/serde_json/tests/test.rs:2069
+MISSING_SYMBOL function test_borrowed_key at tmp/serde_json/tests/test.rs:2077
+MISSING_SYMBOL function test_effectively_string_keys at tmp/serde_json/tests/test.rs:2091
+MISSING_SYMBOL function test_json_macro at tmp/serde_json/tests/test.rs:2117
+MISSING_SYMBOL function issue_220 at tmp/serde_json/tests/test.rs:2142
+MISSING_SYMBOL function test_partialeq_number at tmp/serde_json/tests/test.rs:2154
+MISSING_SYMBOL function test_partialeq_string at tmp/serde_json/tests/test.rs:2178
+MISSING_SYMBOL function test_partialeq_bool at tmp/serde_json/tests/test.rs:2188
+MISSING_SYMBOL type FailReader at tmp/serde_json/tests/test.rs:2198
+MISSING_SYMBOL function read at tmp/serde_json/tests/test.rs:2201
+MISSING_SYMBOL function test_category at tmp/serde_json/tests/test.rs:2207
+MISSING_SYMBOL function test_into_io_error at tmp/serde_json/tests/test.rs:2247
+MISSING_SYMBOL function test_borrow at tmp/serde_json/tests/test.rs:2265
+MISSING_SYMBOL function null_invalid_type at tmp/serde_json/tests/test.rs:2274
+MISSING_SYMBOL function test_integer128 at tmp/serde_json/tests/test.rs:2283
+MISSING_SYMBOL function test_integer128_to_value at tmp/serde_json/tests/test.rs:2320
+MISSING_SYMBOL function test_borrowed_raw_value at tmp/serde_json/tests/test.rs:2342
+MISSING_SYMBOL function test_raw_value_in_map_key at tmp/serde_json/tests/test.rs:2374
+MISSING_SYMBOL function test_boxed_raw_value at tmp/serde_json/tests/test.rs:2414
+MISSING_SYMBOL function test_raw_invalid_utf8 at tmp/serde_json/tests/test.rs:2460
+MISSING_SYMBOL function test_serialize_unsized_value_to_raw_value at tmp/serde_json/tests/test.rs:2477
+MISSING_SYMBOL function test_borrow_in_map_key at tmp/serde_json/tests/test.rs:2485
+MISSING_SYMBOL function test_value_into_deserializer at tmp/serde_json/tests/test.rs:2511
+MISSING_SYMBOL function hash_positive_and_negative_zero at tmp/serde_json/tests/test.rs:2536
+MISSING_SYMBOL function test_control_character_search at tmp/serde_json/tests/test.rs:2551
+MISSING_FILE ui/missing_colon.rs
+MISSING_SYMBOL function main at tmp/serde_json/tests/ui/missing_colon.rs:3
+MISSING_FILE ui/missing_comma.rs
+MISSING_SYMBOL function main at tmp/serde_json/tests/ui/missing_comma.rs:3
+MISSING_FILE ui/missing_value.rs
+MISSING_SYMBOL function main at tmp/serde_json/tests/ui/missing_value.rs:3
+MISSING_FILE ui/not_found.rs
+MISSING_SYMBOL function main at tmp/serde_json/tests/ui/not_found.rs:3
+MISSING_FILE ui/parse_expr.rs
+PARSER_REVIEW tmp/serde_json/tests/ui/parse_expr.rs: parser errors; symbol inventory may be incomplete
+PARSER_REVIEW tmp/serde_json/tests/ui/parse_expr.rs:4-4: ERROR ERROR
+PARSER_REVIEW tmp/serde_json/tests/ui/parse_expr.rs:4-4: ERROR ERROR
+MISSING_SYMBOL function main at tmp/serde_json/tests/ui/parse_expr.rs:3
+MISSING_FILE ui/parse_key.rs
+MISSING_SYMBOL function main at tmp/serde_json/tests/ui/parse_key.rs:3
+MISSING_FILE ui/unexpected_after_array_element.rs
+MISSING_SYMBOL function main at tmp/serde_json/tests/ui/unexpected_after_array_element.rs:3
+MISSING_FILE ui/unexpected_after_map_entry.rs
+MISSING_SYMBOL function main at tmp/serde_json/tests/ui/unexpected_after_map_entry.rs:3
+MISSING_FILE ui/unexpected_colon.rs
+MISSING_SYMBOL function main at tmp/serde_json/tests/ui/unexpected_colon.rs:3
+MISSING_FILE ui/unexpected_comma.rs
+MISSING_SYMBOL function main at tmp/serde_json/tests/ui/unexpected_comma.rs:3
+Inventory totals: present=0, declaration_only=0, missing=207
