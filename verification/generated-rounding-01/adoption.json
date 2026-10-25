@@ -1,0 +1,15 @@
+{
+  "generator_commit": "18f124d",
+  "source": "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/tmp/serde_json/src/lexical/rounding.rs",
+  "source_sha256": "4762af3612880b17468ff2a1bb800c8e99f08330ae439699dd53d8dc5463ad13",
+  "raw_sha256": "57c34cb20cf760fc5761ad7ea49ebe29ab244a18840e2ea5600764403a91e388",
+  "destination": "src/commonMain/kotlin/io/github/kotlinmania/serdejson/lexical/generated/rounding/Rounding.kt",
+  "adapter": "src/commonMain/kotlin/io/github/kotlinmania/serdejson/lexical/Rounding.kt",
+  "raw_body_unchanged": true,
+  "raw_rust_observations": 3852,
+  "production_generated_observations": 3852,
+  "production_adapter_observations": 3852,
+  "callback_entry_state_observations": 3852,
+  "native_tests": 131,
+  "new_whole_files_adopted": 1
+}

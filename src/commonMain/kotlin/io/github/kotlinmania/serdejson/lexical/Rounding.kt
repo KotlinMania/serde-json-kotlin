@@ -1,186 +1,65 @@
-// port-lint: source lexical/rounding.rs
-// Adapted from https://github.com/Alexhuszagh/rust-lexical.
-
+// Compatibility entry points for the complete generated lexical/rounding.rs.
 package io.github.kotlinmania.serdejson.lexical
 
-/**
- * Defines rounding schemes for floating-point numbers.
- */
+import io.github.kotlinmania.serdejson.lexical.generated.rounding.ExtendedFloat as RoundingState
+import io.github.kotlinmania.serdejson.lexical.generated.rounding.avoid_overflow as generatedAvoidOverflow
+import io.github.kotlinmania.serdejson.lexical.generated.rounding.internal_n_mask as generatedInternalNMask
+import io.github.kotlinmania.serdejson.lexical.generated.rounding.lower_n_halfway as generatedLowerNHalfway
+import io.github.kotlinmania.serdejson.lexical.generated.rounding.lower_n_mask as generatedLowerNMask
+import io.github.kotlinmania.serdejson.lexical.generated.rounding.nth_bit as generatedNthBit
+import io.github.kotlinmania.serdejson.lexical.generated.rounding.round_downward as generatedRoundDownward
+import io.github.kotlinmania.serdejson.lexical.generated.rounding.round_nearest as generatedRoundNearest
+import io.github.kotlinmania.serdejson.lexical.generated.rounding.round_nearest_tie_even as generatedRoundNearestTieEven
+import io.github.kotlinmania.serdejson.lexical.generated.rounding.round_to_float as generatedRoundToFloat
+import io.github.kotlinmania.serdejson.lexical.generated.rounding.round_to_native as generatedRoundToNative
+import io.github.kotlinmania.serdejson.lexical.generated.rounding.tie_even as generatedTieEven
 
-private const val BITS: Int = 64 // size of ULong in bits
-
-// MASKS
-
-/**
- * Calculate a scalar factor of 2 above the halfway point.
- */
-internal fun nthBit(n: ULong): ULong {
-    require(n < BITS.toULong()) { "nthBit() overflow in shl." }
-    return 1UL shl n.toInt()
-}
-
-/**
- * Generate a bitwise mask for the lower [n] bits.
- */
-internal fun lowerNMask(n: ULong): ULong {
-    require(n <= BITS.toULong()) { "lowerNMask() overflow in shl." }
-    return if (n == BITS.toULong()) {
-        ULong.MAX_VALUE
-    } else {
-        (1UL shl n.toInt()) - 1UL
+/** Preserve scalar state on ordinary and exceptional exits, including callback mutations. */
+private inline fun <R> withRoundingState(fp: ExtendedFloat, operation: (RoundingState) -> R): R {
+    val state = RoundingState(fp.mant, fp.exp)
+    try {
+        return operation(state)
+    } finally {
+        fp.mant = state.mant
+        fp.exp = state.exp
     }
 }
 
-/**
- * Calculate the halfway point for the lower [n] bits.
+/** Callers observe their original object with the current generated state.
+ * Copy callback changes back even when the callback throws.
  */
-internal fun lowerNHalfway(n: ULong): ULong {
-    require(n <= BITS.toULong()) { "lowerNHalfway() overflow in shl." }
-    return if (n == 0UL) {
-        0UL
-    } else {
-        nthBit(n - 1UL)
-    }
-}
-
-/**
- * Calculate a bitwise mask with [n] 1 bits starting at the [bit] position.
- */
-internal fun internalNMask(bit: ULong, n: ULong): ULong {
-    require(bit <= BITS.toULong()) { "internalNMask() overflow in shl." }
-    require(n <= BITS.toULong()) { "internalNMask() overflow in shl." }
-    require(bit >= n) { "internalNMask() overflow in sub." }
-    return lowerNMask(bit) xor lowerNMask(bit - n)
-}
-
-// NEAREST ROUNDING
-
-/**
- * Shift right N-bytes and round to the nearest.
- *
- * Return whether we are above halfway and whether we are halfway.
- */
-internal fun roundNearest(fp: ExtendedFloat, shift: Int): Pair<Boolean, Boolean> {
-    val mask = lowerNMask(shift.toULong())
-    val halfway = lowerNHalfway(shift.toULong())
-
-    val truncatedBits = fp.mant and mask
-    val isAbove = truncatedBits > halfway
-    val isHalfway = truncatedBits == halfway
-
-    // Bit shift so the leading bit is in the hidden bit.
-    overflowingShr(fp, shift)
-
-    return Pair(isAbove, isHalfway)
-}
-
-/**
- * Tie rounded floating point to even.
- */
-internal fun tieEven(fp: ExtendedFloat, isAbove: Boolean, isHalfway: Boolean) {
-    val isOdd = (fp.mant and 1UL) == 1UL
-    if (isAbove || (isOdd && isHalfway)) {
-        fp.mant += 1UL
-    }
-}
-
-/**
- * Shift right N-bytes and round nearest, tie-to-even.
- */
-internal fun roundNearestTieEven(fp: ExtendedFloat, shift: Int) {
-    val (isAbove, isHalfway) = roundNearest(fp, shift)
-    tieEven(fp, isAbove, isHalfway)
-}
-
-// DIRECTED ROUNDING
-
-/**
- * Shift right N-bytes and round towards a direction.
- *
- * Return whether we have any truncated bytes.
- */
-private fun roundToward(fp: ExtendedFloat, shift: Int): Boolean {
-    val mask = lowerNMask(shift.toULong())
-    val truncatedBits = fp.mant and mask
-    overflowingShr(fp, shift)
-    return truncatedBits != 0UL
-}
-
-/**
- * Shift right N-bytes and round toward zero.
- */
-internal fun roundDownward(fp: ExtendedFloat, shift: Int) {
-    roundToward(fp, shift)
-}
-
-// ROUND TO FLOAT
-
-/**
- * Shift the ExtendedFloat fraction to the fraction bits in a native float.
- *
- * [floatTraits] provides the float-type constants.
- * [algorithm] is the rounding function to apply.
- */
-internal fun roundToFloat(
+private fun roundingCallback(
     fp: ExtendedFloat,
-    floatTraits: FloatTraits,
     algorithm: (ExtendedFloat, Int) -> Unit,
-) {
-    val finalExp = fp.exp + floatTraits.defaultShift
-    if (finalExp < floatTraits.denormalExponent) {
-        val diff = floatTraits.denormalExponent - fp.exp
-        if (diff <= MantissaTraits.FULL) {
-            algorithm(fp, diff)
-        } else {
-            fp.mant = 0UL
-            fp.exp = 0
-        }
-    } else {
-        algorithm(fp, floatTraits.defaultShift)
-    }
-
-    if ((fp.mant and floatTraits.carryMask) == floatTraits.carryMask) {
-        shr(fp, 1)
+): (RoundingState, Int) -> Unit = { state, shift ->
+    fp.mant = state.mant
+    fp.exp = state.exp
+    try {
+        algorithm(fp, shift)
+    } finally {
+        state.mant = fp.mant
+        state.exp = fp.exp
     }
 }
 
-// AVOID OVERFLOW/UNDERFLOW
+// Representation-only bridge: normalization remains in the existing Float.kt operation.
+internal fun normalizeForGenerated(fp: ExtendedFloat): UInt = fp.normalize().toUInt()
 
-/**
- * Avoid overflow for large values, shift left as needed.
- *
- * Shift until a 1-bit is in the hidden bit, if the mantissa is not 0.
- */
-internal fun avoidOverflow(fp: ExtendedFloat, floatTraits: FloatTraits) {
-    if (fp.exp >= floatTraits.maxExponent) {
-        val diff = fp.exp - floatTraits.maxExponent
-        if (diff <= floatTraits.mantissaSize) {
-            val bit = (floatTraits.mantissaSize + 1).toULong()
-            val n = (diff + 1).toULong()
-            val mask = internalNMask(bit, n)
-            if ((fp.mant and mask) == 0UL) {
-                val shift = diff + 1
-                shl(fp, shift)
-            }
-        }
-    }
-}
-
-// ROUND TO NATIVE
-
-/**
- * Round an extended-precision float to a native float representation.
- */
-internal fun roundToNative(
-    fp: ExtendedFloat,
-    floatTraits: FloatTraits,
-    algorithm: (ExtendedFloat, Int) -> Unit,
-) {
-    // Shift all the way left, to ensure a consistent representation.
-    fp.normalize()
-
-    // Round so the fraction is in a native mantissa representation,
-    // and avoid overflow/underflow.
-    roundToFloat(fp, floatTraits, algorithm)
-    avoidOverflow(fp, floatTraits)
-}
+internal fun nthBit(n: ULong): ULong = generatedNthBit(n)
+internal fun lowerNMask(n: ULong): ULong = generatedLowerNMask(n)
+internal fun lowerNHalfway(n: ULong): ULong = generatedLowerNHalfway(n)
+internal fun internalNMask(bit: ULong, n: ULong): ULong = generatedInternalNMask(bit, n)
+internal fun roundNearest(fp: ExtendedFloat, shift: Int): Pair<Boolean, Boolean> =
+    withRoundingState(fp) { generatedRoundNearest(it, shift) }
+internal fun tieEven(fp: ExtendedFloat, isAbove: Boolean, isHalfway: Boolean) =
+    withRoundingState(fp) { generatedTieEven(it, isAbove, isHalfway) }
+internal fun roundNearestTieEven(fp: ExtendedFloat, shift: Int) =
+    withRoundingState(fp) { generatedRoundNearestTieEven(it, shift) }
+internal fun roundDownward(fp: ExtendedFloat, shift: Int) =
+    withRoundingState(fp) { generatedRoundDownward(it, shift) }
+internal fun roundToFloat(fp: ExtendedFloat, floatTraits: FloatTraits, algorithm: (ExtendedFloat, Int) -> Unit) =
+    withRoundingState(fp) { generatedRoundToFloat(it, roundingCallback(fp, algorithm), floatTraits) }
+internal fun avoidOverflow(fp: ExtendedFloat, floatTraits: FloatTraits) =
+    withRoundingState(fp) { generatedAvoidOverflow(it, floatTraits) }
+internal fun roundToNative(fp: ExtendedFloat, floatTraits: FloatTraits, algorithm: (ExtendedFloat, Int) -> Unit) =
+    withRoundingState(fp) { generatedRoundToNative(it, roundingCallback(fp, algorithm), floatTraits) }
