@@ -1,0 +1,73 @@
+{
+  "port_base_commit": "85a87b5f27a2f8d49c4c15d0ec6eeef228e17b5d",
+  "generator_commit": "44958aaf2e8396e2850c57303fe74d5752005cf6",
+  "before": {
+    "gradle/libs.versions.toml": "aee48acb5951654cf883837c0930099d8f6c4e2ea6ca27ff8bf83de320cd5f2d",
+    "src/commonMain/kotlin/io/github/kotlinmania/serdejson/lexical/Digit.kt": "63afe67d4afdba5c14f549a35c9eb3046301aec9951be15c498379c5a1de9068",
+    "src/commonMain/kotlin/io/github/kotlinmania/serdejson/lexical/Exponent.kt": "598da4286d1d2234277c669e30823884413c71026af935cfa01eeb996a0e8759",
+    "src/commonMain/kotlin/io/github/kotlinmania/serdejson/lexical/Bhcomp.kt": "fdcd8d3afe953eecbc886dae67f7db10e8dbd061bc4daa664329fe8d399173bc"
+  },
+  "protected": {
+    "src/commonMain/kotlin/io/github/kotlinmania/serdejson/lexical/Math.kt": "73fb5a080f3f542fb14eafd80ad1970dbffa241ce997fddaafa8a91d974942a2",
+    "src/commonMain/kotlin/io/github/kotlinmania/serdejson/lexical/SmallPowers.kt": "174fb5cf12ea32150f53a87e590b84da2eb618eae1d554e0a9203b58a63ef5e0",
+    "src/commonMain/kotlin/io/github/kotlinmania/serdejson/lexical/LargePowers64.kt": "aa2ee0f9cce45bde11f1c346cdf6feaeb64e41ad54ce55be75222240e2088e26",
+    "src/commonMain/kotlin/io/github/kotlinmania/serdejson/lexical/Cached.kt": "f1ea098dd00c836886f839edd568eeccb5f4a154bd03163ebfc380ea45bee2d2",
+    "src/commonMain/kotlin/io/github/kotlinmania/serdejson/lexical/CachedFloat80.kt": "e8722e55b2b77cd35f416f28d8337d5920d212cd006ca3c9619a1ee05239c8a6",
+    "build.gradle.kts": "fcf998b86be5d37f78c121b9eaef6fc142ae928e575713cd1054916a35c7421e",
+    "settings.gradle.kts": "83dc230163f1abed5d48f81b015b403d489562c496d62945255468274ffc890d",
+    "gradle.properties": "145f7eac22f6ad44df8c247f4cfcd052250d9a9f92d99a03bf478417160bde82",
+    "verification/generated-power-tables-01/math-comparison.diff": "d8b2d7b65a0e0bffdc12300c354310ce0730effc3df238fbf8cfb544ad4e660d"
+  },
+  "files": [
+    {
+      "source": "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/tmp/serde_json/src/lexical/digit.rs",
+      "source_sha256": "9502805adbc3da059131d1fac0a802e17065b36cd7472606b3af24e3241d5cb8",
+      "destination": "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/src/commonMain/kotlin/io/github/kotlinmania/serdejson/lexical/generated/digit/Digit.kt",
+      "raw_generated_sha256": "7a5ba626d8f89bb5e1d897fd276100bc1ee9810c409569fe8a7843378b0515e1",
+      "installed_sha256": "53879199afeaa7ab4a3d35503b7af107e63e13e9967117389fa38241d77f753b",
+      "body_edits": "none; package declaration prepended",
+      "removed_hand_port": "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/src/commonMain/kotlin/io/github/kotlinmania/serdejson/lexical/Digit.kt"
+    },
+    {
+      "source": "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/tmp/serde_json/src/lexical/exponent.rs",
+      "source_sha256": "51f19443008e8884b15c7d5d4b1f1cfbd5673a9d1da02f1af39fcf20e315f01f",
+      "destination": "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/src/commonMain/kotlin/io/github/kotlinmania/serdejson/lexical/generated/exponent/Exponent.kt",
+      "raw_generated_sha256": "315d52cc6f034d6272a5c0453ec078c796890f5fbbce6022bd1c13ec2b52f17a",
+      "installed_sha256": "7345e6bc409f73e75311f06adb2eb20ad5e3e945d1f0f8c858c5d99a71eabef2",
+      "body_edits": "none; package declaration prepended",
+      "removed_hand_port": "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/src/commonMain/kotlin/io/github/kotlinmania/serdejson/lexical/Exponent.kt"
+    }
+  ],
+  "configuration": {
+    "pointer_width": 64,
+    "overflow_checks": true,
+    "panic": "unwind"
+  },
+  "validation": "passed",
+  "native_tests": {
+    "tests": 129,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "dependency": {
+    "artifact": "io.github.kotlinmania:num-traits-kotlin:0.2.15",
+    "native_artifact": "/Users/sydney/.m2/repository/io/github/kotlinmania/num-traits-kotlin-macosarm64/0.2.15/num-traits-kotlin-macosarm64-0.2.15.klib",
+    "sha256": "1282b482f6b4608fdefc9e6e7540cba00fb95408bcd42c20e4c543c4fa0e3fb9",
+    "consumption": "normal commonMain bundle, local Maven, offline"
+  },
+  "raw_generated_bodies_unmodified": true,
+  "source_observations": {
+    "digit": 264,
+    "exponent_rows": 16,
+    "exponent_operations": 32,
+    "migrated_caller_cases": 6
+  },
+  "other_platforms": "not run in this increment",
+  "publication": "none",
+  "batch_counts": {
+    "complete_native_verified": 7,
+    "adopted": 5
+  },
+  "known_multiplication_failure": "unchanged; verification/generated-power-tables-01/math-comparison.diff"
+}

@@ -1,0 +1,48 @@
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.8.2/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+
+> Task :dependencyInsight
+io.github.kotlinmania:num-traits-kotlin:0.2.15
+  Variant macosArm64ApiElements-published:
+    | Attribute Name                      | Provided    | Requested   |
+    |-------------------------------------|-------------|-------------|
+    | org.gradle.status                   | release     |             |
+    | org.gradle.category                 | library     | library     |
+    | org.gradle.jvm.environment          | non-jvm     | non-jvm     |
+    | org.gradle.usage                    | kotlin-api  | kotlin-api  |
+    | org.jetbrains.kotlin.native.target  | macos_arm64 | macos_arm64 |
+    | org.jetbrains.kotlin.platform.type  | native      | native      |
+    | org.jetbrains.kotlin.klib.packaging |             | non-packed  |
+
+io.github.kotlinmania:num-traits-kotlin:0.2.15
+\--- macosArm64CompileKlibraries
+
+io.github.kotlinmania:num-traits-kotlin-macosarm64:0.2.15
+  Variant macosArm64ApiElements-published:
+    | Attribute Name                      | Provided    | Requested   |
+    |-------------------------------------|-------------|-------------|
+    | org.gradle.status                   | release     |             |
+    | org.gradle.category                 | library     | library     |
+    | org.gradle.jvm.environment          | non-jvm     | non-jvm     |
+    | org.gradle.usage                    | kotlin-api  | kotlin-api  |
+    | org.jetbrains.kotlin.native.target  | macos_arm64 | macos_arm64 |
+    | org.jetbrains.kotlin.platform.type  | native      | native      |
+    | org.jetbrains.kotlin.klib.packaging |             | non-packed  |
+
+io.github.kotlinmania:num-traits-kotlin-macosarm64:0.2.15
+\--- io.github.kotlinmania:num-traits-kotlin:0.2.15
+     \--- macosArm64CompileKlibraries
+
+A web-based, searchable dependency report is available by adding the --scan option.
+Kotlin build report is written to file:///Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/build/reports/kotlin-build/serde-json-kotlin-build-2026-10-25-09-09-50-0.txt
+
+[Incubating] Problems report is available at: file:///Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 10.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/9.8.2/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 6s
+1 actionable task: 1 executed

@@ -10,6 +10,7 @@ ktlintEngine = "1.8.0"
 kotlinxBenchmark = "0.5.0"
 serdeKotlin = "0.1.12"
 indexmapKotlin = "0.1.5"
+numTraitsKotlin = "0.2.15"
 
 [plugins]
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
@@ -22,9 +23,11 @@ kotlin-allopen = { id = "org.jetbrains.kotlin.plugin.allopen", version.ref = "ko
 [libraries]
 serde-core = { module = "io.github.kotlinmania:serde-core", version.ref = "serdeKotlin" }
 indexmap-kotlin = { module = "io.github.kotlinmania:indexmap-kotlin", version.ref = "indexmapKotlin" }
+num-traits-kotlin = { module = "io.github.kotlinmania:num-traits-kotlin", version.ref = "numTraitsKotlin" }
 
 [bundles]
 serde-json-commonMain = [
   "serde-core",
   "indexmap-kotlin",
+  "num-traits-kotlin",
 ]

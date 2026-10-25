@@ -1,0 +1,3 @@
+complete input parsed by proc-macro2-kotlin:0.1.7 and syn-kotlin:0.4.0
+3 top-level items emitted; 0 top-level items and 0 nested nodes configured out (not translated)
+TranslationProfile(pointerWidth=64, overflowChecks=true, panic=unwind, debugAssertions=null, cfgTest=null, cfgFeatures={}, sourceModule=null, helperPrefix=__rtk, cfgFlags={})

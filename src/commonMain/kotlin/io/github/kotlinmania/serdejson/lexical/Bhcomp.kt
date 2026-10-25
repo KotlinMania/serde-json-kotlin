@@ -3,6 +3,11 @@
 
 package io.github.kotlinmania.serdejson.lexical
 
+import io.github.kotlinmania.serdejson.lexical.generated.digit.__rtkOption as DigitOption
+import io.github.kotlinmania.serdejson.lexical.generated.digit.__rtkPanic as DigitPanic
+import io.github.kotlinmania.serdejson.lexical.generated.digit.to_digit
+import io.github.kotlinmania.serdejson.lexical.generated.exponent.scientific_exponent
+
 /**
  * Compare the mantissa to the halfway representation of the float.
  *
@@ -41,7 +46,10 @@ private fun parseMantissa(
         }
 
         value = value * 10UL
-        value += toDigit(digit) ?: 0u
+        value += when (val parsed = to_digit(digit.toUByte())) {
+            is DigitOption.Some -> parsed.value.toULong()
+            DigitOption.None -> throw DigitPanic("called `Option::unwrap()` on a `None` value")
+        }
 
         i++
         counter++
@@ -169,7 +177,7 @@ internal fun bhcomp(
         } else {
             0
         }
-    val sciExp = scientificExponent(exponent, integerDigits, digitsStart)
+    val sciExp = scientific_exponent(exponent, integerDigits.toULong(), digitsStart.toULong())
     val count = minOf(floatTraits.maxDigits, integerDigits + fractionLen - digitsStart)
     val scaledExponent = sciExp + 1 - count
 
