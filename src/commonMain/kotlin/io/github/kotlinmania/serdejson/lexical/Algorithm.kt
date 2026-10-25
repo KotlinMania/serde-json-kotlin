@@ -33,7 +33,7 @@ internal fun fastPath(
         val float = floatTraits.fromBits(mantissa)
         floatTraits.pow10(float, exponent)
     } else if (exponent >= 0 && exponent <= maxExp + shiftExp) {
-        val smallPowers = POW10_64
+        val smallPowers = POW10_64.asSlice()
         val shift = exponent - maxExp
         val power = smallPowers[shift]
 

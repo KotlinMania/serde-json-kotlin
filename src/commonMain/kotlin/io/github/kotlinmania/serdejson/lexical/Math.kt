@@ -19,10 +19,10 @@ internal typealias Limb = ULong
 private typealias Wide = ULong
 
 /** Pre-computed powers of 5 for the limb type. */
-internal val POW5_LIMB: ULongArray = POW5_64
+internal val POW5_LIMB: List<ULong> get() = POW5_64.asSlice()
 
 /** Pre-computed powers of 10 for the limb type. */
-internal val POW10_LIMB: ULongArray = POW10_64
+internal val POW10_LIMB: List<ULong> get() = POW10_64.asSlice()
 
 // SCALAR
 // ------
@@ -229,7 +229,7 @@ private object Small {
         if (n == 0) return
 
         val smallPowers = POW5_LIMB
-        val largePowers = POW5
+        val largePowers = POW5.asSlice()
 
         val bitLength = 32 - n.countLeadingZeroBits()
         if (x.size + largePowers[bitLength - 1].size < 2 * KARATSUBA_CUTOFF) {

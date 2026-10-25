@@ -1,0 +1,4 @@
+source_utf16_start	source_utf16_end	source_line	kind	disposition
+0	62	1	trivia-gap	emitted
+62	110	3	doc	emitted
+112	161	5	doc	emitted

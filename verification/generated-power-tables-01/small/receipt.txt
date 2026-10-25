@@ -1,0 +1,3 @@
+complete input parsed by proc-macro2-kotlin:0.1.7 and syn-kotlin:0.4.0
+2 top-level items emitted; 2 top-level items and 0 nested nodes configured out (not translated)
+TranslationProfile(pointerWidth=null, overflowChecks=null, panic=null, debugAssertions=null, cfgTest=null, cfgFeatures={}, sourceModule=null, helperPrefix=SerdeJsonSmallPowers, cfgFlags={}, cfgValues={CfgValue(key=fast_arithmetic, value=32)=false, CfgValue(key=fast_arithmetic, value=64)=true})
