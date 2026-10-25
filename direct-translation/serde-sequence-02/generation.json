@@ -1,0 +1,92 @@
+{
+  "executable_sha256": "32bb230a6164b900320411cf4768382e4400e390c646c091de48786ad912cb83",
+  "input_mode": "unchanged complete Rust source for every fragment",
+  "jobs": [
+    {
+      "command": [
+        "/Volumes/stuff/Projects/kotlinmania/rust-kotlin/build/bin/nativeMacos/debugExecutable/rust-kotlin.kexe",
+        "serde-sequence-loop",
+        "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/tmp/serde_json/src/value/de.rs",
+        "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/direct-translation/serde-sequence-02/loop",
+        "--line=113",
+        "--seed=ValueDeserialize",
+        "--stateless-seed",
+        "--bind=visitor:access",
+        "--bind=vec:values",
+        "--vec=vec",
+        "--try-macro=tri"
+      ],
+      "exit": 0,
+      "stdout": "Serde sequence loop /Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/direct-translation/serde-sequence-02/loop: selected source line 113\n",
+      "stderr": "",
+      "source_sha256": "ceda1bf415aafde89caa83bf275811b70d393717d4e1038e0c61822d2da02993",
+      "prior_adopted_output_diff_exit": 0,
+      "generated_sha256": "277f6a68d1beeb2055f6b81569d76e1517ccdddef0657ef816e7539fc68d63f9"
+    },
+    {
+      "command": [
+        "/Volumes/stuff/Projects/kotlinmania/rust-kotlin/build/bin/nativeMacos/debugExecutable/rust-kotlin.kexe",
+        "serde-sequence-result",
+        "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/tmp/serde_json/src/de.rs",
+        "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/direct-translation/serde-sequence-02/text-some",
+        "--line=1965",
+        "--bind=seed:seed",
+        "--bind=self.de:de",
+        "--try-macro=tri"
+      ],
+      "exit": 0,
+      "stdout": "Serde sequence loop /Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/direct-translation/serde-sequence-02/text-some: selected source line 1965\n",
+      "stderr": "",
+      "source_sha256": "2364aaa767bb40eeedd4aa24e3bf917be5e007a00bd3d911b61f9de74aa5f074",
+      "prior_adopted_output_diff_exit": 0,
+      "generated_sha256": "928b48c9415577f4fc48bb6c1192d83e6487804fac67ce7867f5b094acea7a11"
+    },
+    {
+      "command": [
+        "/Volumes/stuff/Projects/kotlinmania/rust-kotlin/build/bin/nativeMacos/debugExecutable/rust-kotlin.kexe",
+        "serde-sequence-result",
+        "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/tmp/serde_json/src/de.rs",
+        "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/direct-translation/serde-sequence-02/text-none",
+        "--line=1967"
+      ],
+      "exit": 0,
+      "stdout": "Serde sequence loop /Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/direct-translation/serde-sequence-02/text-none: selected source line 1967\n",
+      "stderr": "",
+      "source_sha256": "2364aaa767bb40eeedd4aa24e3bf917be5e007a00bd3d911b61f9de74aa5f074",
+      "prior_adopted_output_diff_exit": 0,
+      "generated_sha256": "ea7072a404914d157ed0ce68377255a5eb52ff356de377c01b5e347d35b4d5f2"
+    },
+    {
+      "command": [
+        "/Volumes/stuff/Projects/kotlinmania/rust-kotlin/build/bin/nativeMacos/debugExecutable/rust-kotlin.kexe",
+        "serde-sequence-result",
+        "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/tmp/serde_json/src/value/de.rs",
+        "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/direct-translation/serde-sequence-02/value-some",
+        "--line=641",
+        "--bind=seed:seed",
+        "--bind=value:deserializer"
+      ],
+      "exit": 0,
+      "stdout": "Serde sequence loop /Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/direct-translation/serde-sequence-02/value-some: selected source line 641\n",
+      "stderr": "",
+      "source_sha256": "ceda1bf415aafde89caa83bf275811b70d393717d4e1038e0c61822d2da02993",
+      "prior_adopted_output_diff_exit": 0,
+      "generated_sha256": "11452bb0674fac11dc48c2c6cb2e04be9ec8c595aca004171e08ed5c588cf25f"
+    },
+    {
+      "command": [
+        "/Volumes/stuff/Projects/kotlinmania/rust-kotlin/build/bin/nativeMacos/debugExecutable/rust-kotlin.kexe",
+        "serde-sequence-result",
+        "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/tmp/serde_json/src/value/de.rs",
+        "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/direct-translation/serde-sequence-02/value-none",
+        "--line=642"
+      ],
+      "exit": 0,
+      "stdout": "Serde sequence loop /Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/direct-translation/serde-sequence-02/value-none: selected source line 642\n",
+      "stderr": "",
+      "source_sha256": "ceda1bf415aafde89caa83bf275811b70d393717d4e1038e0c61822d2da02993",
+      "prior_adopted_output_diff_exit": 0,
+      "generated_sha256": "ea7072a404914d157ed0ce68377255a5eb52ff356de377c01b5e347d35b4d5f2"
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "executable": "/Volumes/stuff/Projects/kotlinmania/rust-kotlin/build/bin/nativeMacos/debugExecutable/rust-kotlin.kexe",
+  "sha256": "32bb230a6164b900320411cf4768382e4400e390c646c091de48786ad912cb83",
+  "tests": {
+    "tests": 186,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "recognition": [
+    {
+      "source": "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/tmp/serde_json/src/de.rs",
+      "source_sha256": "2364aaa767bb40eeedd4aa24e3bf917be5e007a00bd3d911b61f9de74aa5f074",
+      "exit": 0,
+      "stdout": "lexer=proc-macro2-kotlin:0.1.7 parser=syn-kotlin:0.4.0 tokens=1412 items=58\n0 Use\n1 Use\n2 Use\n3 Use\n4 Use\n5 Use\n6 Use\n7 Use\n8 Use\n9 Use\n10 Use\n11 Use\n12 Use\n13 Use\n14 Use\n15 Use\n16 Struct\n17 Impl\n18 Impl\n19 Impl\n20 Impl\n21 Macro\n22 Enum\n23 Impl\n24 Impl\n25 Impl\n26 Static\n27 Macro\n28 Macro\n29 Macro\n30 Macro\n31 Impl\n32 Struct\n33 Impl\n34 Impl\n35 Struct\n36 Impl\n37 Impl\n38 Struct\n39 Impl\n40 Impl\n41 Impl\n42 Struct\n43 Impl\n44 Impl\n45 Impl\n46 Struct\n47 Macro\n48 Impl\n49 Impl\n50 Struct\n51 Impl\n52 Impl\n53 Impl\n54 Fn\n55 Fn\n56 Fn\n57 Fn\n",
+      "stderr": ""
+    },
+    {
+      "source": "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/tmp/serde_json/src/value/de.rs",
+      "source_sha256": "ceda1bf415aafde89caa83bf275811b70d393717d4e1038e0c61822d2da02993",
+      "exit": 0,
+      "stdout": "lexer=proc-macro2-kotlin:0.1.7 parser=syn-kotlin:0.4.0 tokens=661 items=61\n0 Use\n1 Use\n2 Use\n3 Use\n4 Use\n5 Use\n6 Use\n7 Use\n8 Use\n9 Use\n10 Use\n11 Use\n12 Use\n13 Use\n14 Impl\n15 Impl\n16 Impl\n17 Macro\n18 Fn\n19 Impl\n20 Impl\n21 Struct\n22 Impl\n23 Impl\n24 Impl\n25 Struct\n26 Impl\n27 Struct\n28 Impl\n29 Impl\n30 Struct\n31 Impl\n32 Impl\n33 Macro\n34 Fn\n35 Impl\n36 Impl\n37 Struct\n38 Impl\n39 Struct\n40 Impl\n41 Struct\n42 Impl\n43 Impl\n44 Struct\n45 Impl\n46 Impl\n47 Struct\n48 Macro\n49 Impl\n50 Struct\n51 Enum\n52 Impl\n53 Impl\n54 Impl\n55 Struct\n56 Impl\n57 Impl\n58 Impl\n59 Struct\n60 Impl\n",
+      "stderr": ""
+    }
+  ]
+}
