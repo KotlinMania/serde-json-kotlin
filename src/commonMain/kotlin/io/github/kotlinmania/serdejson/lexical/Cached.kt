@@ -1,7 +1,15 @@
-// port-lint: source lexical/cached.rs
+// Integration adapter for the unchanged generated lexical/cached.rs.
 // Adapted from https://github.com/Alexhuszagh/rust-lexical.
 
 package io.github.kotlinmania.serdejson.lexical
+
+import io.github.kotlinmania.serdejson.lexical.generated.cached.ExtendedFloatArray as GeneratedArray
+import io.github.kotlinmania.serdejson.lexical.generated.cached.ModeratePathPowers as GeneratedPowers
+import io.github.kotlinmania.serdejson.lexical.generated.cached.get_extended_float
+import io.github.kotlinmania.serdejson.lexical.generated.cached.get_small
+import io.github.kotlinmania.serdejson.lexical.generated.cached.get_large
+import io.github.kotlinmania.serdejson.lexical.generated.cached.get_small_int
+import io.github.kotlinmania.serdejson.lexical.generated.cached.len
 
 /**
  * Cached powers for extended-precision floats.
@@ -16,12 +24,16 @@ internal class ExtendedFloatArray(
     /** Pre-calculated binary exponents for the powers. */
     val exp: IntArray,
 ) {
-    /** Get the [ExtendedFloat] at [index] without bounds checking. */
+    // Primitive-array views preserve the existing internal adapter API. Owners
+    // must keep cached table storage immutable while the view is retained.
+    internal val generated = GeneratedArray(mant.asList(), exp.asList())
+
+    /** Get the [ExtendedFloat] at [index] with the source's bounds checks. */
     fun getExtendedFloat(index: Int): ExtendedFloat =
-        ExtendedFloat(mant[index], exp[index])
+        generated.get_extended_float(index.toULong()).let { ExtendedFloat(it.mant, it.exp) }
 
     /** Length of the cached arrays. */
-    val length: Int get() = mant.size
+    val length: Int get() = generated.len().toInt()
 }
 
 /**
@@ -39,14 +51,18 @@ internal class ModeratePathPowers(
     /** Exponent bias for the large powers. */
     val bias: Int,
 ) {
+    private val generated = GeneratedPowers(small.generated, large.generated, smallInt.asList(), step, bias)
+
     /** Get a small [ExtendedFloat] at [index]. */
-    fun getSmall(index: Int): ExtendedFloat = small.getExtendedFloat(index)
+    fun getSmall(index: Int): ExtendedFloat =
+        generated.get_small(index.toULong()).let { ExtendedFloat(it.mant, it.exp) }
 
     /** Get a large [ExtendedFloat] at [index]. */
-    fun getLarge(index: Int): ExtendedFloat = large.getExtendedFloat(index)
+    fun getLarge(index: Int): ExtendedFloat =
+        generated.get_large(index.toULong()).let { ExtendedFloat(it.mant, it.exp) }
 
     /** Get a small integer power at [index]. */
-    fun getSmallInt(index: Int): ULong = smallInt[index]
+    fun getSmallInt(index: Int): ULong = generated.get_small_int(index.toULong())
 }
 
 /**
