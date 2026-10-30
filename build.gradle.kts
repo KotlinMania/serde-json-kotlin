@@ -158,8 +158,6 @@ val benchmarkWarmups = providers.gradleProperty("project.benchmark.warmups").map
 val benchmarkIterations = providers.gradleProperty("project.benchmark.iterations").map { it.toInt() }.getOrElse(5)
 val benchmarkIterationTime = providers.gradleProperty("project.benchmark.iterationTime").map { it.toLong() }.getOrElse(1L)
 val benchmarkIterationTimeUnit = providers.gradleProperty("project.benchmark.iterationTimeUnit").getOrElse("s")
-val intellijCoroutinesVersion =
-    providers.gradleProperty("versions.intellij.coroutines").getOrElse("1.10.2-intellij-1")
 
 val projectKonanDataDirectory =
     providers
@@ -181,12 +179,13 @@ configurations.configureEach {
         exclude(group = "org.jetbrains", module = "annotations")
     }
     if (name == "swiftExportClasspath") {
-        dependencies.add(projectDependencyHandler.create("org.jetbrains.kotlin:swift-export-embeddable:$kotlinVersion"))
-        dependencies.add(
-            projectDependencyHandler.create(
-                "org.jetbrains.intellij.deps.kotlinx:kotlinx-coroutines-core-jvm:$intellijCoroutinesVersion",
-            ),
-        )
+        // KotlinMania patched exporter: emits `internal import` instead of
+        // `@_implementationOnly import` (Xcode 26.5 flags the latter as
+        // [#ImplementationOnlyDeprecated] under the strict-warning gate) and
+        // repairs the bundled KotlinRuntimeSupport/CoroutineSupport sources.
+        // io.github.kotlinmania:swift-export-embeddable:2.4.20-km.4, published
+        // from KotlinMania/kotlin-swift-export-tooling at Kotlin 2.4.20.
+        dependencies.add(projectDependencyHandler.create("io.github.kotlinmania:swift-export-embeddable:2.4.20-km.4"))
     }
 }
 
@@ -1774,6 +1773,22 @@ tasks.register("swiftExportSmokeTest") {
             swiftBuildFile.deleteRecursively()
         }
         swiftBuildFile.mkdirs()
+        val spmPackageDir =
+            layout.buildDirectory
+                .dir("SPMPackage")
+                .get()
+                .asFile
+        if (spmPackageDir.exists()) {
+            spmPackageDir.deleteRecursively()
+        }
+        val swiftExportDir =
+            layout.buildDirectory
+                .dir("SwiftExport")
+                .get()
+                .asFile
+        if (swiftExportDir.exists()) {
+            swiftExportDir.deleteRecursively()
+        }
         val swiftBuildDir = swiftBuildFile.absolutePath
         execOperations
             .exec {
