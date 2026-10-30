@@ -99,7 +99,8 @@ internal class IoRead<R : IoReader>(
     private var ch: Byte? = null
 
     /** Temporary storage of raw buffering bytes. */
-    private var rawBuffer: MutableList<Byte>? = null
+    private val rawBuffer: MutableList<Byte> = ArrayList()
+    private var rawBuffering: Boolean = false
 
     override val shouldEarlyReturnIfFailed: Boolean
         get() = true
@@ -137,13 +138,17 @@ internal class IoRead<R : IoReader>(
         val peeked = ch
         if (peeked != null) {
             ch = null
-            rawBuffer?.add(peeked)
+            if (rawBuffering) {
+                rawBuffer.add(peeked)
+            }
             return SerdeResult.success(peeked)
         }
         return when (val item = iter.nextOrNull()) {
             null -> SerdeResult.success(null)
             is IoResult.Ok -> {
-                rawBuffer?.add(item.value)
+                if (rawBuffering) {
+                    rawBuffer.add(item.value)
+                }
                 SerdeResult.success(item.value)
             }
             is IoResult.Err -> SerdeResult.failure(SerdeError.custom(JsonError.io(item.error.fmt()).toString()))
@@ -167,8 +172,8 @@ internal class IoRead<R : IoReader>(
 
     override fun discard() {
         val peeked = ch
-        if (peeked != null) {
-            rawBuffer?.add(peeked)
+        if (peeked != null && rawBuffering) {
+            rawBuffer.add(peeked)
         }
         ch = null
     }
@@ -228,14 +233,17 @@ internal class IoRead<R : IoReader>(
     }
 
     override fun beginRawBuffering() {
-        rawBuffer = ArrayList()
+        rawBuffer.clear()
+        rawBuffering = true
     }
 
     override fun <V> endRawBuffering(visitor: Visitor<V>): SerdeResult<V> {
-        val raw =
-            rawBuffer?.toByteArray()
-                ?: return SerdeResult.failure(SerdeError.custom("raw buffering was not started"))
-        rawBuffer = null
+        if (!rawBuffering) {
+            return SerdeResult.failure(SerdeError.custom("raw buffering was not started"))
+        }
+        val raw = rawBuffer.toByteArray()
+        rawBuffer.clear()
+        rawBuffering = false
         val str = asStr(this, raw).getOrElse { return SerdeResult.failure(it) }
         return visitor.visitMap(OwnedRawDeserializer(str))
     }
