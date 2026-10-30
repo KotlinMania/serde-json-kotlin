@@ -89,7 +89,7 @@ class ValueMapKeyParityTest {
                         object : Visitor<Long> {
                             override fun expecting(): String = "an optional integer"
 
-                            override fun <D : Deserializer> visitSome(deserializer: D): SerdeResult<Long> = I64Deserialize.deserialize(deserializer)
+                            override fun <D2 : Deserializer> visitSome(innerDeserializer: D2): SerdeResult<Long> = I64Deserialize.deserialize(innerDeserializer)
                         },
                     )
             }
@@ -101,7 +101,7 @@ class ValueMapKeyParityTest {
                         object : Visitor<Long> {
                             override fun expecting(): String = "an integer key"
 
-                            override fun <D : Deserializer> visitNewtypeStruct(deserializer: D): SerdeResult<Long> = I64Deserialize.deserialize(deserializer)
+                            override fun <D2 : Deserializer> visitNewtypeStruct(innerDeserializer: D2): SerdeResult<Long> = I64Deserialize.deserialize(innerDeserializer)
                         },
                     )
             }
@@ -124,7 +124,7 @@ class ValueMapKeyParityTest {
                                 access
                                     .variantSeed(
                                         object : DeserializeSeed<String> {
-                                            override fun <D : Deserializer> deserialize(deserializer: D): SerdeResult<String> = StringDeserialize.deserialize(deserializer)
+                                            override fun <D2 : Deserializer> deserialize(innerDeserializer: D2): SerdeResult<String> = StringDeserialize.deserialize(innerDeserializer)
                                         },
                                     ).flatMap { (name, variant) -> variant.unitVariant().map { name } }
                         },

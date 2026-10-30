@@ -146,8 +146,8 @@ class ResultPropagationTest {
                         access
                             .variantSeed(
                                 object : DeserializeSeed<String> {
-                                    override fun <D> deserialize(deserializer: D): SerdeResult<String>
-                                    where D : Deserializer = StringDeserialize.deserialize(deserializer)
+                                    override fun <D2 : Deserializer> deserialize(innerDeserializer: D2): SerdeResult<String> =
+                                        StringDeserialize.deserialize(innerDeserializer)
                                 },
                             ).flatMap { (name, variant) ->
                                 if (name == "Forward") {
