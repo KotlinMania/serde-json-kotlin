@@ -603,6 +603,9 @@ kotlin {
     swiftExport {
         moduleName = frameworkName
         flattenPackage = projectNamespace
+        export("io.github.kotlinmania:serde-core:${libs.versions.serdeKotlin.get()}") {
+            moduleName = "IoGithubKotlinmaniaSerdeCore"
+        }
         @OptIn(org.jetbrains.kotlin.gradle.swiftexport.ExperimentalSwiftExportDsl::class)
         configure {
             settings.put("enableCoroutinesSupport", "true")

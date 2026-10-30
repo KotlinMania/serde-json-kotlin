@@ -31,7 +31,7 @@ struct SerdeJsonExportTests {
 
     @Test func outcomeRetainsOriginalDiagnosticIdentity() {
         let error = io.github.kotlinmania.serde.SerdeError(message: "original", source: nil)
-        let result = JsonValueOutcome.companion.failure(error: error)
+        let result = JsonValueOutcome.Companion.shared.failure(error: error)
         let value: Value? = result.value
         #expect(value == nil)
         #expect(result.error === error)
@@ -62,7 +62,7 @@ struct SerdeJsonExportTests {
         let root: Value? = parsed.value
         #expect(root != nil)
         #expect(parsed.error == nil)
-        #expect(root?.get(key: "label")?.asStr() == "tensor😀")
+        #expect(root?.get(index: "label")?.asStr() == "tensor😀")
 
         let encoded: JsonStringOutcome = toStr(value: root!)
         let compact: String? = encoded.value
