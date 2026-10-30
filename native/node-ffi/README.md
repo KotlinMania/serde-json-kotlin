@@ -10,7 +10,7 @@ targets load.
 
 ```
 native/node-ffi/
-├── binding.gyp            — node-gyp build config (one target, ffi_native)
+├── binding.gyp            — declarative native build settings (one target, ffi_native)
 ├── package.json           — npm package (@kotlinmania/template-native-bindings)
 ├── index.js               — loader (Release → Debug fallback)
 └── src/
@@ -25,21 +25,25 @@ libc-kotlin does (`stdio_bindings.cpp`, `unistd_bindings.cpp`, etc.).
 
 ## Building
 
-The Gradle `buildNodeFfi` task (enabled by `project.ffi.napi=true` in
-`gradle.properties`) runs these commands for you. Manual invocation:
+The Gradle `buildNodeFfi` task reads `binding.gyp` through the Java
+`NodeFfiBuilder` helper. It installs the declared N-API headers with package
+scripts disabled, then compiles the C/C++ sources with the native compiler.
+
+From the project root:
 
 ```bash
-cd native/node-ffi
-npm install
-npx node-gyp configure
-npx node-gyp build
+./gradlew buildNodeFfi -Pproject.ffi.napi=true
 ```
 
-This produces `build/Release/ffi_native.node`.
+This produces `native/node-ffi/build/Release/ffi_native.node`. The helper uses
+Gradle's pinned Node executable and matching, checksum-verified release headers.
+Downloaded headers and compilation scratch files stay under this project's
+`build/` directory. Offline mode uses already verified headers and fails when
+they are unavailable. No separate build-generator runtime is required.
 
-## Filename quirk — node-gyp strips a "lib" prefix
+## Output filenames
 
-node-gyp follows the Unix linker convention of stripping a `lib` prefix from
+The Java builder retains the existing convention of stripping a `lib` prefix from
 `target_name`, so `target_name = "libc_native"` in libc-kotlin's binding.gyp
 produces `c_native.node`, not `libc_native.node`. The template's default
 target is `ffi_native` — no stripping, the emitted file is `ffi_native.node`.

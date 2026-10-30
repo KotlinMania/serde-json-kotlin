@@ -12,4 +12,4 @@ Proof uses checked overflow/debug assertions, panic unwind and usize64 on Rust a
 
 Exactly one newly adopted whole file. No target, FFI, dependency, kernel or remote changes. The pre-existing multiplication issue remains outside this change.
 
-Reproduce after compiling production: `python3 verification/generated-rounding-01/check_production.py --out tmp/generated-rounding-01/production-new`.
+Reproduce after compiling production: `./verification/generated-rounding-01/check_production.sh --out build/generated-rounding-01/production-new`.

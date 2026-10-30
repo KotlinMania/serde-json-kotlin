@@ -12,4 +12,4 @@ Validation is pinned to Rust aarch64-apple-darwin revision 7189d39d9ce936881b813
 
 No dependency/configuration, target, FFI or kernel changes; no remote action or publication. One newly adopted whole Rust file. Supporting record declarations, bindings, adapters and repeated comparisons add zero files.
 
-Reproduce after compiling the Native production library: `python3 verification/generated-errors-01/check_production.py --out tmp/generated-errors-01/production-new`.
+Reproduce after compiling the Native production library: `./verification/generated-errors-01/check_production.sh --out build/generated-errors-01/production-new`.

@@ -29,21 +29,18 @@ this task. The existing Android and publish-dry-run workflows invoke it too.
 
 ## Focused synchronization
 
-Use Python 3.11+ for standard-library TOML parsing. The workspace launcher
+Use Java 21. Gradle compiles the helpers in buildSrc and supplies its bundled TOML parser. The workspace launcher
 `tools/sync_template.sh` routes to this implementation; its reviewable source is
 `verification/workspace-sync-template.sh` (install location: workspace `tools/`).
-Never run the historical generic `sweep_template_diff.py --fix` to apply this
-repair: it carries unrelated stale pins. Its `--actions-only` path already
-handles hidden `.github` YAML and YML; this sync inventories both extensions but
-changes no workflows or pins in destination projects.
+The Java workspace diagnostic is available through `tools/shared-build-sync/run.sh diagnose`. Generic replacement remains disabled. The Android planner inventories hidden YAML and YML files and changes no destination workflows or pins.
 
 Example read-only plan from the shared workspace:
 
 ```sh
-KOTLINMANIA_PYTHON=/opt/homebrew/bin/python3 tools/sync_template.sh \
+tools/sync_template.sh \
   --repo /Volumes/stuff/Projects/kotlinmania/quote-kotlin \
   --api-alias libs.proc.macro2.kotlin \
-  --plan automation-artifacts/<card>/plan.json
+  --plan tools/shared-build-sync/plan.json
 ```
 
 Name one existing checkout and, for a plain multi-project build, an explicit
@@ -57,9 +54,9 @@ Application requires a clean feature branch and a current ownership grant JSON
 containing exact `repo`, `head`, `owner`, and `source_write_granted: true`:
 
 ```sh
-KOTLINMANIA_PYTHON=/opt/homebrew/bin/python3 tools/sync_template.sh \
-  --apply-plan automation-artifacts/<card>/plan.json \
-  --grant automation-artifacts/<card>/source-grant.json
+tools/sync_template.sh \
+  --apply-plan tools/shared-build-sync/plan.json \
+  --grant tools/shared-build-sync/source-grant.json
 ```
 
 The grant must come from the coordinator after checking held projects. A source
@@ -122,27 +119,26 @@ verified Maven publication. Those gates must complete before any rollout/release
 
 
 The complete target/runner contract and existing CI gaps are recorded in
-[ALL_TARGET_VALIDATION.md](ALL_TARGET_VALIDATION.md). Strict Swift source policy
-regressions are Python tests only; they do not demonstrate compilation or runtime
-execution. Warning relaxations are rejected by the scoped sync before any write.
+[ALL_TARGET_VALIDATION.md](ALL_TARGET_VALIDATION.md). Warning relaxations are rejected by the scoped sync before any write.
 
 
 ## Shared Swift known-problem scan
 
-`scan_swift.py` and `swift-known-problems.json` provide a read-only, versioned
+`SwiftProblemScanner.java` and `swift-known-problems.json` provide a read-only, versioned
 scan of the existing build, workflows (both `.yml` and `.yaml`), manifests,
 consumer tests and generated bridge/runtime output. Run the central template
 copy against one existing project; no source synchronization or build occurs:
 
 ```sh
-python3 template/verification/scan_swift.py --root libc-kotlin \
-  --generated-root libc-kotlin/build/SPMPackage/macosArm64/Debug \
-  --bridge-root libc-kotlin/build/SwiftExport/macosArm64/Debug \
-  --output automation-artifacts/<card>/swift-scan.json
+./tools/java-build-tool.sh SwiftProblemScanner \
+  --root "$PWD/libc-kotlin" \
+  --generated-root "$PWD/libc-kotlin/build/SPMPackage/macosArm64/Debug" \
+  --bridge-root "$PWD/libc-kotlin/build/SwiftExport/macosArm64/Debug" \
+  --output "$PWD/template/build/reports/swift-scan.json"
 ```
 
 Paths above are workspace-relative. A new project generated from this template
-can run its own `verification/scan_swift.py --root .`. Do not blanket-copy build
+can run its own `./gradlew -p buildSrc runBuildTool --args="SwiftProblemScanner --root ."`. Do not blanket-copy build
 scripts or apply isolated compiler patches to satisfy the scan. Each finding has
 a stable rule ID, severity, canonical `SWIFT.md` recipe reference and next action.
 The registry records warning overrides, weaker Swift language modes, generated
@@ -168,8 +164,7 @@ scanner until replaced with real project behavior. Current real full Libc CI
 KotlinRuntimeSupport: implementation-only import without library evolution and
 non-Sendable KotlinBase storage in KotlinError. Swift consumer execution was zero.
 The isolated enum/cancellation/runtime candidates remain gated; no fleet adoption
-is implied. Six Python policy/evidence-reader unit tests exercise the scanner;
-those are not Swift compiler or library runtime tests.
+is implied.
 
 
 ## Android publication host routing
@@ -199,21 +194,16 @@ project workflows: existing publication overrides and workflow specialization re
 review and a matching host route before propagation. The default template's Mac/Android
 workflow route is source-only until its actual Gradle task graph, transported root
 metadata and independent Android consumer have been executed at the same source head.
-`test_android_host_route.py` protects these source edges; its Python passes are not
-Gradle, Kotlin, Swift or library runtime test passes. Linux ARM64 runtime routing is a
-separate concern and is not repaired by changing publication prerequisites.
+Linux ARM64 runtime routing is a separate concern and is not repaired by changing
+publication prerequisites.
 
 
 ## Rust workspace and behavior parity
 
-Run the existing declaration scanner with an installed Python 3.11+ interpreter:
+Run the declaration scanner through the Java build tools (Java 21):
 
 ```sh
-python3 -B template/verification/scan_rust_parity.py \
-  --manifest-index automation-artifacts/<card>/manifest-index.json \
-  --kotlin-root libc-kotlin \
-  --mapping automation-artifacts/<card>/mapping.json \
-  --output automation-artifacts/<card>/cargo-parity.json --strict
+./gradlew -p buildSrc runBuildTool --args='RustParityScanner --manifest-index tools/shared-build-sync/manifest-index.json  --kotlin-root libc-kotlin  --mapping tools/shared-build-sync/mapping.json  --output tools/shared-build-sync/cargo-parity.json --strict'
 ```
 
 The index pins the upstream repository and 40-character revision. Each manifest
@@ -270,16 +260,12 @@ exercise parsing and evidence integrity; they are not library runtime tests.
 
 The template compiles Linux C wrappers for the requested Native target and its
 sysroot on both Linux and macOS hosts. Before cinterop consumes an archive,
-`verify_native_archive.py` reads its actual ELF relocatable members and rejects
+`NativeArchiveVerifier.java` reads its actual ELF relocatable members and rejects
 x64/ARM64 mismatches, malformed archives and a compiled object absent from the
 archive. It writes `native-archive-verification.json` beside the target archive.
 
-`test_linux_wrapper_target.py` covers the host command and guard wiring.
-`test_verify_native_archive.py --archive /path/to/existing/linux-x64-wrapper.a`
-exercises the byte-level guard against a real existing archive. These Python
-regressions are separate from Native compilation, final linking and runtime
-acceptance. Libc's representative ARM64 cross-link is recorded under workspace
-`automation-artifacts/2026-10-20-template-aar-sync/libc-directory-repair/linux-arm64-repair/diagnostic-2/`;
+Libc's representative ARM64 cross-link is recorded under workspace
+`template/build/reports/java-native-verifiers/`;
 it does not establish Linux ARM64 runtime behavior or a template build pass.
 
 The focused Android sync does not rewrite Native wrapper blocks or install this
@@ -305,8 +291,6 @@ use the helper's returned directory, which can be either the registered compiler
 input or the private extraction, while retaining target/sysroot and architecture
 checks.
 
-`test_native_dependency_cache.py` and `test_linux_wrapper_target.py` exercise source
-policy regressions. They do not compile or execute a target. The shared helper
-matches Libc PR135's tested implementation; exact-head compiler/link/runtime
+The shared helper matches Libc PR135's tested implementation; exact-head compiler/link/runtime
 receipts remain necessary for each project and target. The focused Android sync
 route does not rewrite existing FFI specialization or apply this change to a fleet.
