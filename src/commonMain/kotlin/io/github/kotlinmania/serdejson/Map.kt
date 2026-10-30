@@ -373,6 +373,7 @@ class Iter internal constructor(
     private var remaining: Int,
 ) : Iterator<Pair<String, Value>> by iter {
     override fun next(): Pair<String, Value> {
+        if (!hasNext()) throw NoSuchElementException()
         val entry = iter.next()
         remaining -= 1
         return entry
@@ -389,6 +390,7 @@ class IterMut internal constructor(
     private var remaining: Int,
 ) : Iterator<Pair<String, Value>> by iter {
     override fun next(): Pair<String, Value> {
+        if (!hasNext()) throw NoSuchElementException()
         val entry = iter.next()
         remaining -= 1
         return entry
@@ -405,6 +407,7 @@ class IntoIter internal constructor(
     private var remaining: Int,
 ) : Iterator<Pair<String, Value>> by iter {
     override fun next(): Pair<String, Value> {
+        if (!hasNext()) throw NoSuchElementException()
         val entry = iter.next()
         remaining -= 1
         return entry

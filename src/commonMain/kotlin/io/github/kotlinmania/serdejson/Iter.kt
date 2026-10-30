@@ -32,6 +32,7 @@ internal class LineColIterator<I : Iterator<IoResult<Byte>>>(
     override fun hasNext(): Boolean = iter.hasNext()
 
     override fun next(): IoResult<Byte> {
+        if (!hasNext()) throw NoSuchElementException()
         val item = iter.next()
         if (item is IoResult.Ok) {
             if (item.value == '\n'.code.toByte()) {
