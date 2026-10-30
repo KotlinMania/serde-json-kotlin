@@ -1,11 +1,11 @@
 package io.github.kotlinmania.serdejson
 
 import io.github.kotlinmania.serde.SerdeResult
-import io.github.kotlinmania.serdecore.de.BytesDeserialize
 import io.github.kotlinmania.serdecore.de.F32Deserialize
 import io.github.kotlinmania.serdecore.de.I64Deserialize
 import io.github.kotlinmania.serdecore.de.StringDeserialize
 import io.github.kotlinmania.serdecore.de.U64Deserialize
+import io.github.kotlinmania.serdecore.de.Visitor
 import io.github.kotlinmania.serdecore.ser.Serialize
 import io.github.kotlinmania.serdecore.ser.Serializer
 import io.github.kotlinmania.serdejson.io.SliceIoReader
@@ -131,7 +131,13 @@ class UnicodeAndParityTest {
         assertTrue(assertNotNull(sliceErr2.error).message.contains("invalid unicode code point"))
 
         // deserializeBytes allows WTF-8 lone surrogates in byte-string mode
-        val wtf8Bytes = deserializeFromStr("\"\\uD800\"", BytesDeserialize).getOrThrow()
+        val rawByteVisitor =
+            object : Visitor<ByteArray> {
+                override fun expecting(): String = "byte string"
+
+                override fun visitBytes(v: ByteArray): SerdeResult<ByteArray> = SerdeResult.success(v)
+            }
+        val wtf8Bytes = JsonDeserializer.fromStr("\"\\uD800\"").deserializeBytes(rawByteVisitor).getOrThrow()
         assertContentEquals(
             byteArrayOf(0xED.toByte(), 0xA0.toByte(), 0x80.toByte()),
             wtf8Bytes,
@@ -145,8 +151,8 @@ class UnicodeAndParityTest {
                 override fun <Ok> serialize(serializer: Serializer<Ok>): SerdeResult<Ok> =
                     serializer.serializeTupleVariant("Shape", 0u, "Pair", 2).flatMap { tv ->
                         tv
-                            .serializeElement(Value.Number(JsonNumber.from(10)))
-                            .flatMap { tv.serializeElement(Value.Str("tensor😀")) }
+                            .serializeField(Value.Number(JsonNumber.from(10)))
+                            .flatMap { tv.serializeField(Value.Str("tensor😀")) }
                             .flatMap { tv.end() }
                     }
             }
