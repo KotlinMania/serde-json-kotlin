@@ -286,9 +286,8 @@ class UnicodeAndParityTest {
             fromStr("0.12345678901234567890123456789").getOrThrow().asF64(),
         )
         assertEquals(
-            1.2345679e24,
-            fromStr("1234567890123456789012345.0").getOrThrow().asF64()!!,
-            1e9,
+            1.2345678901234568e24,
+            fromStr("1234567890123456789012345.0").getOrThrow().asF64(),
         )
         val singlePrecision = deserializeFromStr("1.00000017881393421514957253748434595763683319091796875001", F32Deserialize).getOrThrow()
         assertEquals(Float.fromBits(0x3F800002), singlePrecision)
