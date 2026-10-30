@@ -1,70 +1,86 @@
 // port-lint: source lexical/parse.rs
+// Adapted from https://github.com/Alexhuszagh/rust-lexical.
+
 package io.github.kotlinmania.serdejson.lexical
 
 /**
  * Parse a float for which the entire integer and fraction parts fit into a
  * 64-bit mantissa.
- *
- * @param mantissa The 64-bit mantissa containing all significant digits.
- * @param mantExp  The mantissa exponent (scaling factor) computed from the
- *                 raw exponent and the number of fraction / truncated digits.
- * @return The parsed [Double].
  */
-internal fun parseConciseFloat(mantissa: ULong, mantExp: Int): Double {
-    if (mantissa == 0UL) return 0.0
-    val mantissaStr = mantissa.toString()
-    val floatStr = formatScientific(mantissaStr, mantExp)
-    return floatStr.toDouble()
+internal fun parseConciseFloat(
+    mantissa: ULong,
+    mantExp: Int,
+    floatTraits: FloatTraits = F64Float,
+): Double {
+    val fast = fastPath(floatTraits, mantissa, mantExp)
+    if (fast != null) {
+        return fast
+    }
+
+    val truncated = false
+    val (fp, valid) = moderatePath(floatTraits, mantissa, mantExp, truncated)
+    if (valid) {
+        return fp.intoFloat(floatTraits)
+    }
+
+    val b = fp.intoDownwardFloat(floatTraits)
+    if (floatTraits.isSpecial(b)) {
+        return b
+    }
+
+    val integer = mantissa.toString().encodeToByteArray()
+    val fraction = ByteArray(0)
+    return bhcomp(floatTraits, b, integer, fraction, mantExp)
 }
 
 /**
- * Parse a float from extracted float components.
+ * Parse a float from extracted integer, fraction, and exponent components.
  *
- * @param integer  Byte array containing the integer digits (ASCII `b'0'`..`b'9'`).
- * @param fraction Byte array containing the fraction digits (ASCII `b'0'`..`b'9'`).
- * @param exponent The parsed 32-bit exponent.
- * @return The parsed [Double].
- *
- * Precondition: The integer must not have leading zeros.
+ * Precondition: [integer] must not have leading zeros.
  */
-internal fun parseTruncatedFloat(integer: ByteArray, fraction: ByteArray, exponent: Int): Double {
+internal fun parseTruncatedFloat(
+    integer: ByteArray,
+    fraction: ByteArray,
+    exponent: Int,
+    floatTraits: FloatTraits = F64Float,
+): Double {
     var fracLen = fraction.size
     while (fracLen > 0 && fraction[fracLen - 1] == '0'.code.toByte()) {
         fracLen--
     }
-
-    val intStr = integer.decodeToString()
-    val fracStr = if (fracLen > 0) fraction.copyOfRange(0, fracLen).decodeToString() else ""
-
-    val combinedDigits = intStr + fracStr
-    if (combinedDigits.isEmpty() || combinedDigits.all { it == '0' }) return 0.0
-
-    val effectiveExp = exponent - fracLen
-    val floatStr = formatScientific(combinedDigits, effectiveExp)
-    return floatStr.toDouble()
-}
-
-private fun formatScientific(digits: String, exp: Int): String {
-    if (digits.isEmpty()) return "0.0"
-
-    var leadingZeroCount = 0
-    while (leadingZeroCount < digits.length - 1 && digits[leadingZeroCount] == '0') {
-        leadingZeroCount++
-    }
-    val significantDigits = if (leadingZeroCount > 0) digits.substring(leadingZeroCount) else digits
-
-    val power = exp + (significantDigits.length - 1)
-
-    val mantissaStr =
-        if (significantDigits.length <= 1) {
-            significantDigits
+    val trimmedFraction =
+        if (fracLen == fraction.size) {
+            fraction
         } else {
-            significantDigits[0].toString() + "." + significantDigits.substring(1)
+            fraction.copyOfRange(0, fracLen)
         }
 
-    return if (power == 0) {
-        mantissaStr
-    } else {
-        mantissaStr + "e" + power
+    val totalDigits = integer.size + trimmedFraction.size
+    var truncated = 0uL
+    var mantissa = 0uL
+    for (idx in 0 until totalDigits) {
+        val c = if (idx < integer.size) integer[idx] else trimmedFraction[idx - integer.size]
+        val digit =
+            toDigit(c.toUByte())
+                ?: throw LexicalPanicException("called `Option::unwrap()` on a `None` value")
+        val next = addDigit(mantissa, digit)
+        if (next != null) {
+            mantissa = next
+        } else {
+            truncated = (totalDigits - idx).toULong()
+            break
+        }
     }
+
+    val mantExp = mantissaExponent(exponent, trimmedFraction.size.toULong(), truncated)
+    val isTruncated = true
+    return fallbackPath(
+        floatTraits,
+        integer,
+        trimmedFraction,
+        mantissa,
+        exponent,
+        mantExp,
+        isTruncated,
+    )
 }

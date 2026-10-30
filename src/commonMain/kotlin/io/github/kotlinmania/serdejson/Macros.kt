@@ -1,11 +1,9 @@
-// port-lint: source macros.rs
 package io.github.kotlinmania.serdejson
 
 import io.github.kotlinmania.serdecore.ser.Serialize
 
 /**
- * Builder DSL for constructing [Value] objects, the Kotlin equivalent of the
- * upstream `json!` macro.
+ * Builder DSL for constructing [Value] objects.
  *
  * Usage:
  * ```

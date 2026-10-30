@@ -1,27 +1,50 @@
+// port-lint: source lexical/shift.rs
+// Adapted from https://github.com/Alexhuszagh/rust-lexical.
+
 package io.github.kotlinmania.serdejson.lexical
 
-import io.github.kotlinmania.serdejson.lexical.generated.shift.ExtendedFloat as ShiftState
-import io.github.kotlinmania.serdejson.lexical.generated.shift.shr as generatedShr
-import io.github.kotlinmania.serdejson.lexical.generated.shift.overflowing_shr as generatedOverflowingShr
-import io.github.kotlinmania.serdejson.lexical.generated.shift.shl as generatedShl
+import io.github.kotlinmania.numtraits.I32Num
+import io.github.kotlinmania.numtraits.checkedShl
+import io.github.kotlinmania.numtraits.checkedShr
 
-/** Compatibility adapter for complete raw-generated lexical/shift.rs.
- * Uses the verified 64-bit profile with overflow checks and debug assertions.
- * Copy back on exceptional exits too: Rust may update mant before exp overflows.
- * No shift arithmetic is implemented by this adapter.
- */
-private inline fun withShiftState(fp: ExtendedFloat, operation: (ShiftState) -> Unit) {
-    val state = ShiftState(fp.mant, fp.exp)
-    try {
-        operation(state)
-    } finally {
-        fp.mant = state.mant
-        fp.exp = state.exp
+/** Exception raised when lexical arithmetic violates checked bounds or panics. */
+internal class LexicalPanicException(message: String) : RuntimeException(message)
+
+/** Shift extended-precision float right by [shift] bits. */
+internal fun shr(fp: ExtendedFloat, shift: Int) {
+    val bits = 64uL
+    if (shift.toLong().toULong() >= bits) {
+        throw LexicalPanicException("shr() overflow in shift right.")
     }
+    fp.mant = fp.mant.checkedShr(shift.toUInt()) ?: throw LexicalPanicException("attempt to shift with overflow")
+    fp.exp = I32Num.checkedAdd(fp.exp, shift) ?: throw LexicalPanicException("attempt to add with overflow")
 }
 
-internal fun shr(fp: ExtendedFloat, shift: Int) = withShiftState(fp) { generatedShr(it, shift) }
+/**
+ * Shift extended-precision float right by [shift] bits, zeroing the mantissa
+ * when [shift] equals the 64-bit mantissa width.
+ */
+internal fun overflowingShr(fp: ExtendedFloat, shift: Int) {
+    val bits = 64uL
+    val unsignedShift = shift.toLong().toULong()
+    if (unsignedShift > bits) {
+        throw LexicalPanicException("overflowing_shr() overflow in shift right.")
+    }
+    fp.mant =
+        if (unsignedShift == bits) {
+            0uL
+        } else {
+            fp.mant.checkedShr(shift.toUInt()) ?: throw LexicalPanicException("attempt to shift with overflow")
+        }
+    fp.exp = I32Num.checkedAdd(fp.exp, shift) ?: throw LexicalPanicException("attempt to add with overflow")
+}
 
-internal fun overflowingShr(fp: ExtendedFloat, shift: Int) = withShiftState(fp) { generatedOverflowingShr(it, shift) }
-
-internal fun shl(fp: ExtendedFloat, shift: Int) = withShiftState(fp) { generatedShl(it, shift) }
+/** Shift extended-precision float left by [shift] bits. */
+internal fun shl(fp: ExtendedFloat, shift: Int) {
+    val bits = 64uL
+    if (shift.toLong().toULong() >= bits) {
+        throw LexicalPanicException("shl() overflow in shift left.")
+    }
+    fp.mant = fp.mant.checkedShl(shift.toUInt()) ?: throw LexicalPanicException("attempt to shift with overflow")
+    fp.exp = I32Num.checkedSub(fp.exp, shift) ?: throw LexicalPanicException("attempt to subtract with overflow")
+}

@@ -25,6 +25,8 @@ high_priority_ports.md
 NEXT_ACTIONS.md
 port_lint_proposed_changes.md
 ast_distance_*.txt
+deep_symbol_inventory.txt
+direct-translation/
 .cache/
 *.lock
 kotlin-js-store/*
@@ -50,6 +52,10 @@ __pycache__/
 
 # Android SDK
 /.android-sdk/
+**/.android-sdk/
+**/.build/
+*.o.tmp
+**/src/native/interop/cinterop/*.a
 local.properties
 
 # Swift Package Manager / Xcode workspace state.

@@ -4,9 +4,12 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class GeneratedPowerTablesTest {
+    private fun ULongArray.asSlice(): List<ULong> = toList()
+
+    private fun Array<ULongArray>.asSlice(): List<List<ULong>> = map { it.toList() }
+
     @Test
     fun sourceTableDimensionsAndBoundaryValues() {
-        // Recorded from the unchanged Rust sources with fast_arithmetic="64".
         assertEquals(listOf(1, 1, 1, 1, 1, 2, 3, 5, 10, 19, 38, 75, 149, 298), POW5.asSlice().map { it.size })
         assertEquals(28, POW5_64.asSlice().size)
         assertEquals(7450580596923828125uL, POW5_64.asSlice().last())
@@ -26,7 +29,6 @@ class GeneratedPowerTablesTest {
 
     @Test
     fun existingMultiplicationConsumesGeneratedTableViews() {
-        // Rust oracle: [u64::MAX, 1] * 5^28, little-endian limbs.
         val value = Bigint(mutableListOf(ULong.MAX_VALUE, 1uL))
         value.imulPow5(28)
         assertEquals(listOf(18087329236509514223uL, 718829674400074783uL, 4uL), value.data)

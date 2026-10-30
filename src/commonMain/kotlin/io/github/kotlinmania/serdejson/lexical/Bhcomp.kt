@@ -3,19 +3,12 @@
 
 package io.github.kotlinmania.serdejson.lexical
 
-import io.github.kotlinmania.serdejson.lexical.generated.digit.__rtkOption as DigitOption
-import io.github.kotlinmania.serdejson.lexical.generated.digit.__rtkPanic as DigitPanic
-import io.github.kotlinmania.serdejson.lexical.generated.digit.to_digit
-import io.github.kotlinmania.serdejson.lexical.generated.exponent.scientific_exponent
-
 /**
  * Compare the mantissa to the halfway representation of the float.
  *
  * Compares the actual significant digits of the mantissa to the
  * theoretical digits from `b+h`, scaled into the proper range.
  */
-
-// MANTISSA
 
 /**
  * Parse the full mantissa into a big integer.
@@ -35,9 +28,9 @@ private fun parseMantissa(
     var i = 0
     val result = Bigint.default()
 
-    val allDigits = integer.toList() + fraction.toList()
-
-    for (digit in allDigits) {
+    val totalLen = integer.size + fraction.size
+    for (idx in 0 until totalLen) {
+        val digit = if (idx < integer.size) integer[idx] else fraction[idx - integer.size]
         if (counter == step) {
             result.imulSmall(smallPowers[counter])
             result.iaddSmall(value)
@@ -45,11 +38,11 @@ private fun parseMantissa(
             value = 0UL
         }
 
-        value = value * 10UL
-        value += when (val parsed = to_digit(digit.toUByte())) {
-            is DigitOption.Some -> parsed.value.toULong()
-            DigitOption.None -> throw DigitPanic("called `Option::unwrap()` on a `None` value")
-        }
+        value *= 10UL
+        val parsed =
+            toDigit(digit.toUByte())
+                ?: throw LexicalPanicException("called `Option::unwrap()` on a `None` value")
+        value += parsed.toULong()
 
         i++
         counter++
@@ -61,15 +54,13 @@ private fun parseMantissa(
         result.iaddSmall(value)
     }
 
-    if (i < integer.size + fraction.size) {
+    if (i < totalLen) {
         result.imulSmall(10UL)
         result.iaddSmall(1UL)
     }
 
     return result
 }
-
-// FLOAT OPS
 
 /** Calculate `b` from a representation of `b` as a float. */
 private fun bExtended(floatTraits: FloatTraits, f: Double): ExtendedFloat =
@@ -84,10 +75,8 @@ private fun bhExtended(floatTraits: FloatTraits, f: Double): ExtendedFloat {
     )
 }
 
-// ROUNDING
-
 /** Custom round-nearest, tie-even algorithm for bhcomp. */
-private fun roundNearestTieEvenBhcomp(fp: ExtendedFloat, shift: Int, isTruncated: Boolean) {
+private fun roundNearestTieEven(fp: ExtendedFloat, shift: Int, isTruncated: Boolean) {
     val (isAbove, isHalfway) = roundNearest(fp, shift)
     var above = isAbove
     var halfway = isHalfway
@@ -97,8 +86,6 @@ private fun roundNearestTieEvenBhcomp(fp: ExtendedFloat, shift: Int, isTruncated
     }
     tieEven(fp, above, halfway)
 }
-
-// BHCOMP
 
 /** Calculate the mantissa for a big integer with a positive exponent. */
 private fun largeAtof(floatTraits: FloatTraits, mantissa: Bigint, exponent: Int): Double {
@@ -110,7 +97,7 @@ private fun largeAtof(floatTraits: FloatTraits, mantissa: Bigint, exponent: Int)
     val (mant, isTruncated) = bigmant.hi64()
     val exp = bigmant.bitLength() - bits
     val fp = ExtendedFloat(mant, exp)
-    fp.roundToNative(floatTraits) { f, shift -> roundNearestTieEvenBhcomp(f, shift, isTruncated) }
+    fp.roundToNative(floatTraits) { f, shift -> roundNearestTieEven(f, shift, isTruncated) }
     return intoFloat(fp, floatTraits)
 }
 
@@ -177,7 +164,7 @@ internal fun bhcomp(
         } else {
             0
         }
-    val sciExp = scientific_exponent(exponent, integerDigits.toULong(), digitsStart.toULong())
+    val sciExp = scientificExponent(exponent, integerDigits.toULong(), digitsStart.toULong())
     val count = minOf(floatTraits.maxDigits, integerDigits + fractionLen - digitsStart)
     val scaledExponent = sciExp + 1 - count
 

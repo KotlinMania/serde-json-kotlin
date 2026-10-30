@@ -1,39 +1,26 @@
-// Integration adapter for the unchanged generated lexical/cached.rs.
+// port-lint: source lexical/cached.rs
 // Adapted from https://github.com/Alexhuszagh/rust-lexical.
 
 package io.github.kotlinmania.serdejson.lexical
 
-import io.github.kotlinmania.serdejson.lexical.generated.cached.ExtendedFloatArray as GeneratedArray
-import io.github.kotlinmania.serdejson.lexical.generated.cached.ModeratePathPowers as GeneratedPowers
-import io.github.kotlinmania.serdejson.lexical.generated.cached.get_extended_float
-import io.github.kotlinmania.serdejson.lexical.generated.cached.get_small
-import io.github.kotlinmania.serdejson.lexical.generated.cached.get_large
-import io.github.kotlinmania.serdejson.lexical.generated.cached.get_small_int
-import io.github.kotlinmania.serdejson.lexical.generated.cached.len
-
 /**
- * Cached powers for extended-precision floats.
- */
-
-/**
- * Precalculated powers that uses two-separate arrays for memory-efficiency.
+ * Precalculated powers stored in parallel mantissa and exponent arrays.
  */
 internal class ExtendedFloatArray(
-    /** Pre-calculated mantissa for the powers. */
+    /** Pre-calculated mantissas for the powers. */
     val mant: ULongArray,
     /** Pre-calculated binary exponents for the powers. */
     val exp: IntArray,
 ) {
-    // Primitive-array views preserve the existing internal adapter API. Owners
-    // must keep cached table storage immutable while the view is retained.
-    internal val generated = GeneratedArray(mant.asList(), exp.asList())
+    /** Return the [ExtendedFloat] at [index]. */
+    fun getExtendedFloat(index: Int): ExtendedFloat = ExtendedFloat(mant[index], exp[index])
 
-    /** Get the [ExtendedFloat] at [index] with the source's bounds checks. */
-    fun getExtendedFloat(index: Int): ExtendedFloat =
-        generated.get_extended_float(index.toULong()).let { ExtendedFloat(it.mant, it.exp) }
+    /** Return the number of cached entries. */
+    fun len(): Int = mant.size
 
-    /** Length of the cached arrays. */
-    val length: Int get() = generated.len().toInt()
+    /** Length property alias for internal callers. */
+    val length: Int
+        get() = len()
 }
 
 /**
@@ -51,22 +38,18 @@ internal class ModeratePathPowers(
     /** Exponent bias for the large powers. */
     val bias: Int,
 ) {
-    private val generated = GeneratedPowers(small.generated, large.generated, smallInt.asList(), step, bias)
+    /** Get a small [ExtendedFloat] power at [index]. */
+    fun getSmall(index: Int): ExtendedFloat = small.getExtendedFloat(index)
 
-    /** Get a small [ExtendedFloat] at [index]. */
-    fun getSmall(index: Int): ExtendedFloat =
-        generated.get_small(index.toULong()).let { ExtendedFloat(it.mant, it.exp) }
-
-    /** Get a large [ExtendedFloat] at [index]. */
-    fun getLarge(index: Int): ExtendedFloat =
-        generated.get_large(index.toULong()).let { ExtendedFloat(it.mant, it.exp) }
+    /** Get a large [ExtendedFloat] power at [index]. */
+    fun getLarge(index: Int): ExtendedFloat = large.getExtendedFloat(index)
 
     /** Get a small integer power at [index]. */
-    fun getSmallInt(index: Int): ULong = generated.get_small_int(index.toULong())
+    fun getSmallInt(index: Int): ULong = smallInt[index]
 }
 
 /**
- * Cached powers as an interface for a floating-point type.
+ * Cached powers provider for an extended-precision floating-point type.
  */
 internal interface ModeratePathCache {
     /** Get cached powers. */
@@ -77,5 +60,6 @@ internal interface ModeratePathCache {
  * [ModeratePathCache] implementation for [ExtendedFloat].
  */
 internal object ExtendedFloatCache : ModeratePathCache {
-    override fun getPowers(): ModeratePathPowers = CachedFloat80.getPowers()
+    override fun getPowers(): ModeratePathPowers =
+        io.github.kotlinmania.serdejson.lexical.getPowers()
 }
