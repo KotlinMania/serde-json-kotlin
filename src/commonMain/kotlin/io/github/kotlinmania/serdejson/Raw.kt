@@ -27,6 +27,24 @@ class RawValue(
     val json: String,
 ) : Serialize,
     Deserializer {
+    /** Access the JSON text underlying a raw value. */
+    fun get(): String = json
+
+    /** Returns a copy of this [RawValue]. */
+    fun clone(): RawValue = RawValue(json)
+
+    /** Creates an owned [RawValue] from this value. */
+    fun toOwned(): RawValue = RawValue(json)
+
+    /** Unwraps the underlying JSON text. */
+    fun intoOwned(): String = json
+
+    /** Formats this [RawValue] for debug output. */
+    fun fmtDebug(): String = "RawValue($json)"
+
+    /** Returns this [RawValue] as a [Deserializer]. */
+    fun intoDeserializer(): Deserializer = this
+
     override fun <Ok> serialize(serializer: Serializer<Ok>): SerdeResult<Ok> =
         serializer.serializeStruct(TOKEN, 1).flatMap { fields ->
             fields.serializeField(TOKEN, RawValueSerialize(this)).flatMap { fields.end() }
@@ -133,6 +151,21 @@ class RawValue(
     override fun toString(): String = json
 
     companion object : Deserialize<RawValue> {
+        internal fun fromBorrowed(json: String): RawValue = RawValue(json)
+
+        internal fun fromOwned(json: String): RawValue = RawValue(json)
+
+        internal fun intoOwned(rawValue: RawValue): String = rawValue.json
+
+        /** Returns the default [RawValue] (`null`). */
+        fun default(): RawValue = NULL
+
+        /** Convert an owned [String] of JSON data to a validated [RawValue]. */
+        fun fromString(json: String): JsonRawValueOutcome = rawValueFromString(json)
+
+        /** Unwraps a [RawValue] into its underlying JSON [String]. */
+        fun from(rawValue: RawValue): String = rawValue.json
+
         override fun <D : Deserializer> deserialize(deserializer: D): SerdeResult<RawValue> =
             deserializer.deserializeNewtypeStruct(TOKEN, BoxedVisitor)
 
@@ -180,7 +213,7 @@ fun rawValueFromString(json: String): JsonRawValueOutcome =
 
 /** Converts a serializable value into owned raw JSON text. */
 fun toRawValue(value: Serialize): JsonRawValueOutcome =
-    JsonRawValueOutcome.fromResult(toStr(value).toSerdeResult().map { RawValue(it) })
+    JsonRawValueOutcome.fromResult(toStr(value).toSerdeResult().map { RawValue.fromOwned(it) })
 
 private object RawKey : Deserialize<Unit> {
     override fun <D : Deserializer> deserialize(deserializer: D): SerdeResult<Unit> =
@@ -189,24 +222,147 @@ private object RawKey : Deserialize<Unit> {
                 override fun expecting(): String = "raw value"
 
                 override fun visitStr(v: String): SerdeResult<Unit> =
-                    if (v == RawValue.TOKEN) SerdeResult.success(Unit) else SerdeResult.failure(SerdeError.custom("unexpected raw value"))
+                    if (v == RawValue.TOKEN) {
+                        SerdeResult.success(Unit)
+                    } else {
+                        SerdeResult.failure(SerdeError.custom("unexpected raw value"))
+                    }
             },
         )
 }
 
-internal object BoxedFromString : DeserializeSeed<RawValue>, Visitor<RawValue> {
-    override fun <D : Deserializer> deserialize(deserializer: D): SerdeResult<RawValue> = deserializer.deserializeStr(this)
+internal object ReferenceVisitor : Visitor<RawValue> {
+    override fun expecting(): String = "any valid JSON value"
+
+    override fun <A : MapAccess> visitMap(access: A): SerdeResult<RawValue> {
+        val key = access.nextKey(RawKey).getOrElse { return SerdeResult.failure(it) }
+        if (key == null) return SerdeResult.failure(SerdeError.invalidType(Unexpected.Map, this))
+        return access.nextValueSeed(ReferenceFromString)
+    }
+}
+
+internal object ReferenceFromString :
+    DeserializeSeed<RawValue>,
+    Visitor<RawValue> {
+    override fun <D : Deserializer> deserialize(deserializer: D): SerdeResult<RawValue> =
+        deserializer.deserializeStr(this)
 
     override fun expecting(): String = "raw value"
 
-    override fun visitStr(v: String): SerdeResult<RawValue> = SerdeResult.success(RawValue(v))
+    fun visitBorrowedStr(s: String): SerdeResult<RawValue> =
+        SerdeResult.success(RawValue.fromBorrowed(s))
+
+    override fun visitStr(v: String): SerdeResult<RawValue> = visitBorrowedStr(v)
+
+    override fun visitString(v: String): SerdeResult<RawValue> = visitBorrowedStr(v)
+}
+
+internal object BoxedFromString :
+    DeserializeSeed<RawValue>,
+    Visitor<RawValue> {
+    override fun <D : Deserializer> deserialize(deserializer: D): SerdeResult<RawValue> =
+        deserializer.deserializeString(this)
+
+    override fun expecting(): String = "raw value"
+
+    override fun visitStr(v: String): SerdeResult<RawValue> =
+        SerdeResult.success(RawValue.fromOwned(v))
+
+    override fun visitString(v: String): SerdeResult<RawValue> =
+        SerdeResult.success(RawValue.fromOwned(v))
+}
+
+internal object RawKeyDeserializer : Deserializer {
+    override fun <V> deserializeAny(visitor: Visitor<V>): SerdeResult<V> =
+        visitor.visitStr(RawValue.TOKEN)
+
+    override fun <V> deserializeBool(visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeI8(visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeI16(visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeI32(visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeI64(visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeI128(visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeU8(visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeU16(visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeU32(visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeU64(visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeU128(visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeF32(visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeF64(visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeChar(visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeStr(visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeString(visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeBytes(visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeByteBuf(visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeOption(visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeUnit(visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeUnitStruct(name: String, visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeNewtypeStruct(name: String, visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeSeq(visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeTuple(len: Int, visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeTupleStruct(name: String, len: Int, visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeMap(visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeStruct(name: String, fields: List<String>, visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeEnum(name: String, variants: List<String>, visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeIdentifier(visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeIgnoredAny(visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
 }
 
 internal class OwnedRawDeserializer(
     private var rawValue: String?,
 ) : MapAccess {
     override fun <K> nextKeySeed(seed: DeserializeSeed<K>): SerdeResult<K?> =
-        if (rawValue == null) SerdeResult.success(null) else seed.deserialize(ValueDeserializer(Value.Str(RawValue.TOKEN))).map { it }
+        if (rawValue == null) {
+            SerdeResult.success(null)
+        } else {
+            seed.deserialize(RawKeyDeserializer).map { it }
+        }
+
+    override fun <V> nextValueSeed(seed: DeserializeSeed<V>): SerdeResult<V> {
+        val raw = rawValue ?: return SerdeResult.failure(SerdeError.custom("value is missing"))
+        rawValue = null
+        return seed.deserialize(ValueDeserializer(Value.Str(raw)))
+    }
+}
+
+internal class BorrowedRawDeserializer(
+    private var rawValue: String?,
+) : MapAccess {
+    override fun <K> nextKeySeed(seed: DeserializeSeed<K>): SerdeResult<K?> =
+        if (rawValue == null) {
+            SerdeResult.success(null)
+        } else {
+            seed.deserialize(RawKeyDeserializer).map { it }
+        }
 
     override fun <V> nextValueSeed(seed: DeserializeSeed<V>): SerdeResult<V> {
         val raw = rawValue ?: return SerdeResult.failure(SerdeError.custom("value is missing"))

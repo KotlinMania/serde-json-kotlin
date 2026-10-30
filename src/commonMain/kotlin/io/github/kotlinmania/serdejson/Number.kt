@@ -1,8 +1,12 @@
 // port-lint: source number.rs
 package io.github.kotlinmania.serdejson
 
+import io.github.kotlinmania.serde.SerdeError
 import io.github.kotlinmania.serde.SerdeResult
+import io.github.kotlinmania.serdecore.de.Deserialize
+import io.github.kotlinmania.serdecore.de.Deserializer
 import io.github.kotlinmania.serdecore.de.Unexpected
+import io.github.kotlinmania.serdecore.de.Visitor
 import io.github.kotlinmania.serdecore.ser.Serialize
 import io.github.kotlinmania.serdecore.ser.Serializer
 
@@ -11,7 +15,8 @@ import io.github.kotlinmania.serdecore.ser.Serializer
  */
 class JsonNumber private constructor(
     private val n: N,
-) : Serialize {
+) : Serialize,
+    Deserializer {
     /**
      * The internal representation of a JSON number.
      */
@@ -29,7 +34,7 @@ class JsonNumber private constructor(
         ) : N()
     }
 
-    companion object {
+    companion object : Deserialize<JsonNumber> {
         /** Converts a finite [Double] to a [JsonNumber]. Infinite or NaN values are not JSON numbers. */
         fun fromF64(f: Double): JsonNumber? =
             if (f.isFinite()) {
@@ -65,6 +70,26 @@ class JsonNumber private constructor(
         /** Converts a [UInt] to a [JsonNumber]. */
         fun fromU32(u: UInt): JsonNumber = fromU64(u.toULong())
 
+        /** Converts a signed 128-bit decimal integer representation to a [JsonNumber] if in range. */
+        fun fromI128(i: String): JsonNumber? =
+            if (i.startsWith('-')) {
+                val parsed = i.toLongOrNull() ?: return null
+                if (parsed < 0L) {
+                    JsonNumber(N.NegInt(parsed))
+                } else {
+                    JsonNumber(N.PosInt(parsed.toULong()))
+                }
+            } else {
+                val parsed = i.toULongOrNull() ?: return null
+                JsonNumber(N.PosInt(parsed))
+            }
+
+        /** Converts an unsigned 128-bit decimal integer representation to a [JsonNumber] if in range. */
+        fun fromU128(i: String): JsonNumber? {
+            val parsed = i.toULongOrNull() ?: return null
+            return JsonNumber(N.PosInt(parsed))
+        }
+
         /** Creates a [JsonNumber] from a [ParserNumber]. */
         internal fun fromParserNumber(value: ParserNumber): JsonNumber =
             when (value) {
@@ -80,9 +105,43 @@ class JsonNumber private constructor(
                 is N.NegInt -> Unexpected.Signed(inner.value)
                 is N.Float -> Unexpected.FloatValue(inner.value)
             }
+
+        override fun <D : Deserializer> deserialize(deserializer: D): SerdeResult<JsonNumber> =
+            deserializer.deserializeAny(NumberVisitor)
+
+        private object NumberVisitor : Visitor<JsonNumber> {
+            override fun expecting(): String = "a JSON number"
+
+            override fun visitI64(v: Long): SerdeResult<JsonNumber> =
+                SerdeResult.success(fromI64(v))
+
+            override fun visitI128(v: String): SerdeResult<JsonNumber> {
+                val num =
+                    fromI128(v)
+                        ?: return SerdeResult.failure(SerdeError.custom("JSON number out of range"))
+                return SerdeResult.success(num)
+            }
+
+            override fun visitU64(v: ULong): SerdeResult<JsonNumber> =
+                SerdeResult.success(fromU64(v))
+
+            override fun visitU128(v: String): SerdeResult<JsonNumber> {
+                val num =
+                    fromU128(v)
+                        ?: return SerdeResult.failure(SerdeError.custom("JSON number out of range"))
+                return SerdeResult.success(num)
+            }
+
+            override fun visitF64(v: Double): SerdeResult<JsonNumber> {
+                val num =
+                    fromF64(v)
+                        ?: return SerdeResult.failure(SerdeError.custom("not a JSON number"))
+                return SerdeResult.success(num)
+            }
+        }
     }
 
-    /** Returns true if the [Number] is an integer between [Long.MIN_VALUE] and [Long.MAX_VALUE]. */
+    /** Returns true if the [JsonNumber] is an integer between [Long.MIN_VALUE] and [Long.MAX_VALUE]. */
     fun isI64(): Boolean =
         when (n) {
             is N.PosInt -> n.value <= Long.MAX_VALUE.toULong()
@@ -90,21 +149,21 @@ class JsonNumber private constructor(
             is N.Float -> false
         }
 
-    /** Returns true if the [Number] is an integer between zero and [ULong.MAX_VALUE]. */
+    /** Returns true if the [JsonNumber] is an integer between zero and [ULong.MAX_VALUE]. */
     fun isU64(): Boolean =
         when (n) {
             is N.PosInt -> true
             is N.NegInt, is N.Float -> false
         }
 
-    /** Returns true if the [Number] can be represented by [Double]. */
+    /** Returns true if the [JsonNumber] can be represented by [Double]. */
     fun isF64(): Boolean =
         when (n) {
             is N.Float -> true
             is N.PosInt, is N.NegInt -> false
         }
 
-    /** If the [Number] is an integer, represent it as [Long] if possible. Returns null otherwise. */
+    /** If the [JsonNumber] is an integer, represent it as [Long] if possible. Returns null otherwise. */
     fun asI64(): Long? =
         when (n) {
             is N.PosInt -> if (n.value <= Long.MAX_VALUE.toULong()) n.value.toLong() else null
@@ -112,7 +171,7 @@ class JsonNumber private constructor(
             is N.Float -> null
         }
 
-    /** If the [Number] is an integer, represent it as [ULong] if possible. Returns null otherwise. */
+    /** If the [JsonNumber] is an integer, represent it as [ULong] if possible. Returns null otherwise. */
     fun asU64(): ULong? =
         when (n) {
             is N.PosInt -> n.value
@@ -127,6 +186,21 @@ class JsonNumber private constructor(
             is N.Float -> n.value
         }
 
+    /** If the [JsonNumber] is an integer, represent it as a signed 128-bit decimal string. */
+    fun asI128(): String? =
+        when (n) {
+            is N.PosInt -> n.value.toString()
+            is N.NegInt -> n.value.toString()
+            is N.Float -> null
+        }
+
+    /** If the [JsonNumber] is a non-negative integer, represent it as an unsigned 128-bit decimal string. */
+    fun asU128(): String? =
+        when (n) {
+            is N.PosInt -> n.value.toString()
+            is N.NegInt, is N.Float -> null
+        }
+
     /** Represents the number as [Float] if possible. Returns null otherwise. */
     internal fun asF32(): Float? =
         when (n) {
@@ -134,6 +208,15 @@ class JsonNumber private constructor(
             is N.NegInt -> n.value.toFloat()
             is N.Float -> n.value.toFloat()
         }
+
+    /** Returns a copy of this [JsonNumber]. */
+    fun clone(): JsonNumber = JsonNumber(n)
+
+    /** Formats this [JsonNumber] for debug output. */
+    fun fmtDebug(): String = "Number($this)"
+
+    /** Returns this [JsonNumber] as a [Deserializer]. */
+    fun intoDeserializer(): Deserializer = this
 
     override fun toString(): String =
         when (n) {
@@ -148,6 +231,73 @@ class JsonNumber private constructor(
             is N.NegInt -> serializer.serializeI64(n.value)
             is N.Float -> serializer.serializeF64(n.value)
         }
+
+    override fun <V> deserializeAny(visitor: Visitor<V>): SerdeResult<V> =
+        when (n) {
+            is N.PosInt -> visitor.visitU64(n.value)
+            is N.NegInt -> visitor.visitI64(n.value)
+            is N.Float -> visitor.visitF64(n.value)
+        }
+
+    override fun <V> deserializeBool(visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeI8(visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeI16(visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeI32(visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeI64(visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeI128(visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeU8(visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeU16(visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeU32(visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeU64(visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeU128(visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeF32(visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeF64(visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeChar(visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeStr(visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeString(visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeBytes(visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeByteBuf(visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeOption(visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeUnit(visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeUnitStruct(name: String, visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeNewtypeStruct(name: String, visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeSeq(visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeTuple(len: Int, visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeTupleStruct(name: String, len: Int, visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeMap(visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeStruct(name: String, fields: List<String>, visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeEnum(name: String, variants: List<String>, visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeIdentifier(visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
+
+    override fun <V> deserializeIgnoredAny(visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -215,11 +365,26 @@ internal fun formatFinite(f: Double): String {
     }
 }
 
+/** Converts a [Byte] to a [JsonNumber]. */
+fun JsonNumber.Companion.from(i: Byte): JsonNumber = fromI64(i.toLong())
+
+/** Converts a [Short] to a [JsonNumber]. */
+fun JsonNumber.Companion.from(i: Short): JsonNumber = fromI64(i.toLong())
+
 /** Converts an [Int] to a [JsonNumber]. */
 fun JsonNumber.Companion.from(i: Int): JsonNumber = fromI64(i.toLong())
 
 /** Converts a [Long] to a [JsonNumber]. */
 fun JsonNumber.Companion.from(i: Long): JsonNumber = fromI64(i)
+
+/** Converts a [UByte] to a [JsonNumber]. */
+fun JsonNumber.Companion.from(u: UByte): JsonNumber = fromU64(u.toULong())
+
+/** Converts a [UShort] to a [JsonNumber]. */
+fun JsonNumber.Companion.from(u: UShort): JsonNumber = fromU64(u.toULong())
+
+/** Converts a [UInt] to a [JsonNumber]. */
+fun JsonNumber.Companion.from(u: UInt): JsonNumber = fromU64(u.toULong())
 
 /** Converts a [ULong] to a [JsonNumber]. */
 fun JsonNumber.Companion.from(u: ULong): JsonNumber = fromU64(u)

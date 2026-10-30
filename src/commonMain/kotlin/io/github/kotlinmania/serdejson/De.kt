@@ -1,9 +1,11 @@
 // port-lint: source de.rs
 package io.github.kotlinmania.serdejson
 
+import io.github.kotlinmania.serde.SerdeDiagnosticCarrier
 import io.github.kotlinmania.serde.SerdeError
 import io.github.kotlinmania.serde.SerdeResult
 import io.github.kotlinmania.serde.serdeCatching
+import io.github.kotlinmania.serdecore.de.Deserialize
 import io.github.kotlinmania.serdecore.de.DeserializeSeed
 import io.github.kotlinmania.serdecore.de.Deserializer
 import io.github.kotlinmania.serdecore.de.EnumAccess
@@ -14,6 +16,11 @@ import io.github.kotlinmania.serdecore.de.SeqElement
 import io.github.kotlinmania.serdecore.de.Unexpected
 import io.github.kotlinmania.serdecore.de.VariantAccess
 import io.github.kotlinmania.serdecore.de.Visitor
+import io.github.kotlinmania.serdejson.io.IoReader
+import io.github.kotlinmania.serdejson.lexical.F32Float
+import io.github.kotlinmania.serdejson.lexical.F64Float
+import io.github.kotlinmania.serdejson.lexical.parseConciseFloat
+import io.github.kotlinmania.serdejson.lexical.parseTruncatedFloat
 
 // ─── ParserNumber ─────────────────────────────────────────────────────────────
 
@@ -70,6 +77,8 @@ class JsonParser(
         private set
     private var line: Int = 1
     private var col: Int = 0
+    internal var singlePrecision: Boolean = false
+    private val scratch: MutableList<Byte> = ArrayList()
 
     /** Returns the current position as (line, column). */
     fun position(): Pair<Int, Int> = Pair(line, col)
@@ -330,7 +339,8 @@ class JsonParser(
                 }
                 else -> true
             }
-        val next = nextCharOrNull()
+        val next = nextChar()
+        if (next < 0) (error(ErrorCode.EofWhileParsingValue)).raise()
         if (next.toChar() !in '0'..'9') (error(ErrorCode.InvalidNumber)).raise()
         var exp = (next - '0'.code)
         while (peekOrNull().toChar() in '0'..'9') {
@@ -369,75 +379,101 @@ class JsonParser(
         }
     }
 
-    /** Handles overflow in the integer part by switching to f64 parsing without losing precision. */
-    private fun parseLongInteger(positive: Boolean, significand: ULong): Double {
-        val sb = StringBuilder()
-        sb.append(significand)
+    /** Handles overflow in the integer part by switching to truncated lexical float parsing without losing precision. */
+    private fun parseLongInteger(positive: Boolean, partialSignificand: ULong): Double {
+        scratch.clear()
+        for (b in partialSignificand.toString().encodeToByteArray()) {
+            scratch.add(b)
+        }
         while (true) {
             when (val ch = peekOrNull().toChar()) {
                 in '0'..'9' -> {
+                    scratch.add(ch.code.toByte())
                     eatChar()
-                    sb.append(ch)
                 }
                 '.' -> {
                     eatChar()
-                    sb.append('.')
-                    var hasDigits = false
-                    while (peekOrNull().toChar() in '0'..'9') {
-                        val digit = peekOrNull().toChar()
-                        eatChar()
-                        sb.append(digit)
-                        hasDigits = true
-                    }
-                    if (!hasDigits) {
-                        if (peekRaw() >= 0) (peekError(ErrorCode.InvalidNumber)).raise()
-                        (peekError(ErrorCode.EofWhileParsingValue)).raise()
-                    }
+                    return parseLongDecimal(positive, scratch.size)
                 }
                 'e', 'E' -> {
-                    eatChar()
-                    sb.append('e')
-                    val expSign = peekOrNull().toChar()
-                    if (expSign == '+' || expSign == '-') {
-                        eatChar()
-                        sb.append(expSign)
-                    }
-                    val next = nextCharOrNull()
-                    if (next.toChar() !in '0'..'9') (error(ErrorCode.InvalidNumber)).raise()
-                    sb.append(next.toChar())
-                    while (peekOrNull().toChar() in '0'..'9') {
-                        val digit = peekOrNull().toChar()
-                        eatChar()
-                        sb.append(digit)
-                    }
-                    val d =
-                        sb.toString().toDoubleOrNull()
-                            ?: (error(ErrorCode.NumberOutOfRange)).raise()
-                    if (d.isInfinite()) (error(ErrorCode.NumberOutOfRange)).raise()
-                    return if (positive) d else -d
+                    return parseLongExponent(positive, scratch.size)
                 }
                 else -> {
-                    val d =
-                        sb.toString().toDoubleOrNull()
-                            ?: (error(ErrorCode.NumberOutOfRange)).raise()
-                    if (d.isInfinite()) (error(ErrorCode.NumberOutOfRange)).raise()
-                    return if (positive) d else -d
+                    return f64LongFromParts(positive, scratch.size, 0)
                 }
             }
         }
     }
 
-    /** Handles overflow in the decimal part — discards remaining digits. */
+    private fun parseLongDecimal(positive: Boolean, integerEnd: Int): Double {
+        var atLeastOneDigit = integerEnd < scratch.size
+        while (peekOrNull().toChar() in '0'..'9') {
+            val ch = peekOrNull()
+            scratch.add(ch.toByte())
+            eatChar()
+            atLeastOneDigit = true
+        }
+        if (!atLeastOneDigit) {
+            if (peekRaw() >= 0) (peekError(ErrorCode.InvalidNumber)).raise()
+            (peekError(ErrorCode.EofWhileParsingValue)).raise()
+        }
+        return when (peekOrNull().toChar()) {
+            'e', 'E' -> parseLongExponent(positive, integerEnd)
+            else -> f64LongFromParts(positive, integerEnd, 0)
+        }
+    }
+
+    private fun parseLongExponent(positive: Boolean, integerEnd: Int): Double {
+        eatChar()
+        val positiveExp =
+            when (peekOrNull().toChar()) {
+                '+' -> {
+                    eatChar()
+                    true
+                }
+                '-' -> {
+                    eatChar()
+                    false
+                }
+                else -> true
+            }
+        val next = nextChar()
+        if (next < 0) (error(ErrorCode.EofWhileParsingValue)).raise()
+        if (next.toChar() !in '0'..'9') (error(ErrorCode.InvalidNumber)).raise()
+        var exp = next - '0'.code
+        while (peekOrNull().toChar() in '0'..'9') {
+            val digit = peekOrNull() - '0'.code
+            eatChar()
+            if (overflow(exp, digit, Int.MAX_VALUE)) {
+                val zeroSignificand = scratch.all { it == '0'.code.toByte() }
+                return parseExponentOverflow(positive, zeroSignificand, positiveExp)
+            }
+            exp = exp * 10 + digit
+        }
+        val finalExp = if (positiveExp) exp else -exp
+        return f64LongFromParts(positive, integerEnd, finalExp)
+    }
+
+    /** Handles overflow in the decimal part by switching to truncated lexical float parsing. */
     private fun parseDecimalOverflow(
         positive: Boolean,
         significand: ULong,
         exponent: Int,
     ): Double {
-        while (peekOrNull().toChar() in '0'..'9') eatChar()
-        return when (peekOrNull().toChar()) {
-            'e', 'E' -> parseExponent(positive, significand, exponent)
-            else -> f64FromParts(positive, significand, exponent)
+        val sigText = significand.toString()
+        val fractionDigits = -exponent
+        scratch.clear()
+        val zeros = fractionDigits - (sigText.length + 1)
+        if (zeros >= 0) {
+            repeat(zeros + 1) {
+                scratch.add('0'.code.toByte())
+            }
         }
+        for (b in sigText.encodeToByteArray()) {
+            scratch.add(b)
+        }
+        val integerEnd = scratch.size - fractionDigits
+        return parseLongDecimal(positive, integerEnd)
     }
 
     /** Handles overflow in the exponent part. */
@@ -451,30 +487,27 @@ class JsonParser(
         return if (positive) 0.0 else -0.0
     }
 
+    private fun f64LongFromParts(
+        positive: Boolean,
+        integerEnd: Int,
+        exponent: Int,
+    ): Double {
+        val raw = scratch.toByteArray()
+        val integer = raw.copyOfRange(0, integerEnd)
+        val fraction = raw.copyOfRange(integerEnd, raw.size)
+        val traits = if (singlePrecision) F32Float else F64Float
+        val f = parseTruncatedFloat(integer, fraction, exponent, traits)
+        if (f.isInfinite()) (error(ErrorCode.NumberOutOfRange)).raise()
+        return if (positive) f else -f
+    }
+
     /**
-     * Constructs a Double from a significand and exponent using the POW10 table.
+     * Constructs an exact IEEE-754 floating-point value from a 64-bit significand and decimal exponent.
      */
     private fun f64FromParts(positive: Boolean, significand: ULong, exponent: Int): Double {
-        var f = significand.toDouble()
-        var exp = exponent
-        loop@ while (true) {
-            val absExp = if (exp == Int.MIN_VALUE) Int.MAX_VALUE else kotlin.math.abs(exp)
-            val pow = POW10.get(absExp)
-            if (pow != null) {
-                if (exp >= 0) {
-                    f *= pow
-                    if (f.isInfinite()) (error(ErrorCode.NumberOutOfRange)).raise()
-                } else {
-                    f /= pow
-                }
-                break@loop
-            } else {
-                if (f == 0.0) break@loop
-                if (exp >= 0) (error(ErrorCode.NumberOutOfRange)).raise()
-                f /= 1e308
-                exp += 308
-            }
-        }
+        val traits = if (singlePrecision) F32Float else F64Float
+        val f = parseConciseFloat(significand, exponent, traits)
+        if (f.isInfinite()) (error(ErrorCode.NumberOutOfRange)).raise()
         return if (positive) f else -f
     }
 
@@ -537,7 +570,12 @@ class JsonParser(
                     if (pos >= input.length) (error(ErrorCode.EofWhileParsingString)).raise()
                     val esc = input[pos]
                     pos++
-                    col++
+                    if (esc == '\n') {
+                        line++
+                        col = 0
+                    } else {
+                        col++
+                    }
                     when (esc) {
                         '"' -> sb.append('"')
                         '\\' -> sb.append('\\')
@@ -549,28 +587,21 @@ class JsonParser(
                         'f' -> sb.append('\u000C')
                         'u' -> {
                             val cp = decodeHexEscape()
-                            // Handle surrogate pairs
-                            if (cp in 0xD800..0xDBFF) {
-                                // High surrogate — look for low surrogate
-                                if (pos + 1 < input.length && input[pos] == '\\' && input[pos + 1] == 'u') {
-                                    pos += 2
-                                    col += 2
-                                    val low = decodeHexEscape()
-                                    if (low in 0xDC00..0xDFFF) {
-                                        val full = 0x10000 + ((cp - 0xD800) shl 10) + (low - 0xDC00)
-                                        sb.appendCodePoint(full)
-                                    } else {
-                                        // Invalid low surrogate — emit replacement
-                                        sb.appendCodePoint(cp)
-                                        sb.appendCodePoint(low)
-                                    }
-                                } else {
-                                    // Lone high surrogate
-                                    sb.appendCodePoint(cp)
+                            if (cp in 0xDC00..0xDFFF) {
+                                (error(ErrorCode.LoneLeadingSurrogateInHexEscape)).raise()
+                            } else if (cp in 0xD800..0xDBFF) {
+                                val slash = nextChar()
+                                if (slash < 0) (error(ErrorCode.EofWhileParsingString)).raise()
+                                if (slash != '\\'.code) (error(ErrorCode.UnexpectedEndOfHexEscape)).raise()
+                                val uChar = nextChar()
+                                if (uChar < 0) (error(ErrorCode.EofWhileParsingString)).raise()
+                                if (uChar != 'u'.code) (error(ErrorCode.UnexpectedEndOfHexEscape)).raise()
+                                val low = decodeHexEscape()
+                                if (low !in 0xDC00..0xDFFF) {
+                                    (error(ErrorCode.LoneLeadingSurrogateInHexEscape)).raise()
                                 }
-                            } else if (cp in 0xDC00..0xDFFF) {
-                                // Lone low surrogate
-                                sb.appendCodePoint(cp)
+                                val full = 0x10000 + ((cp - 0xD800) shl 10) + (low - 0xDC00)
+                                sb.appendCodePoint(full)
                             } else {
                                 sb.appendCodePoint(cp)
                             }
@@ -579,6 +610,18 @@ class JsonParser(
                     }
                 }
                 c.code < 0x20 -> (error(ErrorCode.ControlCharacterWhileParsingString)).raise()
+                c.isHighSurrogate() -> {
+                    if (pos < input.length && input[pos].isLowSurrogate()) {
+                        val low = input[pos]
+                        pos++
+                        col++
+                        sb.append(c)
+                        sb.append(low)
+                    } else {
+                        (error(ErrorCode.InvalidUnicodeCodePoint)).raise()
+                    }
+                }
+                c.isLowSurrogate() -> (error(ErrorCode.InvalidUnicodeCodePoint)).raise()
                 else -> sb.append(c)
             }
         }
@@ -587,18 +630,114 @@ class JsonParser(
 
     /** Parses a 4-hex-digit unicode escape. Assumes `\\u` has been consumed. */
     private fun decodeHexEscape(): Int {
-        if (pos + 4 > input.length) (error(ErrorCode.UnexpectedEndOfHexEscape)).raise()
-        val hex = input.substring(pos, pos + 4)
+        if (pos + 4 > input.length) {
+            while (pos < input.length) {
+                eatChar()
+            }
+            (error(ErrorCode.EofWhileParsingString)).raise()
+        }
+        val c0 = input[pos]
+        val c1 = input[pos + 1]
+        val c2 = input[pos + 2]
+        val c3 = input[pos + 3]
         pos += 4
         col += 4
-        val cp =
-            hex.toIntOrNull(16)
-                ?: (error(ErrorCode.InvalidUnicodeCodePoint)).raise()
-        return cp
+        if (c0.code > 0xFF || c1.code > 0xFF || c2.code > 0xFF || c3.code > 0xFF) {
+            (error(ErrorCode.InvalidEscape)).raise()
+        }
+        val decoded =
+            decodeFourHexDigits(
+                c0.code.toByte(),
+                c1.code.toByte(),
+                c2.code.toByte(),
+                c3.code.toByte(),
+            ) ?: (error(ErrorCode.InvalidEscape)).raise()
+        return decoded.toInt()
     }
 
-    /** Parses a JSON string as raw bytes (for deserializeBytes). */
-    internal fun parseStrRaw(): ByteArray = parseStr().encodeToByteArray()
+    private fun parseRawEscapeInto(rawBytes: MutableList<Byte>) {
+        if (pos >= input.length) (error(ErrorCode.EofWhileParsingString)).raise()
+        val esc = nextChar().toChar()
+        when (esc) {
+            '"' -> rawBytes.add('"'.code.toByte())
+            '\\' -> rawBytes.add('\\'.code.toByte())
+            '/' -> rawBytes.add('/'.code.toByte())
+            'n' -> rawBytes.add('\n'.code.toByte())
+            'r' -> rawBytes.add('\r'.code.toByte())
+            't' -> rawBytes.add('\t'.code.toByte())
+            'b' -> rawBytes.add(0x08.toByte())
+            'f' -> rawBytes.add(0x0C.toByte())
+            'u' -> parseRawUnicodeEscapeInto(rawBytes)
+            else -> (error(ErrorCode.InvalidEscape)).raise()
+        }
+    }
+
+    private fun parseRawUnicodeEscapeInto(rawBytes: MutableList<Byte>) {
+        var n = decodeHexEscape()
+        while (true) {
+            if (n !in 0xD800..0xDBFF) {
+                pushWtf8Codepoint(n, rawBytes)
+                return
+            }
+            val n1 = n
+            if (peekRaw() < 0) (error(ErrorCode.EofWhileParsingString)).raise()
+            if (peekRaw() == '\\'.code) {
+                eatChar()
+            } else {
+                pushWtf8Codepoint(n1, rawBytes)
+                return
+            }
+            if (peekRaw() < 0) (error(ErrorCode.EofWhileParsingString)).raise()
+            if (peekRaw() == 'u'.code) {
+                eatChar()
+            } else {
+                pushWtf8Codepoint(n1, rawBytes)
+                parseRawEscapeInto(rawBytes)
+                return
+            }
+            val n2 = decodeHexEscape()
+            if (n2 !in 0xDC00..0xDFFF) {
+                pushWtf8Codepoint(n1, rawBytes)
+                n = n2
+                continue
+            }
+            val combined = (((n1 - 0xD800) shl 10) or (n2 - 0xDC00)) + 0x10000
+            pushWtf8Codepoint(combined, rawBytes)
+            return
+        }
+    }
+
+    /** Parses a JSON string as raw bytes (for deserializeBytes), allowing WTF-8 lone surrogates. */
+    internal fun parseStrRaw(): ByteArray {
+        val rawBytes = ArrayList<Byte>()
+        while (pos < input.length) {
+            val c = input[pos]
+            pos++
+            if (c == '\n') {
+                line++
+                col = 0
+            } else {
+                col++
+            }
+            when {
+                c == '"' -> return rawBytes.toByteArray()
+                c == '\\' -> parseRawEscapeInto(rawBytes)
+                c.isHighSurrogate() -> {
+                    if (pos < input.length && input[pos].isLowSurrogate()) {
+                        val low = input[pos]
+                        pos++
+                        col++
+                        val combined = 0x10000 + ((c.code - 0xD800) shl 10) + (low.code - 0xDC00)
+                        pushWtf8Codepoint(combined, rawBytes)
+                    } else {
+                        pushWtf8Codepoint(c.code, rawBytes)
+                    }
+                }
+                else -> pushWtf8Codepoint(c.code, rawBytes)
+            }
+        }
+        (error(ErrorCode.EofWhileParsingString)).raise()
+    }
 
     /** Ignores a JSON string (skips past it). The opening `"` must be consumed. */
     internal fun ignoreStr() {
@@ -615,15 +754,15 @@ class JsonParser(
                 c == '"' -> return
                 c == '\\' -> {
                     if (pos >= input.length) (error(ErrorCode.EofWhileParsingString)).raise()
-                    if (input[pos] == 'u') {
-                        pos++
-                        col++
-                        decodeHexEscape()
-                    } else {
-                        pos++
-                        col++
+                    when (nextChar().toChar()) {
+                        '"', '\\', '/', 'b', 'f', 'n', 'r', 't' -> Unit
+                        'u' -> {
+                            decodeHexEscape()
+                        }
+                        else -> (error(ErrorCode.InvalidEscape)).raise()
                     }
                 }
+                c.code < 0x20 -> (error(ErrorCode.ControlCharacterWhileParsingString)).raise()
             }
         }
         (error(ErrorCode.EofWhileParsingString)).raise()
@@ -995,24 +1134,10 @@ class JsonParser(
     }
 }
 
-// ─── POW10 table ─────────────────────────────────────────────────────────────
-
-/**
- * Table of powers of 10 for fast Double construction.
- */
-private val POW10: kotlin.collections.Map<Int, Double> =
-    buildMap {
-        var v = 1.0
-        for (i in 0..308) {
-            put(i, v)
-            v *= 10.0
-        }
-    }
-
 // ─── JsonDeserializer ─────────────────────────────────────────────────────────
 //
 // The serde [Deserializer] implementation backed by [JsonParser].
-// Each `deserialize_*` method peeks at the next byte, validates it matches
+// Each `deserialize*` method peeks at the next byte, validates it matches
 // the expected type, consumes it, and dispatches to the visitor.
 
 /**
@@ -1030,8 +1155,25 @@ class JsonDeserializer(
     internal var remainingDepth: Int = 128
         private set
 
-    /** Decrements recursion depth; throws if limit exceeded. */
+    private var recursionLimitDisabled: Boolean = false
+
+    /** Disables the default 128-level container recursion limit on this deserializer. */
+    fun disableRecursionLimit() {
+        recursionLimitDisabled = true
+    }
+
+    /** Validates that the input stream is at the end or only has trailing whitespace. */
+    fun end(): SerdeResult<Unit> = parser.end()
+
+    /** Turns this JSON deserializer into an iterator over concatenated JSON values of type [T]. */
+    fun <T> intoIter(deserialize: Deserialize<T>): StreamDeserializer<T> =
+        StreamDeserializer(deserialize, parser)
+
+    /** Decrements recursion depth; raises [ErrorCode.RecursionLimitExceeded] if limit exceeded. */
     private inline fun <T> checkRecursion(block: () -> T): T {
+        if (recursionLimitDisabled) {
+            return block()
+        }
         remainingDepth--
         if (remainingDepth == 0) {
             (parser.peekError(ErrorCode.RecursionLimitExceeded)).raise()
@@ -1041,6 +1183,11 @@ class JsonDeserializer(
         } finally {
             remainingDepth++
         }
+    }
+
+    companion object {
+        /** Creates a [JsonDeserializer] from a JSON string. */
+        fun fromStr(s: String): JsonDeserializer = JsonDeserializer(JsonParser(s))
     }
 
     override fun isHumanReadable(): Boolean = true
@@ -1139,7 +1286,14 @@ class JsonDeserializer(
 
     override fun <V> deserializeU64(visitor: Visitor<V>): SerdeResult<V> = deserializeNumber(visitor)
 
-    override fun <V> deserializeF32(visitor: Visitor<V>): SerdeResult<V> = deserializeNumber(visitor)
+    override fun <V> deserializeF32(visitor: Visitor<V>): SerdeResult<V> {
+        parser.singlePrecision = true
+        return try {
+            deserializeNumber(visitor)
+        } finally {
+            parser.singlePrecision = false
+        }
+    }
 
     override fun <V> deserializeF64(visitor: Visitor<V>): SerdeResult<V> = deserializeNumber(visitor)
 
@@ -1404,14 +1558,14 @@ class JsonDeserializer(
                 try {
                     parser.parseAnyNumber(false).invalidType(visitor)
                 } catch (e: Throwable) {
-                    if (e is io.github.kotlinmania.serde.SerdeDiagnosticCarrier) e.error else throw e
+                    if (e is SerdeDiagnosticCarrier) e.error else throw e
                 }
             }
             in '0'..'9' -> {
                 try {
                     parser.parseAnyNumber(true).invalidType(visitor)
                 } catch (e: Throwable) {
-                    if (e is io.github.kotlinmania.serde.SerdeDiagnosticCarrier) e.error else throw e
+                    if (e is SerdeDiagnosticCarrier) e.error else throw e
                 }
             }
             '"' -> {
@@ -1458,9 +1612,9 @@ internal class JsonSeqAccess(
     override fun <T> nextElementSeed(seed: DeserializeSeed<T>): SerdeResult<SeqElement<T>> =
         serdeCatching { hasNextElement() }.flatMap { hasNext ->
             if (hasNext) {
-                `seed`.deserialize(`de`).map { `__serdeValue0` -> io.github.kotlinmania.serdecore.de.SeqElement.Some(`__serdeValue0`) }
+                seed.deserialize(de).map { value -> SeqElement.Some(value) }
             } else {
-                io.github.kotlinmania.serde.SerdeResult.success(io.github.kotlinmania.serdecore.de.SeqElement.None)
+                SerdeResult.success(SeqElement.None)
             }
         }
 
@@ -1832,17 +1986,82 @@ class StreamDeserializer<T>(
 /**
  * Creates a [StreamDeserializer] from a JSON string and a [Deserialize] implementation.
  */
-fun <T> streamDeserializer(json: String, deserialize: io.github.kotlinmania.serdecore.de.Deserialize<T>): StreamDeserializer<T> =
+fun <T> streamDeserializer(json: String, deserialize: Deserialize<T>): StreamDeserializer<T> =
     StreamDeserializer(deserialize, JsonParser(json))
 
 // ─── Top-level deserialization functions ───────────────────────────────────────
 
+private fun invalidUtf8SliceError(json: ByteArray): SerdeError {
+    var line = 1
+    var col = 1
+    var i = 0
+    while (i < json.size) {
+        val b0 = json[i].toInt() and 0xFF
+        when {
+            b0 < 0x80 -> {
+                if (b0 == '\n'.code) {
+                    line++
+                    col = 1
+                } else {
+                    col++
+                }
+                i++
+            }
+            b0 in 0xC2..0xDF -> {
+                if (i + 1 >= json.size || (json[i + 1].toInt() and 0xC0) != 0x80) {
+                    break
+                }
+                col += 2
+                i += 2
+            }
+            b0 in 0xE0..0xEF -> {
+                if (i + 2 >= json.size) break
+                val b1 = json[i + 1].toInt() and 0xFF
+                val b2 = json[i + 2].toInt() and 0xFF
+                val validLead =
+                    when (b0) {
+                        0xE0 -> b1 in 0xA0..0xBF
+                        0xED -> b1 in 0x80..0x9F
+                        else -> (b1 and 0xC0) == 0x80
+                    }
+                if (!validLead || (b2 and 0xC0) != 0x80) break
+                col += 3
+                i += 3
+            }
+            b0 in 0xF0..0xF4 -> {
+                if (i + 3 >= json.size) break
+                val b1 = json[i + 1].toInt() and 0xFF
+                val b2 = json[i + 2].toInt() and 0xFF
+                val b3 = json[i + 3].toInt() and 0xFF
+                val validLead =
+                    when (b0) {
+                        0xF0 -> b1 in 0x90..0xBF
+                        0xF4 -> b1 in 0x80..0x8F
+                        else -> (b1 and 0xC0) == 0x80
+                    }
+                if (!validLead || (b2 and 0xC0) != 0x80 || (b3 and 0xC0) != 0x80) break
+                col += 4
+                i += 4
+            }
+            else -> break
+        }
+    }
+    return SerdeError.custom(JsonError.syntax(ErrorCode.InvalidUnicodeCodePoint, line, col).toString())
+}
+
+private fun decodeUtf8JsonSlice(json: ByteArray): SerdeResult<String> =
+    try {
+        SerdeResult.success(json.decodeToString(throwOnInvalidSequence = true))
+    } catch (_: CharacterCodingException) {
+        SerdeResult.failure(invalidUtf8SliceError(json))
+    }
+
 /**
- * Deserialize an instance of type T from a string of JSON text using the given [Deserialize].
+ * Deserialize an instance of type [T] from a string of JSON text using the given [Deserialize].
  *
  * Verifies that the entire input is consumed (no trailing characters).
  */
-fun <T> deserializeFromStr(json: String, deserialize: io.github.kotlinmania.serdecore.de.Deserialize<T>): SerdeResult<T> =
+fun <T> deserializeFromStr(json: String, deserialize: Deserialize<T>): SerdeResult<T> =
     serdeCatching {
         val parser = JsonParser(json)
         val de = JsonDeserializer(parser)
@@ -1852,10 +2071,23 @@ fun <T> deserializeFromStr(json: String, deserialize: io.github.kotlinmania.serd
     }
 
 /**
- * Deserialize an instance of type T from a byte array of JSON text using the given [Deserialize].
+ * Deserialize an instance of type [T] from a byte array of JSON text using the given [Deserialize].
  */
-fun <T> deserializeFromSlice(json: ByteArray, deserialize: io.github.kotlinmania.serdecore.de.Deserialize<T>): SerdeResult<T> =
-    deserializeFromStr(json.decodeToString(), deserialize)
+fun <T> deserializeFromSlice(json: ByteArray, deserialize: Deserialize<T>): SerdeResult<T> =
+    decodeUtf8JsonSlice(json).flatMap { text -> deserializeFromStr(text, deserialize) }
+
+/**
+ * Deserialize an instance of type [T] from an [IoReader] byte stream using the given [Deserialize].
+ */
+internal fun <R : IoReader, T> fromReader(rdr: R, deserialize: Deserialize<T>): SerdeResult<T> {
+    val ioRead = IoRead.new(rdr)
+    val buffer = ArrayList<Byte>()
+    while (true) {
+        val next = ioRead.next().getOrElse { return SerdeResult.failure(it) } ?: break
+        buffer.add(next)
+    }
+    return deserializeFromSlice(buffer.toByteArray(), deserialize)
+}
 
 /**
  * Parse a JSON string into a [Value].
@@ -1864,19 +2096,19 @@ fun fromStr(json: String): JsonValueOutcome =
     JsonValueOutcome.fromResult(deserializeFromStr(json, ValueDeserialize))
 
 /**
- * Parse a JSON string into a type T using the given [io.github.kotlinmania.serdecore.de.Deserialize] implementation.
+ * Parse a JSON string into a type [T] using the given [Deserialize] implementation.
  */
-fun <T> fromStr(json: String, deserialize: io.github.kotlinmania.serdecore.de.Deserialize<T>): SerdeResult<T> =
+fun <T> fromStr(json: String, deserialize: Deserialize<T>): SerdeResult<T> =
     deserializeFromStr(json, deserialize)
 
 /**
  * Parse a JSON byte array into a [Value].
  */
 fun fromSlice(json: ByteArray): JsonValueOutcome =
-    fromStr(json.decodeToString())
+    JsonValueOutcome.fromResult(fromSlice(json, ValueDeserialize))
 
 /**
- * Parse a JSON byte array into a type T using the given [io.github.kotlinmania.serdecore.de.Deserialize] implementation.
+ * Parse a JSON byte array into a type [T] using the given [Deserialize] implementation.
  */
-fun <T> fromSlice(json: ByteArray, deserialize: io.github.kotlinmania.serdecore.de.Deserialize<T>): SerdeResult<T> =
-    fromStr(json.decodeToString(), deserialize)
+fun <T> fromSlice(json: ByteArray, deserialize: Deserialize<T>): SerdeResult<T> =
+    deserializeFromSlice(json, deserialize)

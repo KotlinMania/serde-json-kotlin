@@ -58,6 +58,67 @@ internal sealed class IoResult<out T> {
 }
 
 /**
+ * The Read interface for reading bytes from a source.
+ */
+internal fun interface IoReader {
+    fun readByte(): IoResult<Byte>?
+}
+
+/**
+ * Adapts an [IoReader] into a byte-by-byte [Iterator] of [IoResult].
+ */
+internal fun IoReader.bytes(): Iterator<IoResult<Byte>> =
+    object : Iterator<IoResult<Byte>> {
+        private var buffered: IoResult<Byte>? = null
+        private var bufferedReady: Boolean = false
+        private var eof: Boolean = false
+
+        private fun ensureBuffered() {
+            if (!bufferedReady && !eof) {
+                val next = readByte()
+                if (next == null) {
+                    eof = true
+                } else {
+                    buffered = next
+                    bufferedReady = true
+                }
+            }
+        }
+
+        override fun hasNext(): Boolean {
+            ensureBuffered()
+            return bufferedReady
+        }
+
+        override fun next(): IoResult<Byte> {
+            ensureBuffered()
+            if (!bufferedReady) {
+                throw NoSuchElementException("end of IoReader byte stream")
+            }
+            bufferedReady = false
+            val result = buffered!!
+            buffered = null
+            return result
+        }
+    }
+
+/**
+ * A [ByteArray] source that implements [IoReader].
+ */
+internal class SliceIoReader(
+    private val bytes: ByteArray,
+) : IoReader {
+    private var pos: Int = 0
+
+    override fun readByte(): IoResult<Byte>? =
+        if (pos < bytes.size) {
+            IoResult.ok(bytes[pos++])
+        } else {
+            null
+        }
+}
+
+/**
  * The Write interface for writing bytes to a sink.
  */
 internal fun interface IoWrite {

@@ -1,6 +1,8 @@
 // port-lint: source iter.rs
 package io.github.kotlinmania.serdejson
 
+import io.github.kotlinmania.serdejson.io.IoResult
+
 /**
  * An iterator that tracks line and column positions while iterating over bytes.
  *
@@ -9,11 +11,9 @@ package io.github.kotlinmania.serdejson
  * following a newline character are in column 1. The column is 0 immediately after
  * a newline character has been read.
  */
-internal class LineColIterator<I>(
+internal class LineColIterator<I : Iterator<IoResult<Byte>>>(
     private val iter: I,
-) where I : Iterable<Int> {
-    private val iterator = iter.iterator()
-
+) : Iterator<IoResult<Byte>> {
     /** Index of the current line. */
     private var line: Int = 1
 
@@ -29,19 +29,30 @@ internal class LineColIterator<I>(
 
     fun byteOffset(): Int = startOfLine + col
 
-    /** Returns the next byte, or -1 if no more data. */
-    fun next(): Int {
-        if (!iterator.hasNext()) return -1
-        val c = iterator.next()
-        if (c == '\n'.code) {
-            startOfLine += col + 1
-            line++
-            col = 0
-        } else {
-            col++
+    override fun hasNext(): Boolean = iter.hasNext()
+
+    override fun next(): IoResult<Byte> {
+        val item = iter.next()
+        if (item is IoResult.Ok) {
+            if (item.value == '\n'.code.toByte()) {
+                startOfLine += col + 1
+                line += 1
+                col = 0
+            } else {
+                col += 1
+            }
         }
-        return c
+        return item
     }
 
-    fun hasNext(): Boolean = iterator.hasNext()
+    fun nextOrNull(): IoResult<Byte>? =
+        if (iter.hasNext()) {
+            next()
+        } else {
+            null
+        }
+
+    companion object {
+        fun <I : Iterator<IoResult<Byte>>> new(iter: I): LineColIterator<I> = LineColIterator(iter)
+    }
 }
