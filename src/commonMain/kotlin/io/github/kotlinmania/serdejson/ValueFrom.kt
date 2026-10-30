@@ -48,8 +48,8 @@ fun Value.Companion.from(m: io.github.kotlinmania.serdejson.JsonMap): Value = Va
 /** Convert a [List] of [Value] to a [Value.Array]. */
 fun Value.Companion.from(list: List<Value>): Value = Value.Array(list)
 
-/** Convert an array of [Value] to a [Value.Array]. */
-fun Value.Companion.from(array: Array<Value>): Value = Value.Array(array.toList())
+/** Convert a slice of [Value] to a [Value.Array]. */
+fun Value.Companion.fromSlice(slice: List<Value>): Value = Value.Array(slice.toList())
 
 /** Convert `Unit` to [Value.Null]. */
 fun Value.Companion.from(unit: Unit): Value = Value.Null

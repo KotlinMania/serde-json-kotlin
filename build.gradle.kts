@@ -609,6 +609,13 @@ kotlin {
         }
     }
 
+    tasks
+        .withType<org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile>()
+        .matching { it.name.startsWith("compileSwiftExportMain") }
+        .configureEach {
+            compilerOptions.freeCompilerArgs.add("-Xwarning-level=UNCHECKED_CAST:disabled")
+        }
+
     // Android KMP library. Block name is `android` — `androidLibrary` is deprecated in current KGP.
     android {
         namespace = projectNamespace
