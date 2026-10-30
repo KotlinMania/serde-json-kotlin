@@ -4,7 +4,6 @@ import io.github.kotlinmania.serde.SerdeResult
 import io.github.kotlinmania.serdecore.de.Deserialize
 import io.github.kotlinmania.serdecore.ser.Serialize
 import io.github.kotlinmania.serdecore.ser.Serializer
-import io.github.kotlinmania.serdejson.io.VecIoWrite
 
 /**
  * Represents any valid JSON value.
@@ -136,7 +135,7 @@ sealed class Value : Serialize {
     fun sortAllObjects() {
         when (this) {
             is Object -> {
-                // IndexMap preserves order; sorting would require sortKeys support
+                value.sortKeys()
                 value.values().forEach { it.sortAllObjects() }
             }
             is Array -> value.forEach { it.sortAllObjects() }
@@ -147,17 +146,9 @@ sealed class Value : Serialize {
     override fun <Ok> serialize(serializer: Serializer<Ok>): SerdeResult<Ok> =
         serialize(this, serializer)
 
-    override fun toString(): String {
-        val writer = VecIoWrite()
-        toJsonString(writer, this, pretty = false)
-        return writer.bytes.decodeToString()
-    }
+    override fun toString(): String = valueToStr(this)
 
-    fun toPrettyString(): String {
-        val writer = VecIoWrite()
-        toJsonString(writer, this, pretty = true)
-        return writer.bytes.decodeToString()
-    }
+    fun toPrettyString(): String = valueToStrPretty(this)
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

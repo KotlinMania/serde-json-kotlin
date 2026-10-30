@@ -17,6 +17,8 @@ internal class IoError(
 ) {
     override fun toString(): String = message
 
+    fun fmt(): String = message
+
     companion object {
         fun new(kind: IoErrorKind, message: String): IoError = IoError(kind, message)
     }

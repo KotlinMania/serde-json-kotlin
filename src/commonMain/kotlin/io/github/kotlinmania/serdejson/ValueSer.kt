@@ -123,9 +123,7 @@ open class Serializer : io.github.kotlinmania.serdecore.ser.Serializer<Value> {
     }
 
     override fun serializeChar(v: Char): SerdeResult<Value> {
-        var s = ""
-        s += v
-        val res = Value.Str(s)
+        val res = Value.Str(charArrayOf(v).concatToString())
         result = res
         return SerdeResult.success(res)
     }
@@ -162,6 +160,11 @@ open class Serializer : io.github.kotlinmania.serdecore.ser.Serializer<Value> {
     override fun <T : Serialize> serializeNewtypeVariant(
         name: String,
         variantIndex: UInt,
+        variant: String,
+        value: T,
+    ): SerdeResult<Value> = serializeNewtypeVariantEntry(variant, value)
+
+    private fun <T : Serialize> serializeNewtypeVariantEntry(
         variant: String,
         value: T,
     ): SerdeResult<Value> {
@@ -332,7 +335,7 @@ sealed class SerializeMap :
     override fun <T : Serialize> serializeValue(value: T): SerdeResult<Unit> {
         return when (this) {
             is Map -> {
-                val k = nextKey ?: error("serialize_value called before serialize_key")
+                val k = nextKey ?: error("serializeValue called before serializeKey")
                 nextKey = null
                 val v = toValue(value).toSerdeResult().getOrElse { return SerdeResult.failure(it) }
                 map.insert(k, v)
