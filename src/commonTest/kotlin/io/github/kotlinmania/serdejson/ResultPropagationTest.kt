@@ -132,32 +132,31 @@ class ResultPropagationTest {
         assertSame(error, result.exceptionOrNull())
     }
 
+    private object ForwardStringSeed : DeserializeSeed<String> {
+        override fun <D : Deserializer> deserialize(deserializer: D): SerdeResult<String> =
+            StringDeserialize.deserialize(deserializer)
+    }
+
+    private object ForwardVisitor : Visitor<String> {
+        override fun expecting(): String = "ScrollDirection"
+
+        override fun <A> visitEnum(access: A): SerdeResult<String>
+            where A : EnumAccess =
+            access
+                .variantSeed(ForwardStringSeed)
+                .flatMap { (name, variant) ->
+                    if (name == "Forward") {
+                        variant.unitVariant().map { name }
+                    } else {
+                        SerdeResult.failure(SerdeError.unknownVariant(name, listOf("Forward")))
+                    }
+                }
+    }
+
     private object Forward : Deserialize<String> {
         override fun <D> deserialize(deserializer: D): SerdeResult<String>
             where D : Deserializer =
-            deserializer.deserializeEnum(
-                "ScrollDirection",
-                listOf("Forward"),
-                object : Visitor<String> {
-                    override fun expecting(): String = "ScrollDirection"
-
-                    override fun <A> visitEnum(access: A): SerdeResult<String>
-                    where A : EnumAccess =
-                        access
-                            .variantSeed(
-                                object : DeserializeSeed<String> {
-                                    override fun <D2 : Deserializer> deserialize(innerDeserializer: D2): SerdeResult<String> =
-                                        StringDeserialize.deserialize(innerDeserializer)
-                                },
-                            ).flatMap { (name, variant) ->
-                                if (name == "Forward") {
-                                    variant.unitVariant().map { name }
-                                } else {
-                                    SerdeResult.failure(SerdeError.unknownVariant(name, listOf("Forward")))
-                                }
-                            }
-                },
-            )
+            deserializer.deserializeEnum("ScrollDirection", listOf("Forward"), ForwardVisitor)
     }
 
     @Test

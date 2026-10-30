@@ -80,30 +80,45 @@ class ValueMapKeyParityTest {
         assertTrue(decodeKey("-1", WideKey(false)).isFailure)
     }
 
+    private object OptionalKeyVisitor : Visitor<Long> {
+        override fun expecting(): String = "an optional integer"
+
+        override fun <D : Deserializer> visitSome(deserializer: D): SerdeResult<Long> =
+            I64Deserialize.deserialize(deserializer)
+    }
+
+    private object NewtypeKeyVisitor : Visitor<Long> {
+        override fun expecting(): String = "an integer key"
+
+        override fun <D : Deserializer> visitNewtypeStruct(deserializer: D): SerdeResult<Long> =
+            I64Deserialize.deserialize(deserializer)
+    }
+
+    private object DirectionSeed : DeserializeSeed<String> {
+        override fun <D : Deserializer> deserialize(deserializer: D): SerdeResult<String> =
+            StringDeserialize.deserialize(deserializer)
+    }
+
+    private object DirectionVisitor : Visitor<String> {
+        override fun expecting(): String = "a direction"
+
+        override fun <A : EnumAccess> visitEnum(access: A): SerdeResult<String> =
+            access
+                .variantSeed(DirectionSeed)
+                .flatMap { (name, variant) -> variant.unitVariant().map { name } }
+    }
+
     @Test
     fun optionAndNewtypeMapKeysUseTheKeyDeserializer() {
         val optional =
             object : Deserialize<Long> {
                 override fun <D : Deserializer> deserialize(deserializer: D): SerdeResult<Long> =
-                    deserializer.deserializeOption(
-                        object : Visitor<Long> {
-                            override fun expecting(): String = "an optional integer"
-
-                            override fun <D2 : Deserializer> visitSome(innerDeserializer: D2): SerdeResult<Long> = I64Deserialize.deserialize(innerDeserializer)
-                        },
-                    )
+                    deserializer.deserializeOption(OptionalKeyVisitor)
             }
         val newtype =
             object : Deserialize<Long> {
                 override fun <D : Deserializer> deserialize(deserializer: D): SerdeResult<Long> =
-                    deserializer.deserializeNewtypeStruct(
-                        "Key",
-                        object : Visitor<Long> {
-                            override fun expecting(): String = "an integer key"
-
-                            override fun <D2 : Deserializer> visitNewtypeStruct(innerDeserializer: D2): SerdeResult<Long> = I64Deserialize.deserialize(innerDeserializer)
-                        },
-                    )
+                    deserializer.deserializeNewtypeStruct("Key", NewtypeKeyVisitor)
             }
         assertEquals(7L, decodeKey("7", optional).getOrThrow())
         assertEquals(8L, decodeKey("8", newtype).getOrThrow())
@@ -114,21 +129,7 @@ class ValueMapKeyParityTest {
         val variant =
             object : Deserialize<String> {
                 override fun <D : Deserializer> deserialize(deserializer: D): SerdeResult<String> =
-                    deserializer.deserializeEnum(
-                        "Direction",
-                        listOf("Forward"),
-                        object : Visitor<String> {
-                            override fun expecting(): String = "a direction"
-
-                            override fun <A : EnumAccess> visitEnum(access: A): SerdeResult<String> =
-                                access
-                                    .variantSeed(
-                                        object : DeserializeSeed<String> {
-                                            override fun <D2 : Deserializer> deserialize(innerDeserializer: D2): SerdeResult<String> = StringDeserialize.deserialize(innerDeserializer)
-                                        },
-                                    ).flatMap { (name, variant) -> variant.unitVariant().map { name } }
-                        },
-                    )
+                    deserializer.deserializeEnum("Direction", listOf("Forward"), DirectionVisitor)
             }
         assertEquals("Forward", decodeKey("Forward", variant).getOrThrow())
     }
