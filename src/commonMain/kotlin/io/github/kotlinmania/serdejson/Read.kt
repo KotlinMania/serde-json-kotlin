@@ -146,7 +146,7 @@ internal class IoRead<R : IoReader>(
                 rawBuffer?.add(item.value)
                 SerdeResult.success(item.value)
             }
-            is IoResult.Err -> SerdeResult.failure(SerdeError.custom(JsonError.io(item.error).toString()))
+            is IoResult.Err -> SerdeResult.failure(SerdeError.custom(JsonError.io(item.error.fmt()).toString()))
         }
     }
 
@@ -161,7 +161,7 @@ internal class IoRead<R : IoReader>(
                 ch = item.value
                 SerdeResult.success(ch)
             }
-            is IoResult.Err -> SerdeResult.failure(SerdeError.custom(JsonError.io(item.error).toString()))
+            is IoResult.Err -> SerdeResult.failure(SerdeError.custom(JsonError.io(item.error.fmt()).toString()))
         }
     }
 
@@ -201,9 +201,15 @@ internal class IoRead<R : IoReader>(
                 continue
             }
             when (b) {
-                '"'.code.toByte() -> return SerdeResult.success(Unit)
-                '\\'.code.toByte() -> ignoreEscape(this).getOrElse { return SerdeResult.failure(it) }
-                else -> return error(this, ErrorCode.ControlCharacterWhileParsingString)
+                '"'.code.toByte() -> {
+                    return SerdeResult.success(Unit)
+                }
+                '\\'.code.toByte() -> {
+                    ignoreEscape(this).getOrElse { return SerdeResult.failure(it) }
+                }
+                else -> {
+                    return error(this, ErrorCode.ControlCharacterWhileParsingString)
+                }
             }
         }
     }
@@ -776,25 +782,18 @@ internal fun pushWtf8Codepoint(n: Int, scratch: MutableList<Byte>) {
 internal fun ignoreEscape(read: Read): SerdeResult<Unit> {
     val ch = nextOrEof(read).getOrElse { return SerdeResult.failure(it) }
     return when (ch) {
-        '"'.code.toByte(),
-        '\\'.code.toByte(),
-        '/'.code.toByte(),
-        'b'.code.toByte(),
-        'f'.code.toByte(),
-        'n'.code.toByte(),
-        'r'.code.toByte(),
-        't'.code.toByte(),
-        -> SerdeResult.success(Unit)
+        '"'.code.toByte(), '\\'.code.toByte(), '/'.code.toByte(), 'b'.code.toByte() -> SerdeResult.success(Unit)
+        'f'.code.toByte(), 'n'.code.toByte(), 'r'.code.toByte(), 't'.code.toByte() -> SerdeResult.success(Unit)
         'u'.code.toByte() -> read.decodeHexEscape().map { Unit }
         else -> error(read, ErrorCode.InvalidEscape)
     }
 }
 
 internal fun decodeHexValSlow(value: Int): Int? =
-    when (value) {
-        in '0'.code..'9'.code -> value - '0'.code
-        in 'a'.code..'f'.code -> value - 'a'.code + 10
-        in 'A'.code..'F'.code -> value - 'A'.code + 10
+    when {
+        value in '0'.code..'9'.code -> value - '0'.code
+        value in 'a'.code..'f'.code -> value - 'a'.code + 10
+        value in 'A'.code..'F'.code -> value - 'A'.code + 10
         else -> null
     }
 
