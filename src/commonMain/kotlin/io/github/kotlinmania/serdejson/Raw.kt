@@ -249,8 +249,8 @@ internal object ReferenceFromString :
 
     override fun expecting(): String = "raw value"
 
-    fun visitBorrowedStr(s: String): SerdeResult<RawValue> =
-        SerdeResult.success(RawValue.fromBorrowed(s))
+    override fun visitBorrowedStr(v: String): SerdeResult<RawValue> =
+        SerdeResult.success(RawValue.fromBorrowed(v))
 
     override fun visitStr(v: String): SerdeResult<RawValue> = visitBorrowedStr(v)
 
