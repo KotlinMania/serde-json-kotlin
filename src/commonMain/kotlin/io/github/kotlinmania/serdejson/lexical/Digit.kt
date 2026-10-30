@@ -8,7 +8,7 @@ import io.github.kotlinmania.numtraits.U64Num
 /** Convert an ASCII byte to its base-10 digit value. */
 internal fun toDigit(c: UByte): UInt? =
     if (c in 48u..57u) {
-        (c - 48u).toUInt()
+        c - 48u
     } else {
         null
     }

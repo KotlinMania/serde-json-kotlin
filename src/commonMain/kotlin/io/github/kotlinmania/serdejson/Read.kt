@@ -784,7 +784,7 @@ internal fun ignoreEscape(read: Read): SerdeResult<Unit> {
     return when (ch) {
         '"'.code.toByte(), '\\'.code.toByte(), '/'.code.toByte(), 'b'.code.toByte() -> SerdeResult.success(Unit)
         'f'.code.toByte(), 'n'.code.toByte(), 'r'.code.toByte(), 't'.code.toByte() -> SerdeResult.success(Unit)
-        'u'.code.toByte() -> read.decodeHexEscape().map { Unit }
+        'u'.code.toByte() -> read.decodeHexEscape().map {}
         else -> error(read, ErrorCode.InvalidEscape)
     }
 }
