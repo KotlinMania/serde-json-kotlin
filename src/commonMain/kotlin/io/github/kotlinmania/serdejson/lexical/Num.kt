@@ -174,6 +174,9 @@ internal interface FloatTraits : Number {
     /** Compute self * 10^n. */
     fun pow10(value: Double, n: Int): Double
 
+    /** Cast an unsigned 64-bit integer to this float precision. */
+    fun asCast(u: ULong): Double
+
     /** Create a float from its bit representation. */
     fun fromBits(u: ULong): Double
 
@@ -246,16 +249,19 @@ internal object F32Float : FloatTraits {
 
     override fun pow10(value: Double, n: Int): Double =
         if (n > 0) {
-            value * F32_POW10[n]
+            (value.toFloat() * F32_POW10[n]).toDouble()
         } else {
-            value / F32_POW10[-n]
+            (value.toFloat() / F32_POW10[-n]).toDouble()
         }
 
-    override fun fromBits(u: ULong): Double = Float.fromBits(u.toInt()).toDouble()
+    override fun asCast(u: ULong): Double = u.toDouble().toFloat().toDouble()
 
-    override fun toBits(value: Double): ULong = value.toFloat().toRawBits().toULong()
+    override fun fromBits(u: ULong): Double = Float.fromBits(u.toUInt().toInt()).toDouble()
 
-    override fun isSignPositive(value: Double): Boolean = !value.toFloat().isNaN() && value >= 0.0
+    override fun toBits(value: Double): ULong = value.toFloat().toRawBits().toUInt().toULong()
+
+    override fun isSignPositive(value: Double): Boolean =
+        (value.toFloat().toRawBits() and Int.MIN_VALUE) == 0
 }
 
 /** Float parameters for 64-bit floating-point numbers. */
@@ -284,9 +290,12 @@ internal object F64Float : FloatTraits {
             value / F64_POW10[-n]
         }
 
+    override fun asCast(u: ULong): Double = u.toDouble()
+
     override fun fromBits(u: ULong): Double = Double.fromBits(u.toLong())
 
     override fun toBits(value: Double): ULong = value.toRawBits().toULong()
 
-    override fun isSignPositive(value: Double): Boolean = !value.isNaN() && value >= 0.0
+    override fun isSignPositive(value: Double): Boolean =
+        (value.toRawBits() and Long.MIN_VALUE) == 0L
 }

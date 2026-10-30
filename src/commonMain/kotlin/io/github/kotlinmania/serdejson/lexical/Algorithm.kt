@@ -28,9 +28,9 @@ internal fun fastPath(
     } else if (mantissa shr mantissaSize != 0UL) {
         null
     } else if (exponent == 0) {
-        floatTraits.fromBits(mantissa)
+        floatTraits.asCast(mantissa)
     } else if (exponent >= minExp && exponent <= maxExp) {
-        val float = floatTraits.fromBits(mantissa)
+        val float = floatTraits.asCast(mantissa)
         floatTraits.pow10(float, exponent)
     } else if (exponent >= 0 && exponent <= maxExp + shiftExp) {
         val smallPowers = POW10_64
@@ -38,14 +38,25 @@ internal fun fastPath(
         val power = smallPowers[shift]
 
         val value = mantissa * power
-        if (value shr mantissaSize != 0UL) {
+        if (value / power != mantissa) {
+            null
+        } else if (value shr mantissaSize != 0UL) {
             null
         } else {
-            val float = floatTraits.fromBits(value)
+            val float = floatTraits.asCast(value)
             floatTraits.pow10(float, maxExp)
         }
     } else {
         null
+    }
+}
+
+private fun saturatingAddI32(lhs: Int, rhs: Int): Int {
+    val sum = lhs.toLong() + rhs.toLong()
+    return when {
+        sum > Int.MAX_VALUE.toLong() -> Int.MAX_VALUE
+        sum < Int.MIN_VALUE.toLong() -> Int.MIN_VALUE
+        else -> sum.toInt()
     }
 }
 
@@ -65,13 +76,14 @@ private fun multiplyExponentExtended(
     truncated: Boolean,
 ): Boolean {
     val powers = ExtendedFloatCache.getPowers()
-    val exp = exponent + powers.bias
-    val smallIndex = ((exp % powers.step) + powers.step) % powers.step
-    val largeIndex = exp / powers.step
-    return if (exp < 0) {
+    val exp = saturatingAddI32(exponent, powers.bias)
+    if (exp < 0) {
         fp.mant = 0UL
-        true
-    } else if (largeIndex >= powers.large.length) {
+        return true
+    }
+    val smallIndex = exp % powers.step
+    val largeIndex = exp / powers.step
+    return if (largeIndex >= powers.large.length) {
         fp.mant = 1UL shl 63
         fp.exp = 0x7FF
         true
@@ -83,7 +95,7 @@ private fun multiplyExponentExtended(
 
         val smallInt = powers.getSmallInt(smallIndex)
         val product = fp.mant * smallInt
-        if (product < fp.mant || product < smallInt) {
+        if (fp.mant != 0UL && product / fp.mant != smallInt) {
             fp.normalize()
             fp.imul(powers.getSmall(smallIndex))
             errors += ULongFloatErrors.errorHalfscale()
