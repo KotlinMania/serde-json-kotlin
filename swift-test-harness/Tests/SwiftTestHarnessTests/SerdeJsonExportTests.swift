@@ -55,4 +55,24 @@ struct SerdeJsonExportTests {
         #expect(actual == text)
         #expect(encoded.error == nil)
     }
+
+    @Test func supplementaryUnicodeRoundTripsWithoutCorruption() {
+        let input = "{\"label\":\"tensor😀\",\"emojis\":[\"🦀\",\"🧪\"]}"
+        let parsed: JsonValueOutcome = fromStr(json: input)
+        let root: Value? = parsed.value
+        #expect(root != nil)
+        #expect(parsed.error == nil)
+        #expect(root?.get(key: "label")?.asStr() == "tensor😀")
+
+        let encoded: JsonStringOutcome = toStr(value: root!)
+        let compact: String? = encoded.value
+        #expect(compact == input)
+        #expect(compact?.contains("??") == false)
+        #expect(encoded.error == nil)
+
+        let prettyOutcome: JsonStringOutcome = toStrPretty(value: root!)
+        let pretty: String? = prettyOutcome.value
+        #expect(pretty?.contains("\"tensor😀\"") == true)
+        #expect(pretty?.contains("??") == false)
+    }
 }
