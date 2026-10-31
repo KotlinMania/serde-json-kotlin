@@ -842,9 +842,7 @@ class JsonParser(
                 c == '\\' -> {
                     if (pos >= input.length) (error(ErrorCode.EofWhileParsingString)).raise()
                     when (nextChar().toChar()) {
-                        '"', '\\', '/', 'b', 'f', 'n', 'r', 't' -> {
-                            Unit
-                        }
+                        '"', '\\', '/', 'b', 'f', 'n', 'r', 't' -> {}
 
                         'u' -> {
                             decodeHexEscape()
