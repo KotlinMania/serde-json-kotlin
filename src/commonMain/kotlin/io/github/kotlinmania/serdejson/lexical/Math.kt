@@ -142,14 +142,21 @@ private fun u64ToHi642(r0: ULong, r1: ULong): Pair<ULong, Boolean> {
  */
 internal fun hi64(data: List<Limb>): Pair<ULong, Boolean> =
     when (data.size) {
-        0 -> Pair(0UL, false)
-        1 -> u64ToHi641(data[0])
+        0 -> {
+            Pair(0UL, false)
+        }
+
+        1 -> {
+            u64ToHi641(data[0])
+        }
+
         2 -> {
             val r0 = data[data.size - 1]
             val r1 = data[data.size - 2]
             val (v, n) = u64ToHi642(r0, r1)
             Pair(v, n || nonzero(data, 2))
         }
+
         else -> {
             val r0 = data[data.size - 1]
             val r1 = data[data.size - 2]

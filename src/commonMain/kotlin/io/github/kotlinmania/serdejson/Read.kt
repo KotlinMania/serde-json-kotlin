@@ -121,9 +121,11 @@ internal class IoRead<R : IoReader>(
                 '"'.code.toByte() -> {
                     return result(this, scratch.toByteArray()).map { Reference.Copied(it) }
                 }
+
                 '\\'.code.toByte() -> {
                     parseEscape(this, validate, scratch).getOrElse { return SerdeResult.failure(it) }
                 }
+
                 else -> {
                     if (validate) {
                         return error(this, ErrorCode.ControlCharacterWhileParsingString)
@@ -144,14 +146,20 @@ internal class IoRead<R : IoReader>(
             return SerdeResult.success(peeked)
         }
         return when (val item = iter.nextOrNull()) {
-            null -> SerdeResult.success(null)
+            null -> {
+                SerdeResult.success(null)
+            }
+
             is IoResult.Ok -> {
                 if (rawBuffering) {
                     rawBuffer.add(item.value)
                 }
                 SerdeResult.success(item.value)
             }
-            is IoResult.Err -> SerdeResult.failure(SerdeError.custom(JsonError.io(item.error.fmt()).toString()))
+
+            is IoResult.Err -> {
+                SerdeResult.failure(SerdeError.custom(JsonError.io(item.error.fmt()).toString()))
+            }
         }
     }
 
@@ -161,12 +169,18 @@ internal class IoRead<R : IoReader>(
             return SerdeResult.success(peeked)
         }
         return when (val item = iter.nextOrNull()) {
-            null -> SerdeResult.success(null)
+            null -> {
+                SerdeResult.success(null)
+            }
+
             is IoResult.Ok -> {
                 ch = item.value
                 SerdeResult.success(ch)
             }
-            is IoResult.Err -> SerdeResult.failure(SerdeError.custom(JsonError.io(item.error.fmt()).toString()))
+
+            is IoResult.Err -> {
+                SerdeResult.failure(SerdeError.custom(JsonError.io(item.error.fmt()).toString()))
+            }
         }
     }
 
@@ -209,9 +223,11 @@ internal class IoRead<R : IoReader>(
                 '"'.code.toByte() -> {
                     return SerdeResult.success(Unit)
                 }
+
                 '\\'.code.toByte() -> {
                     ignoreEscape(this).getOrElse { return SerdeResult.failure(it) }
                 }
+
                 else -> {
                     return error(this, ErrorCode.ControlCharacterWhileParsingString)
                 }
@@ -321,6 +337,7 @@ class SliceRead(
                         return result(adapter, scratch.toByteArray()).map { Reference.Copied(it) }
                     }
                 }
+
                 '\\'.code.toByte() -> {
                     for (k in start until index) {
                         scratch.add(slice[k])
@@ -329,6 +346,7 @@ class SliceRead(
                     parseEscape(adapter, validate, scratch).getOrElse { return SerdeResult.failure(it) }
                     start = index
                 }
+
                 else -> {
                     index += 1
                     if (validate && (ch.toInt() and 0xFF) < 0x20) {
@@ -425,10 +443,12 @@ internal class SliceReadAdapter(
                     delegate.index += 1
                     return SerdeResult.success(Unit)
                 }
+
                 '\\'.code.toByte() -> {
                     delegate.index += 1
                     ignoreEscape(this).getOrElse { return SerdeResult.failure(it) }
                 }
+
                 else -> {
                     return error(this, ErrorCode.ControlCharacterWhileParsingString)
                 }
@@ -651,36 +671,49 @@ internal fun parseEscape(
             scratch.add('"'.code.toByte())
             SerdeResult.success(Unit)
         }
+
         '\\'.code.toByte() -> {
             scratch.add('\\'.code.toByte())
             SerdeResult.success(Unit)
         }
+
         '/'.code.toByte() -> {
             scratch.add('/'.code.toByte())
             SerdeResult.success(Unit)
         }
+
         'b'.code.toByte() -> {
             scratch.add(0x08.toByte())
             SerdeResult.success(Unit)
         }
+
         'f'.code.toByte() -> {
             scratch.add(0x0C.toByte())
             SerdeResult.success(Unit)
         }
+
         'n'.code.toByte() -> {
             scratch.add('\n'.code.toByte())
             SerdeResult.success(Unit)
         }
+
         'r'.code.toByte() -> {
             scratch.add('\r'.code.toByte())
             SerdeResult.success(Unit)
         }
+
         't'.code.toByte() -> {
             scratch.add('\t'.code.toByte())
             SerdeResult.success(Unit)
         }
-        'u'.code.toByte() -> parseUnicodeEscape(read, validate, scratch)
-        else -> error(read, ErrorCode.InvalidEscape)
+
+        'u'.code.toByte() -> {
+            parseUnicodeEscape(read, validate, scratch)
+        }
+
+        else -> {
+            error(read, ErrorCode.InvalidEscape)
+        }
     }
 }
 
@@ -765,15 +798,18 @@ internal fun pushWtf8Codepoint(n: Int, scratch: MutableList<Byte>) {
         n <= 0x7F -> {
             scratch.add(n.toByte())
         }
+
         n <= 0x7FF -> {
             scratch.add((0xC0 or (n shr 6)).toByte())
             scratch.add((0x80 or (n and 0x3F)).toByte())
         }
+
         n <= 0xFFFF -> {
             scratch.add((0xE0 or (n shr 12)).toByte())
             scratch.add((0x80 or ((n shr 6) and 0x3F)).toByte())
             scratch.add((0x80 or (n and 0x3F)).toByte())
         }
+
         else -> {
             scratch.add((0xF0 or (n shr 18)).toByte())
             scratch.add((0x80 or ((n shr 12) and 0x3F)).toByte())

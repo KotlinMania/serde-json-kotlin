@@ -55,19 +55,23 @@ private object ValueVisitor : Visitor<Value> {
 
     override fun visitUnit(): SerdeResult<Value> = SerdeResult.success(Value.Null)
 
-    override fun <A : SeqAccess> visitSeq(access: A): SerdeResult<Value> = serdeCatching {
-        val values = mutableListOf<Value>()
-        while (true) {
-            when (val `__serdeNext0` = `access`.nextElement(`ValueDeserialize`).getOrThrow()) {
-                is io.github.kotlinmania.serdecore.de.SeqElement.Some -> {
-                    val `elem` = `__serdeNext0`.value
-                    `values`.add(`elem`)
+    override fun <A : SeqAccess> visitSeq(access: A): SerdeResult<Value> =
+        serdeCatching {
+            val values = mutableListOf<Value>()
+            while (true) {
+                when (val `__serdeNext0` = `access`.nextElement(`ValueDeserialize`).getOrThrow()) {
+                    is io.github.kotlinmania.serdecore.de.SeqElement.Some -> {
+                        val `elem` = `__serdeNext0`.value
+                        `values`.add(`elem`)
+                    }
+
+                    io.github.kotlinmania.serdecore.de.SeqElement.None -> {
+                        break
+                    }
                 }
-                io.github.kotlinmania.serdecore.de.SeqElement.None -> break
             }
+            Value.Array(values)
         }
-        Value.Array(values)
-    }
 
     override fun <A : MapAccess> visitMap(access: A): SerdeResult<Value> {
         val firstKey = access.nextKey(StringDeserialize).getOrElse { return SerdeResult.failure(it) }
@@ -230,8 +234,14 @@ class ValueDeserializer(
                     visitor.visitEnum(ValueEnumAccess(first.first, first.second))
                 }
             }
-            is Value.Str -> visitor.visitEnum(ValueEnumAccess(value.value, null))
-            else -> SerdeResult.failure(SerdeError.custom("expected string or map for enum, got ${Type(value)}"))
+
+            is Value.Str -> {
+                visitor.visitEnum(ValueEnumAccess(value.value, null))
+            }
+
+            else -> {
+                SerdeResult.failure(SerdeError.custom("expected string or map for enum, got ${Type(value)}"))
+            }
         }
 
     override fun <V> deserializeIdentifier(visitor: Visitor<V>): SerdeResult<V> = deserializeStr(visitor)
@@ -293,9 +303,13 @@ private class ValueSeqAccess(
             val value = iter.next()
             remaining -= 1
             val deserializer = ValueDeserializer(value)
-            `seed`.deserialize(`deserializer`).map { `__serdeValue0` -> io.github.kotlinmania.serdecore.de.SeqElement.Some(`__serdeValue0`) }
+            `seed`.deserialize(`deserializer`).map { `__serdeValue0` ->
+                io.github.kotlinmania.serdecore.de.SeqElement
+                    .Some(`__serdeValue0`)
+            }
         } else {
-            io.github.kotlinmania.serde.SerdeResult.success(io.github.kotlinmania.serdecore.de.SeqElement.None)
+            io.github.kotlinmania.serde.SerdeResult
+                .success(io.github.kotlinmania.serdecore.de.SeqElement.None)
         }
 
     override fun sizeHint(): Int = remaining

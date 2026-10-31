@@ -8,7 +8,9 @@ import io.github.kotlinmania.numtraits.checkedShl
 import io.github.kotlinmania.numtraits.checkedShr
 
 /** Exception raised when lexical arithmetic violates checked bounds or panics. */
-internal class LexicalPanicException(message: String) : RuntimeException(message)
+internal class LexicalPanicException(
+    message: String,
+) : RuntimeException(message)
 
 /** Shift extended-precision float right by [shift] bits. */
 internal fun shr(fp: ExtendedFloat, shift: Int) {

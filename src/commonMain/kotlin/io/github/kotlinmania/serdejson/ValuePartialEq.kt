@@ -11,7 +11,10 @@ fun eqF32(value: Value, other: Float): Boolean =
             val n = value.value
             n.asF32() == other
         }
-        else -> false
+
+        else -> {
+            false
+        }
     }
 
 fun eqF64(value: Value, other: Double): Boolean = value.asF64() == other

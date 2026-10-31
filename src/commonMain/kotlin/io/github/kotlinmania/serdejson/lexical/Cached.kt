@@ -61,5 +61,6 @@ internal interface ModeratePathCache {
  */
 internal object ExtendedFloatCache : ModeratePathCache {
     override fun getPowers(): ModeratePathPowers =
-        io.github.kotlinmania.serdejson.lexical.getPowers()
+        io.github.kotlinmania.serdejson.lexical
+            .getPowers()
 }

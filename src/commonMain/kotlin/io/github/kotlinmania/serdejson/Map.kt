@@ -113,10 +113,13 @@ class JsonMap(
     /** Gets the given key's corresponding entry in the map for in-place manipulation. */
     fun entry(key: String): Entry =
         when (val e = map.entry(key)) {
-            is io.github.kotlinmania.indexmap.map.Entry.Vacant ->
+            is io.github.kotlinmania.indexmap.map.Entry.Vacant -> {
                 Entry.Vacant(VacantEntry(e.entry))
-            is io.github.kotlinmania.indexmap.map.Entry.Occupied ->
+            }
+
+            is io.github.kotlinmania.indexmap.map.Entry.Occupied -> {
                 Entry.Occupied(OccupiedEntry(e.entry))
+            }
         }
 
     /** Returns the number of elements in the map. */
@@ -296,7 +299,10 @@ sealed class Entry {
                 occupied.insert(newVal)
                 this
             }
-            is Vacant -> this
+
+            is Vacant -> {
+                this
+            }
         }
 
     /** A vacant Entry. */

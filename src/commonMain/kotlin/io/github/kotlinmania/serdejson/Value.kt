@@ -138,7 +138,11 @@ sealed class Value : Serialize {
                 value.sortKeys()
                 value.values().forEach { it.sortAllObjects() }
             }
-            is Array -> value.forEach { it.sortAllObjects() }
+
+            is Array -> {
+                value.forEach { it.sortAllObjects() }
+            }
+
             else -> {}
         }
     }

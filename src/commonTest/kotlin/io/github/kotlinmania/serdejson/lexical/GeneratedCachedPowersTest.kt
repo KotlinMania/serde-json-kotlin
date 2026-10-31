@@ -7,20 +7,22 @@ class GeneratedCachedPowersTest {
     @Test
     fun integratedTablesMatchEveryRustValue() {
         val p = ExtendedFloatCache.getPowers()
-        val actual = buildList<String> {
-            for ((tag, values) in listOf("small-mant" to p.small.mant, "large-mant" to p.large.mant, "small-int" to p.smallInt)) {
-                add("length|$tag|${values.size}")
-                values.forEachIndexed { i, v -> add("$tag|$i|$v") }
+        val actual =
+            buildList<String> {
+                for ((tag, values) in listOf("small-mant" to p.small.mant, "large-mant" to p.large.mant, "small-int" to p.smallInt)) {
+                    add("length|$tag|${values.size}")
+                    values.forEachIndexed { i, v -> add("$tag|$i|$v") }
+                }
+                for ((tag, values) in listOf("small-exp" to p.small.exp, "large-exp" to p.large.exp)) {
+                    add("length|$tag|${values.size}")
+                    values.forEachIndexed { i, v -> add("$tag|$i|$v") }
+                }
+                add("step|${p.step}")
+                add("bias|${p.bias}")
             }
-            for ((tag, values) in listOf("small-exp" to p.small.exp, "large-exp" to p.large.exp)) {
-                add("length|$tag|${values.size}")
-                values.forEachIndexed { i, v -> add("$tag|$i|$v") }
-            }
-            add("step|${p.step}")
-            add("bias|${p.bias}")
-        }
         // Complete unchanged Rust cached_float80.rs oracle; not old Kotlin values.
-        val expected = """
+        val expected =
+            """
             length|small-mant|10
             small-mant|0|9223372036854775808
             small-mant|1|11529215046068469760
@@ -190,7 +192,7 @@ class GeneratedCachedPowersTest {
             large-exp|65|933
             step|10
             bias|350
-        """.trimIndent().lines()
+            """.trimIndent().lines()
         assertEquals(expected, actual)
     }
 

@@ -18,11 +18,12 @@ class SequenceElementParityTest {
 
     @Test
     fun nullableElementsAndEndOfSequenceRemainDistinct() {
-        val cases = listOf(
-            "[]" to emptyList<Long?>(),
-            "[null]" to listOf(null),
-            "[null,7,null,9]" to listOf(null, 7L, null, 9L),
-        )
+        val cases =
+            listOf(
+                "[]" to emptyList<Long?>(),
+                "[null]" to listOf(null),
+                "[null,7,null,9]" to listOf(null, 7L, null, 9L),
+            )
         for ((text, expected) in cases) {
             assertEquals(expected, fromStr(text, decoder).getOrThrow())
             val value = fromStr(text).getOrThrow()
@@ -45,18 +46,20 @@ class SequenceElementParityTest {
 
     @Test
     fun valueSequenceConsumesTheFailedItemAndRetainsRemainingState() {
-        val visitor = object : Visitor<Unit> {
-            override fun expecting(): String = "sequence"
+        val visitor =
+            object : Visitor<Unit> {
+                override fun expecting(): String = "sequence"
 
-            override fun <A : SeqAccess> visitSeq(access: A): SerdeResult<Unit> = serdeCatching {
-                assertEquals(2, access.sizeHint())
-                assertTrue(access.nextElement(I64Deserialize).isFailure)
-                assertEquals(1, access.sizeHint())
-                assertEquals(SeqElement.Some(7L), access.nextElement(I64Deserialize).getOrThrow())
-                assertEquals(0, access.sizeHint())
-                assertEquals(SeqElement.None, access.nextElement(I64Deserialize).getOrThrow())
+                override fun <A : SeqAccess> visitSeq(access: A): SerdeResult<Unit> =
+                    serdeCatching {
+                        assertEquals(2, access.sizeHint())
+                        assertTrue(access.nextElement(I64Deserialize).isFailure)
+                        assertEquals(1, access.sizeHint())
+                        assertEquals(SeqElement.Some(7L), access.nextElement(I64Deserialize).getOrThrow())
+                        assertEquals(0, access.sizeHint())
+                        assertEquals(SeqElement.None, access.nextElement(I64Deserialize).getOrThrow())
+                    }
             }
-        }
         val value = Value.Array(listOf(Value.Str("bad"), Value.Number(JsonNumber.fromI64(7))))
         ValueDeserializer(value).deserializeSeq(visitor).getOrThrow()
     }

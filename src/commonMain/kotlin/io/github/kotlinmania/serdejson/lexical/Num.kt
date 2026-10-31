@@ -258,7 +258,12 @@ internal object F32Float : FloatTraits {
 
     override fun fromBits(u: ULong): Double = Float.fromBits(u.toUInt().toInt()).toDouble()
 
-    override fun toBits(value: Double): ULong = value.toFloat().toRawBits().toUInt().toULong()
+    override fun toBits(value: Double): ULong =
+        value
+            .toFloat()
+            .toRawBits()
+            .toUInt()
+            .toULong()
 
     override fun isSignPositive(value: Double): Boolean =
         (value.toFloat().toRawBits() and Int.MIN_VALUE) == 0

@@ -303,24 +303,29 @@ class JsonNumber private constructor(
         if (this === other) return true
         if (other !is JsonNumber) return false
         return when (val thisN = n) {
-            is N.PosInt ->
+            is N.PosInt -> {
                 when (val otherN = other.n) {
                     is N.PosInt -> thisN.value == otherN.value
                     is N.NegInt -> false
                     is N.Float -> thisN.value.toDouble() == otherN.value
                 }
-            is N.NegInt ->
+            }
+
+            is N.NegInt -> {
                 when (val otherN = other.n) {
                     is N.NegInt -> thisN.value == otherN.value
                     is N.PosInt -> false
                     is N.Float -> thisN.value.toDouble() == otherN.value
                 }
-            is N.Float ->
+            }
+
+            is N.Float -> {
                 when (val otherN = other.n) {
                     is N.Float -> thisN.value == otherN.value
                     is N.PosInt -> thisN.value == otherN.value.toDouble()
                     is N.NegInt -> thisN.value == otherN.value.toDouble()
                 }
+            }
         }
     }
 

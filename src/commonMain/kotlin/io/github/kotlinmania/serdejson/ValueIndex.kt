@@ -53,7 +53,10 @@ class IntIndex(
                         "cannot access index $index of JSON array of length $len",
                     )
             }
-            else -> throw IllegalStateException("cannot access index $index of JSON ${Type(v)}")
+
+            else -> {
+                throw IllegalStateException("cannot access index $index of JSON ${Type(v)}")
+            }
         }
     }
 }
@@ -90,7 +93,10 @@ class StrIndex(
                 }
                 return current.value.get(key)!!
             }
-            else -> throw IllegalStateException("cannot access key \"$key\" in JSON ${Type(current)}")
+
+            else -> {
+                throw IllegalStateException("cannot access key \"$key\" in JSON ${Type(current)}")
+            }
         }
     }
 }

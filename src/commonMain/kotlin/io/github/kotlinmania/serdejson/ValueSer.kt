@@ -18,10 +18,22 @@ import io.github.kotlinmania.serdecore.ser.SerializeMap as SerdeSerializeMap
  */
 fun <Ok> serialize(value: Value, serializer: Serializer<Ok>): SerdeResult<Ok> {
     return when (value) {
-        is Value.Null -> serializer.serializeUnit()
-        is Value.Bool -> serializer.serializeBool(value.value)
-        is Value.Number -> value.value.serialize(serializer)
-        is Value.Str -> serializer.serializeStr(value.value)
+        is Value.Null -> {
+            serializer.serializeUnit()
+        }
+
+        is Value.Bool -> {
+            serializer.serializeBool(value.value)
+        }
+
+        is Value.Number -> {
+            value.value.serialize(serializer)
+        }
+
+        is Value.Str -> {
+            serializer.serializeStr(value.value)
+        }
+
         is Value.Array -> {
             val seq = serializer.serializeSeq(value.value.size).getOrElse { return SerdeResult.failure(it) }
             for (element in value.value) {
@@ -29,6 +41,7 @@ fun <Ok> serialize(value: Value, serializer: Serializer<Ok>): SerdeResult<Ok> {
             }
             seq.end()
         }
+
         is Value.Object -> {
             val map = serializer.serializeMap(value.value.len()).getOrElse { return SerdeResult.failure(it) }
             for ((k, v) in value.value) {
@@ -209,8 +222,14 @@ open class Serializer : io.github.kotlinmania.serdecore.ser.Serializer<Value> {
 
     override fun serializeStruct(name: String, len: Int): SerdeResult<SerializeStruct<Value>> =
         when (name) {
-            NUMBER_TOKEN -> SerdeResult.success(SerializeMap.Number(null))
-            RAW_VALUE_TOKEN -> SerdeResult.success(SerializeMap.RawValue(null))
+            NUMBER_TOKEN -> {
+                SerdeResult.success(SerializeMap.Number(null))
+            }
+
+            RAW_VALUE_TOKEN -> {
+                SerdeResult.success(SerializeMap.RawValue(null))
+            }
+
             else -> {
                 val map =
                     io.github.kotlinmania.serdejson.JsonMap
@@ -327,8 +346,14 @@ sealed class SerializeMap :
                 nextKey = k
                 SerdeResult.success(Unit)
             }
-            is Number -> error("unreachable")
-            is RawValue -> error("unreachable")
+
+            is Number -> {
+                error("unreachable")
+            }
+
+            is RawValue -> {
+                error("unreachable")
+            }
         }
     }
 
@@ -341,8 +366,14 @@ sealed class SerializeMap :
                 map.insert(k, v)
                 SerdeResult.success(Unit)
             }
-            is Number -> error("unreachable")
-            is RawValue -> error("unreachable")
+
+            is Number -> {
+                error("unreachable")
+            }
+
+            is RawValue -> {
+                error("unreachable")
+            }
         }
     }
 
@@ -351,6 +382,7 @@ sealed class SerializeMap :
             is Map -> {
                 serializeEntry(Value.Str(key), value)
             }
+
             is Number -> {
                 if (key == NUMBER_TOKEN) {
                     val emitted = value.serialize(NumberValueEmitter()).getOrElse { return SerdeResult.failure(it) }
@@ -360,6 +392,7 @@ sealed class SerializeMap :
                     SerdeResult.failure(invalidNumber())
                 }
             }
+
             is RawValue -> {
                 if (key == RAW_VALUE_TOKEN) {
                     val emitted = value.serialize(RawValueEmitter()).getOrElse { return SerdeResult.failure(it) }
@@ -374,11 +407,15 @@ sealed class SerializeMap :
 
     override fun end(): SerdeResult<Value> =
         when (this) {
-            is Map -> SerdeResult.success(Value.Object(map))
+            is Map -> {
+                SerdeResult.success(Value.Object(map))
+            }
+
             is Number -> {
                 val v = outValue ?: error("number value was not emitted")
                 SerdeResult.success(v)
             }
+
             is RawValue -> {
                 val v = outValue ?: error("raw value was not emitted")
                 SerdeResult.success(v)

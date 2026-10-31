@@ -354,8 +354,14 @@ internal sealed class Compound :
                 value.serialize(ser).getOrElse { return SerdeResult.failure(it) }
                 ioToSerde { ser.formatter.endArrayValue(ser.writer) }
             }
-            is Number -> kotlin.error("unreachable")
-            is RawValue -> kotlin.error("unreachable")
+
+            is Number -> {
+                kotlin.error("unreachable")
+            }
+
+            is RawValue -> {
+                kotlin.error("unreachable")
+            }
         }
 
     override fun <T : Serialize> serializeField(value: T): SerdeResult<Unit> = serializeElement(value)
@@ -370,8 +376,14 @@ internal sealed class Compound :
                 key.serialize(StreamMapKeySerializer(ser)).getOrElse { return SerdeResult.failure(it) }
                 ioToSerde { ser.formatter.endObjectKey(ser.writer) }
             }
-            is Number -> kotlin.error("unreachable")
-            is RawValue -> kotlin.error("unreachable")
+
+            is Number -> {
+                kotlin.error("unreachable")
+            }
+
+            is RawValue -> {
+                kotlin.error("unreachable")
+            }
         }
 
     override fun <T : Serialize> serializeValue(value: T): SerdeResult<Unit> =
@@ -381,8 +393,14 @@ internal sealed class Compound :
                 value.serialize(ser).getOrElse { return SerdeResult.failure(it) }
                 ioToSerde { ser.formatter.endObjectValue(ser.writer) }
             }
-            is Number -> kotlin.error("unreachable")
-            is RawValue -> kotlin.error("unreachable")
+
+            is Number -> {
+                kotlin.error("unreachable")
+            }
+
+            is RawValue -> {
+                kotlin.error("unreachable")
+            }
         }
 
     override fun <K : Serialize, V : Serialize> serializeEntry(key: K, value: V): SerdeResult<Unit> {
@@ -392,8 +410,11 @@ internal sealed class Compound :
 
     override fun <T : Serialize> serializeField(key: String, value: T): SerdeResult<Unit> =
         when (this) {
-            is Map -> serializeEntry(Value.Str(key), value)
-            is Number ->
+            is Map -> {
+                serializeEntry(Value.Str(key), value)
+            }
+
+            is Number -> {
                 if (key == NUMBER_TOKEN && !written) {
                     value.serialize(NumberStrEmitter(ser)).also {
                         if (it.isSuccess) written = true
@@ -401,7 +422,9 @@ internal sealed class Compound :
                 } else {
                     SerdeResult.failure(invalidNumberError())
                 }
-            is RawValue ->
+            }
+
+            is RawValue -> {
                 if (key == io.github.kotlinmania.serdejson.RawValue.TOKEN && !written) {
                     value.serialize(RawValueStrEmitter(ser)).also {
                         if (it.isSuccess) written = true
@@ -409,20 +432,23 @@ internal sealed class Compound :
                 } else {
                     SerdeResult.failure(invalidRawValueError())
                 }
+            }
         }
 
     override fun skipField(key: String): SerdeResult<Unit> = SerdeResult.success(Unit)
 
     override fun end(): SerdeResult<Unit> =
         when (this) {
-            is Map ->
+            is Map -> {
                 when (kind) {
-                    CompoundKind.Seq ->
+                    CompoundKind.Seq -> {
                         if (state == State.Empty) {
                             SerdeResult.success(Unit)
                         } else {
                             ioToSerde { ser.formatter.endArray(ser.writer) }
                         }
+                    }
+
                     CompoundKind.TupleVariant -> {
                         if (state != State.Empty) {
                             ioToSerde { ser.formatter.endArray(ser.writer) }.getOrElse { return SerdeResult.failure(it) }
@@ -430,12 +456,15 @@ internal sealed class Compound :
                         ioToSerde { ser.formatter.endObjectValue(ser.writer) }.getOrElse { return SerdeResult.failure(it) }
                         ioToSerde { ser.formatter.endObject(ser.writer) }
                     }
-                    CompoundKind.Map ->
+
+                    CompoundKind.Map -> {
                         if (state == State.Empty) {
                             SerdeResult.success(Unit)
                         } else {
                             ioToSerde { ser.formatter.endObject(ser.writer) }
                         }
+                    }
+
                     CompoundKind.StructVariant -> {
                         if (state != State.Empty) {
                             ioToSerde { ser.formatter.endObject(ser.writer) }.getOrElse { return SerdeResult.failure(it) }
@@ -444,10 +473,15 @@ internal sealed class Compound :
                         ioToSerde { ser.formatter.endObject(ser.writer) }
                     }
                 }
-            is Number ->
+            }
+
+            is Number -> {
                 if (written) SerdeResult.success(Unit) else SerdeResult.failure(invalidNumberError())
-            is RawValue ->
+            }
+
+            is RawValue -> {
                 if (written) SerdeResult.success(Unit) else SerdeResult.failure(invalidRawValueError())
+            }
         }
 }
 
@@ -913,7 +947,10 @@ internal interface Formatter {
                     )
                 writer.writeAll(bytes)
             }
-            else -> writer.writeAll(byteArrayOf('\\'.code.toByte(), escapeChar))
+
+            else -> {
+                writer.writeAll(byteArrayOf('\\'.code.toByte(), escapeChar))
+            }
         }
     }
 
@@ -1134,22 +1171,262 @@ private const val NONE_ESC: Int = 0
 private val ESCAPE: IntArray =
     intArrayOf(
         //   0        1        2        3        4        5        6        7        8        9        A        B        C        D        E        F
-        UU, UU, UU, UU, UU, UU, UU, UU, BB, TT, NN, UU, FF, RR, UU, UU, // 0
-        UU, UU, UU, UU, UU, UU, UU, UU, UU, UU, UU, UU, UU, UU, UU, UU, // 1
-        NONE_ESC, NONE_ESC, QU, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, // 2
-        NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, // 3
-        NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, // 4
-        NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, BS, NONE_ESC, NONE_ESC, NONE_ESC, // 5
-        NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, // 6
-        NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, // 7
-        NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, // 8
-        NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, // 9
-        NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, // A
-        NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, // B
-        NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, // C
-        NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, // D
-        NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, // E
-        NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, NONE_ESC, // F
+        UU,
+        UU,
+        UU,
+        UU,
+        UU,
+        UU,
+        UU,
+        UU,
+        BB,
+        TT,
+        NN,
+        UU,
+        FF,
+        RR,
+        UU,
+        UU, // 0
+        UU,
+        UU,
+        UU,
+        UU,
+        UU,
+        UU,
+        UU,
+        UU,
+        UU,
+        UU,
+        UU,
+        UU,
+        UU,
+        UU,
+        UU,
+        UU, // 1
+        NONE_ESC,
+        NONE_ESC,
+        QU,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC, // 2
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC, // 3
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC, // 4
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        BS,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC, // 5
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC, // 6
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC, // 7
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC, // 8
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC, // 9
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC, // A
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC, // B
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC, // C
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC, // D
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC, // E
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC,
+        NONE_ESC, // F
     )
 
 /**

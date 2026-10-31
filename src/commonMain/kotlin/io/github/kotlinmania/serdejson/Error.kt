@@ -153,12 +153,15 @@ class JsonError(
     fun classify(): Category =
         when (code) {
             is ErrorCode.Message -> Category.DATA
+
             is ErrorCode.Io -> Category.IO
+
             ErrorCode.EofWhileParsingList,
             ErrorCode.EofWhileParsingObject,
             ErrorCode.EofWhileParsingString,
             ErrorCode.EofWhileParsingValue,
             -> Category.EOF
+
             ErrorCode.ExpectedColon,
             ErrorCode.ExpectedListCommaOrEnd,
             ErrorCode.ExpectedObjectCommaOrEnd,
