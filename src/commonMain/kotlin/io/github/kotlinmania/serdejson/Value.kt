@@ -194,6 +194,7 @@ sealed class Value : Serialize {
         /** Parses a string index, returning null for invalid indices. */
         private fun parseIndex(s: String): Int? {
             if (s.startsWith('+') || (s.startsWith('0') && s.length != 1)) return null
+            if (s.any { it !in '0'..'9' }) return null
             return s.toIntOrNull()
         }
 
