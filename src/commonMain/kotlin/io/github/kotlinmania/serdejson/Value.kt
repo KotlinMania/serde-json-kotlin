@@ -161,16 +161,7 @@ sealed class Value : Serialize {
     }
 
     private fun eqValue(a: Value, b: Value): Boolean {
-        if (a is Value.Number && b is Value.Number) {
-            val an = a.value
-            val bn = b.value
-            if (an.isF64() || bn.isF64()) return an.asF64() == bn.asF64()
-            if (an.isI64() && bn.isI64()) return an.asI64() == bn.asI64()
-            if (an.isU64() && bn.isU64()) return an.asU64() == bn.asU64()
-            val al = an.asI64() ?: an.asU64()?.toLong()
-            val bl = bn.asI64() ?: bn.asU64()?.toLong()
-            return al == bl
-        }
+        if (a is Value.Number && b is Value.Number) return a.value == b.value
         if (a is Value.Str && b is Value.Str) return a.value == b.value
         if (a is Value.Bool && b is Value.Bool) return a.value == b.value
         if (a is Value.Null && b is Value.Null) return true

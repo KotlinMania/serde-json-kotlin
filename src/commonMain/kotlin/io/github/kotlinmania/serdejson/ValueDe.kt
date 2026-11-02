@@ -14,8 +14,10 @@ import io.github.kotlinmania.serdecore.de.SeqAccess
 import io.github.kotlinmania.serdecore.de.SeqElement
 import io.github.kotlinmania.serdecore.de.StringDeserialize
 import io.github.kotlinmania.serdecore.de.Unexpected
+import io.github.kotlinmania.serdecore.de.UnitDeserialize
 import io.github.kotlinmania.serdecore.de.VariantAccess
 import io.github.kotlinmania.serdecore.de.Visitor
+import io.github.kotlinmania.serdecore.de.value.intoDeserializer
 
 internal object ValueDeserialize : Deserialize<Value> {
     override fun <D : Deserializer> deserialize(deserializer: D): SerdeResult<Value> =
@@ -106,8 +108,8 @@ class ValueDeserializer(
             when (value) {
                 is Value.Null -> visitor.visitUnit()
                 is Value.Bool -> visitor.visitBool(value.value)
-                is Value.Number -> deserializeNumberAny(value.value, visitor)
-                is Value.Str -> visitor.visitStr(value.value)
+                is Value.Number -> value.value.deserializeAny(visitor)
+                is Value.Str -> visitor.visitString(value.value)
                 is Value.Array -> visitArray(value.value, visitor)
                 is Value.Object -> visitMap(value.value, visitor)
             }
@@ -116,63 +118,51 @@ class ValueDeserializer(
     override fun <V> deserializeBool(visitor: Visitor<V>): SerdeResult<V> =
         when (value) {
             is Value.Bool -> visitor.visitBool(value.value)
-            else -> SerdeResult.failure(typeError("boolean"))
+            else -> SerdeResult.failure(invalidType(visitor))
         }
 
-    override fun <V> deserializeI8(visitor: Visitor<V>): SerdeResult<V> = deserializeI64(visitor)
+    override fun <V> deserializeI8(visitor: Visitor<V>): SerdeResult<V> = deserializeNumber(value, visitor)
 
-    override fun <V> deserializeI16(visitor: Visitor<V>): SerdeResult<V> = deserializeI64(visitor)
+    override fun <V> deserializeI16(visitor: Visitor<V>): SerdeResult<V> = deserializeNumber(value, visitor)
 
-    override fun <V> deserializeI32(visitor: Visitor<V>): SerdeResult<V> = deserializeI64(visitor)
+    override fun <V> deserializeI32(visitor: Visitor<V>): SerdeResult<V> = deserializeNumber(value, visitor)
 
-    override fun <V> deserializeI64(visitor: Visitor<V>): SerdeResult<V> =
+    override fun <V> deserializeI64(visitor: Visitor<V>): SerdeResult<V> = deserializeNumber(value, visitor)
+
+    override fun <V> deserializeI128(visitor: Visitor<V>): SerdeResult<V> = deserializeNumber(value, visitor)
+
+    override fun <V> deserializeU8(visitor: Visitor<V>): SerdeResult<V> = deserializeNumber(value, visitor)
+
+    override fun <V> deserializeU16(visitor: Visitor<V>): SerdeResult<V> = deserializeNumber(value, visitor)
+
+    override fun <V> deserializeU32(visitor: Visitor<V>): SerdeResult<V> = deserializeNumber(value, visitor)
+
+    override fun <V> deserializeU64(visitor: Visitor<V>): SerdeResult<V> = deserializeNumber(value, visitor)
+
+    override fun <V> deserializeU128(visitor: Visitor<V>): SerdeResult<V> = deserializeNumber(value, visitor)
+
+    override fun <V> deserializeF32(visitor: Visitor<V>): SerdeResult<V> = deserializeNumber(value, visitor)
+
+    override fun <V> deserializeF64(visitor: Visitor<V>): SerdeResult<V> = deserializeNumber(value, visitor)
+
+    override fun <V> deserializeChar(visitor: Visitor<V>): SerdeResult<V> = deserializeString(visitor)
+
+    override fun <V> deserializeStr(visitor: Visitor<V>): SerdeResult<V> = deserializeString(visitor)
+
+    override fun <V> deserializeString(visitor: Visitor<V>): SerdeResult<V> =
         when (value) {
-            is Value.Number -> deserializeNumberAny(value.value, visitor)
-            else -> SerdeResult.failure(typeError("i64"))
+            is Value.Str -> visitor.visitString(value.value)
+            else -> SerdeResult.failure(invalidType(visitor))
         }
 
-    override fun <V> deserializeI128(visitor: Visitor<V>): SerdeResult<V> = deserializeI64(visitor)
+    override fun <V> deserializeBytes(visitor: Visitor<V>): SerdeResult<V> = deserializeByteBuf(visitor)
 
-    override fun <V> deserializeU8(visitor: Visitor<V>): SerdeResult<V> = deserializeU64(visitor)
-
-    override fun <V> deserializeU16(visitor: Visitor<V>): SerdeResult<V> = deserializeU64(visitor)
-
-    override fun <V> deserializeU32(visitor: Visitor<V>): SerdeResult<V> = deserializeU64(visitor)
-
-    override fun <V> deserializeU64(visitor: Visitor<V>): SerdeResult<V> =
+    override fun <V> deserializeByteBuf(visitor: Visitor<V>): SerdeResult<V> =
         when (value) {
-            is Value.Number -> deserializeNumberAny(value.value, visitor)
-            else -> SerdeResult.failure(typeError("u64"))
-        }
-
-    override fun <V> deserializeU128(visitor: Visitor<V>): SerdeResult<V> = deserializeU64(visitor)
-
-    override fun <V> deserializeF32(visitor: Visitor<V>): SerdeResult<V> = deserializeF64(visitor)
-
-    override fun <V> deserializeF64(visitor: Visitor<V>): SerdeResult<V> =
-        when (value) {
-            is Value.Number -> deserializeNumberAny(value.value, visitor)
-            else -> SerdeResult.failure(typeError("f64"))
-        }
-
-    override fun <V> deserializeChar(visitor: Visitor<V>): SerdeResult<V> = deserializeStr(visitor)
-
-    override fun <V> deserializeStr(visitor: Visitor<V>): SerdeResult<V> =
-        when (value) {
-            is Value.Str -> visitor.visitStr(value.value)
-            else -> SerdeResult.failure(typeError("string"))
-        }
-
-    override fun <V> deserializeString(visitor: Visitor<V>): SerdeResult<V> = deserializeStr(visitor)
-
-    override fun <V> deserializeBytes(visitor: Visitor<V>): SerdeResult<V> =
-        when (value) {
-            is Value.Str -> visitor.visitStr(value.value)
+            is Value.Str -> visitor.visitString(value.value)
             is Value.Array -> visitArray(value.value, visitor)
-            else -> SerdeResult.failure(typeError("bytes or array"))
+            else -> SerdeResult.failure(invalidType(visitor))
         }
-
-    override fun <V> deserializeByteBuf(visitor: Visitor<V>): SerdeResult<V> = deserializeBytes(visitor)
 
     override fun <V> deserializeOption(visitor: Visitor<V>): SerdeResult<V> =
         when (value) {
@@ -183,7 +173,7 @@ class ValueDeserializer(
     override fun <V> deserializeUnit(visitor: Visitor<V>): SerdeResult<V> =
         when (value) {
             is Value.Null -> visitor.visitUnit()
-            else -> SerdeResult.failure(typeError("null"))
+            else -> SerdeResult.failure(invalidType(visitor))
         }
 
     override fun <V> deserializeUnitStruct(name: String, visitor: Visitor<V>): SerdeResult<V> =
@@ -199,7 +189,7 @@ class ValueDeserializer(
     override fun <V> deserializeSeq(visitor: Visitor<V>): SerdeResult<V> =
         when (value) {
             is Value.Array -> visitArray(value.value, visitor)
-            else -> SerdeResult.failure(typeError("array"))
+            else -> SerdeResult.failure(invalidType(visitor))
         }
 
     override fun <V> deserializeTuple(len: Int, visitor: Visitor<V>): SerdeResult<V> =
@@ -211,14 +201,14 @@ class ValueDeserializer(
     override fun <V> deserializeMap(visitor: Visitor<V>): SerdeResult<V> =
         when (value) {
             is Value.Object -> visitMap(value.value, visitor)
-            else -> SerdeResult.failure(typeError("map"))
+            else -> SerdeResult.failure(invalidType(visitor))
         }
 
     override fun <V> deserializeStruct(name: String, fields: List<String>, visitor: Visitor<V>): SerdeResult<V> =
         when (value) {
             is Value.Array -> visitArray(value.value, visitor)
             is Value.Object -> visitMap(value.value, visitor)
-            else -> SerdeResult.failure(typeError("array or map"))
+            else -> SerdeResult.failure(invalidType(visitor))
         }
 
     override fun <V> deserializeEnum(name: String, variants: List<String>, visitor: Visitor<V>): SerdeResult<V> =
@@ -227,9 +217,14 @@ class ValueDeserializer(
                 val iter = value.value.iterator()
                 val first = if (iter.hasNext()) iter.next() else null
                 if (first == null) {
-                    SerdeResult.failure(SerdeError.custom("expected map with a single key"))
+                    SerdeResult.failure(
+                        SerdeError.invalidValue(Unexpected.Map, Expected { "map with a single key" }),
+                    )
                 } else if (iter.hasNext()) {
-                    SerdeResult.failure(SerdeError.custom("expected map with a single key"))
+                    // enums are encoded in json as maps with a single key:value pair
+                    SerdeResult.failure(
+                        SerdeError.invalidValue(Unexpected.Map, Expected { "map with a single key" }),
+                    )
                 } else {
                     visitor.visitEnum(ValueEnumAccess(first.first, first.second))
                 }
@@ -240,30 +235,28 @@ class ValueDeserializer(
             }
 
             else -> {
-                SerdeResult.failure(SerdeError.custom("expected string or map for enum, got ${Type(value)}"))
+                SerdeResult.failure(
+                    SerdeError.invalidType(value.unexpected(), Expected { "string or map" }),
+                )
             }
         }
 
-    override fun <V> deserializeIdentifier(visitor: Visitor<V>): SerdeResult<V> = deserializeStr(visitor)
+    override fun <V> deserializeIdentifier(visitor: Visitor<V>): SerdeResult<V> = deserializeString(visitor)
 
     override fun <V> deserializeIgnoredAny(visitor: Visitor<V>): SerdeResult<V> = visitor.visitUnit()
 
-    private fun typeError(expected: String): SerdeError =
-        SerdeError.custom("invalid type: expected $expected, got ${Type(value)}")
+    private fun invalidType(exp: Expected): SerdeError =
+        SerdeError.invalidType(value.unexpected(), exp)
 }
 
 /**
- * Deserialize a number value, dispatching to the appropriate visitor method.
+ * Deserialize a [Value] as a JSON number or report an invalid-type diagnostic using [visitor].
  */
-private fun <V> deserializeNumberAny(n: JsonNumber, visitor: Visitor<V>): SerdeResult<V> {
-    val unsigned = n.asU64()
-    if (unsigned != null) return visitor.visitU64(unsigned)
-    val signed = n.asI64()
-    if (signed != null) return visitor.visitI64(signed)
-    val float = n.asF64()
-    if (float != null) return visitor.visitF64(float)
-    return SerdeResult.failure(SerdeError.custom("number out of range"))
-}
+private fun <V> deserializeNumber(value: Value, visitor: Visitor<V>): SerdeResult<V> =
+    when (value) {
+        is Value.Number -> value.value.deserializeAny(visitor)
+        else -> SerdeResult.failure(SerdeError.invalidType(value.unexpected(), visitor))
+    }
 
 /**
  * Visit an array as a sequence.
@@ -352,8 +345,9 @@ private class ValueEnumAccess(
     private val value: Value?,
 ) : EnumAccess {
     override fun <T> variantSeed(seed: DeserializeSeed<T>): SerdeResult<Pair<T, VariantAccess>> {
-        val variantResult = seed.deserialize(ValueDeserializer(Value.Str(variant)))
-        return variantResult.map { it to ValueVariantAccess(value) }
+        val variant = this.variant.intoDeserializer()
+        val visitor = ValueVariantAccess(value)
+        return seed.deserialize(variant).map { it to visitor }
     }
 }
 
@@ -365,8 +359,7 @@ private class ValueVariantAccess(
 ) : VariantAccess {
     override fun unitVariant(): SerdeResult<Unit> =
         if (value != null) {
-            // Deserialize the value as unit
-            ValueDeserializer(value).deserializeUnit(UnitVisitor)
+            UnitDeserialize.deserialize(ValueDeserializer(value))
         } else {
             SerdeResult.success(Unit)
         }
@@ -375,29 +368,48 @@ private class ValueVariantAccess(
         if (value != null) {
             seed.deserialize(ValueDeserializer(value))
         } else {
-            SerdeResult.failure(SerdeError.custom("expected newtype variant, got unit variant"))
+            SerdeResult.failure(
+                SerdeError.invalidType(Unexpected.UnitVariant, Expected { "newtype variant" }),
+            )
         }
 
     override fun <V> tupleVariant(len: Int, visitor: Visitor<V>): SerdeResult<V> =
         when (value) {
-            is Value.Array -> if (value.value.isEmpty()) visitor.visitUnit() else visitArray(value.value, visitor)
-            null -> SerdeResult.failure(SerdeError.custom("expected tuple variant, got unit variant"))
-            else -> SerdeResult.failure(SerdeError.custom("expected tuple variant, got ${Type(value)}"))
+            is Value.Array -> {
+                if (value.value.isEmpty()) visitor.visitUnit() else visitArray(value.value, visitor)
+            }
+
+            null -> {
+                SerdeResult.failure(
+                    SerdeError.invalidType(Unexpected.UnitVariant, Expected { "tuple variant" }),
+                )
+            }
+
+            else -> {
+                SerdeResult.failure(
+                    SerdeError.invalidType(value.unexpected(), Expected { "tuple variant" }),
+                )
+            }
         }
 
     override fun <V> structVariant(fields: List<String>, visitor: Visitor<V>): SerdeResult<V> =
         when (value) {
-            is Value.Object -> visitMap(value.value, visitor)
-            null -> SerdeResult.failure(SerdeError.custom("expected struct variant, got unit variant"))
-            else -> SerdeResult.failure(SerdeError.custom("expected struct variant, got ${Type(value)}"))
+            is Value.Object -> {
+                visitMap(value.value, visitor)
+            }
+
+            null -> {
+                SerdeResult.failure(
+                    SerdeError.invalidType(Unexpected.UnitVariant, Expected { "struct variant" }),
+                )
+            }
+
+            else -> {
+                SerdeResult.failure(
+                    SerdeError.invalidType(value.unexpected(), Expected { "struct variant" }),
+                )
+            }
         }
-}
-
-/** Visitor that accepts unit. */
-private object UnitVisitor : Visitor<Unit> {
-    override fun expecting(): String = "unit"
-
-    override fun visitUnit(): SerdeResult<Unit> = SerdeResult.success(Unit)
 }
 
 private class ValueMapKey(
@@ -476,6 +488,9 @@ private class ValueMapKey(
     override fun <V> deserializeOption(visitor: Visitor<V>): SerdeResult<V> = visitor.visitSome(this)
 
     override fun <V> deserializeNewtypeStruct(name: String, visitor: Visitor<V>): SerdeResult<V> = visitor.visitNewtypeStruct(this)
+
+    override fun <V> deserializeEnum(name: String, variants: List<String>, visitor: Visitor<V>): SerdeResult<V> =
+        key.intoDeserializer().deserializeEnum(name, variants, visitor)
 
     override fun <V> deserializeBytes(visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
 

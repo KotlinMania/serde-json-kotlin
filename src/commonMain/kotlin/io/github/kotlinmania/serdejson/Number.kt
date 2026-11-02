@@ -299,33 +299,15 @@ class JsonNumber private constructor(
 
     override fun <V> deserializeIgnoredAny(visitor: Visitor<V>): SerdeResult<V> = deserializeAny(visitor)
 
+    // Implementing reflexive equality is fine since any float values are always finite.
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is JsonNumber) return false
+        val otherN = other.n
         return when (val thisN = n) {
-            is N.PosInt -> {
-                when (val otherN = other.n) {
-                    is N.PosInt -> thisN.value == otherN.value
-                    is N.NegInt -> false
-                    is N.Float -> thisN.value.toDouble() == otherN.value
-                }
-            }
-
-            is N.NegInt -> {
-                when (val otherN = other.n) {
-                    is N.NegInt -> thisN.value == otherN.value
-                    is N.PosInt -> false
-                    is N.Float -> thisN.value.toDouble() == otherN.value
-                }
-            }
-
-            is N.Float -> {
-                when (val otherN = other.n) {
-                    is N.Float -> thisN.value == otherN.value
-                    is N.PosInt -> thisN.value == otherN.value.toDouble()
-                    is N.NegInt -> thisN.value == otherN.value.toDouble()
-                }
-            }
+            is N.PosInt -> otherN is N.PosInt && thisN.value == otherN.value
+            is N.NegInt -> otherN is N.NegInt && thisN.value == otherN.value
+            is N.Float -> otherN is N.Float && thisN.value == otherN.value
         }
     }
 
