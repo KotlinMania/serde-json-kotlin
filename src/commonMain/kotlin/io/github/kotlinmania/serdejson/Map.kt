@@ -158,9 +158,18 @@ class JsonMap(
         map.retain(f)
     }
 
-    /** Sorts this map's entries in-place using String's usual ordering. */
+    /** Sorts this map's entries in-place using Rust string ordering: unsigned UTF-8 bytes. */
     fun sortKeys() {
-        map.sortKeys { a, b -> a.compareTo(b) }
+        val encodedKeys = map.keys().associateWith { it.encodeToByteArray(throwOnInvalidSequence = true) }
+        map.sortKeys { a, b ->
+            val left = encodedKeys.getValue(a)
+            val right = encodedKeys.getValue(b)
+            for (index in 0 until minOf(left.size, right.size)) {
+                val order = (left[index].toInt() and 0xff) - (right[index].toInt() and 0xff)
+                if (order != 0) return@sortKeys order
+            }
+            left.size.compareTo(right.size)
+        }
     }
 
     fun clone(): JsonMap = JsonMap(map.clone())
