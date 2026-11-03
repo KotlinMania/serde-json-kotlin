@@ -2,7 +2,7 @@
 
 Source: `/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/tmp/serde_json/src/lexical/errors.rs`, SHA-256 `3d9f6de6245533bcb101dfd718cfed61d59dc293f6768cedae28aa13ace164f5`.
 
-Production destination: `src/commonMain/kotlin/io/github/kotlinmania/serdejson/lexical/generated/errors/Errors.kt`. The body is byte-identical to the complete raw Native-verified output, SHA-256 `6bb0472cfffdffc4a6595c2eadfbea6c738ed39b9514673a5714b9775bfd372c`; only package/provenance headers were added. Generator commit: `3318d3b2d952a1f18b9d74a4a57b15973a35951d`.
+Production destination: `src/common/commonMain/kotlin/io/github/kotlinmania/serdejson/lexical/generated/errors/Errors.kt`. The body is byte-identical to the complete raw Native-verified output, SHA-256 `6bb0472cfffdffc4a6595c2eadfbea6c738ed39b9514673a5714b9775bfd372c`; only package/provenance headers were added. Generator commit: `3318d3b2d952a1f18b9d74a4a57b15973a35951d`.
 
 Existing `lexical/Errors.kt` entry points now forward to generated scale, halfscale, and error-estimation methods. Algorithm.kt callers therefore execute the generated implementation without changing their existing argument order or types. The adapter supplies the explicit FloatTraits provider and a read-only scalar snapshot. It implements no error arithmetic. The actual f32/f64 providers and mask helpers remain in Num.kt/Rounding.kt and were compared against their original Rust dependencies; this does not claim those complete dependency files are translated.
 

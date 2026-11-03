@@ -1,6 +1,6 @@
 # Adopted generated lexical/shift.rs
 
-The complete raw-generated checked profile is installed in `src/commonMain/kotlin/io/github/kotlinmania/serdejson/lexical/generated/shift/Shift.kt`; only a package line is prepended. `lexical/Shift.kt` forwards shr, overflowingShr and shl. It copies state back in finally because Rust can write mantissa before an exponent overflow. No arithmetic is reimplemented by the adapter.
+The complete raw-generated checked profile is installed in `src/common/commonMain/kotlin/io/github/kotlinmania/serdejson/lexical/generated/shift/Shift.kt`; only a package line is prepended. `lexical/Shift.kt` forwards shr, overflowingShr and shl. It copies state back in finally because Rust can write mantissa before an exponent overflow. No arithmetic is reimplemented by the adapter.
 
 131 Native tests pass, including partial-write and invalid-count regression tests. A friend consumer of the complete production Gradle KLIB matches all 2,106 checked-profile Rust observations, including 1,254 panic cases and retained state. All actual dependency paths/hashes and exact compiler arguments are in production-validation.json. The two earlier dependency-inspection attempts failed because their task lacked an explicit Native compile prerequisite; they did not invalidate the completed Native tests.
 

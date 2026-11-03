@@ -2,7 +2,7 @@
 
 Source: `/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/tmp/serde_json/src/lexical/cached.rs`, SHA-256 `0e127398691f8042c19cde209e7f4b0161f0f3150342430145929f711e6fdac8`.
 
-Production raw destination: `src/commonMain/kotlin/io/github/kotlinmania/serdejson/lexical/generated/cached/Cached.kt`. Its generated body is byte-identical to rust-kotlin's complete Native-verified output, SHA-256 `28bb7d3530f827bc1d0366ee81216e0ec13b24b5129352930ec1c181556841de`; only the package/port-lint header is added. Generator commit: 019970170167ae2399667f8cdeaf2c569b7fd889.
+Production raw destination: `src/common/commonMain/kotlin/io/github/kotlinmania/serdejson/lexical/generated/cached/Cached.kt`. Its generated body is byte-identical to rust-kotlin's complete Native-verified output, SHA-256 `28bb7d3530f827bc1d0366ee81216e0ec13b24b5129352930ec1c181556841de`; only the package/port-lint header is added. Generator commit: 019970170167ae2399667f8cdeaf2c569b7fd889.
 
 The existing `lexical/Cached.kt` classes retain their Int/primitive-array-facing internal APIs and delegate array length and all four lookup methods to generated code. `lexical/CachedFloat80.kt` routes the cache trait through its generated implementation and supplies its explicit static accessor from the previously adopted generated cached_float80.rs table. One shared record view is initialized from those exact immutable values. No table constants, lookup body or arithmetic are handwritten. Existing lexical/Algorithm.kt consumers now reach the generated methods through these adapters.
 

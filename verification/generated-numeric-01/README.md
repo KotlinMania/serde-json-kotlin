@@ -3,7 +3,7 @@
 Complete unchanged Rust sources in `tmp/serde_json/src/lexical/` now supply the
 production code:
 
-| Rust source | Kotlin destination under src/commonMain/kotlin/io/github/kotlinmania/serdejson/lexical/ |
+| Rust source | Kotlin destination under src/common/commonMain/kotlin/io/github/kotlinmania/serdejson/lexical/ |
 |---|---|
 | `digit.rs` | `generated/digit/Digit.kt` |
 | `exponent.rs` | `generated/exponent/Exponent.kt` |

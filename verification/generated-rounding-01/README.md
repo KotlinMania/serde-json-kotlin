@@ -2,7 +2,7 @@
 
 Source: `tmp/serde_json/src/lexical/rounding.rs`, SHA-256 `4762af3612880b17468ff2a1bb800c8e99f08330ae439699dd53d8dc5463ad13`. Generator source commit: `18f124d` in rust-kotlin.
 
-Destination: `src/commonMain/kotlin/io/github/kotlinmania/serdejson/lexical/generated/rounding/Rounding.kt`. Its body is byte-identical to the complete Rust/Native verified raw output, SHA-256 `57c34cb20cf760fc5761ad7ea49ebe29ab244a18840e2ea5600764403a91e388`; only package/provenance headers were added.
+Destination: `src/common/commonMain/kotlin/io/github/kotlinmania/serdejson/lexical/generated/rounding/Rounding.kt`. Its body is byte-identical to the complete Rust/Native verified raw output, SHA-256 `57c34cb20cf760fc5761ad7ea49ebe29ab244a18840e2ea5600764403a91e388`; only package/provenance headers were added.
 
 Existing `lexical/Rounding.kt` entry points now call the generated functions. The scalar record adapter copies state back on ordinary and exceptional exits. Before each callback, it exposes the current generated state through the caller's original ExtendedFloat object, and copies callback changes back even when the callback throws. Normalization delegates to the existing Float.kt operation. No rounding arithmetic is implemented in the adapter.
 
