@@ -13,6 +13,8 @@ serdeKotlin = "0.1.12"
 indexmapKotlin = "0.1.5"
 numTraitsKotlin = "0.2.15"
 
+androidxTestRunner = "1.7.0"
+
 [plugins]
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 android-kotlin-multiplatform-library = { id = "com.android.kotlin.multiplatform.library", version.ref = "androidKmp" }
@@ -33,6 +35,8 @@ kotlinx-benchmark-runtime = { module = "org.jetbrains.kotlinx:kotlinx-benchmark-
 serde-core = { module = "io.github.kotlinmania:serde-core", version.ref = "serdeKotlin" }
 indexmap-kotlin = { module = "io.github.kotlinmania:indexmap-kotlin", version.ref = "indexmapKotlin" }
 num-traits-kotlin = { module = "io.github.kotlinmania:num-traits-kotlin", version.ref = "numTraitsKotlin" }
+
+androidx-test-runner = { module = "androidx.test:runner", version.ref = "androidxTestRunner" }
 
 [bundles]
 serde-json-commonMain = [
