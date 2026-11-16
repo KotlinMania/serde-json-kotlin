@@ -237,17 +237,7 @@ class ValueDeserializerDiagnosticParityTest {
         val optionForwardedSeed =
             object : DeserializeSeed<String> {
                 override fun <D : Deserializer> deserialize(deserializer: D): SerdeResult<String> =
-                    deserializer.deserializeOption(
-                        object : Visitor<String> {
-                            override fun expecting(): String = "a variant string"
-
-                            override fun visitString(v: String): SerdeResult<String> =
-                                SerdeResult.success("string:$v")
-
-                            override fun <Inner : Deserializer> visitSome(deserializer: Inner): SerdeResult<String> =
-                                SerdeResult.success("some")
-                        },
-                    )
+                    deserializer.deserializeOption(OptionForwardedVisitor)
             }
 
         val enumDecoder =
@@ -349,22 +339,7 @@ class ValueDeserializerDiagnosticParityTest {
 
                         override fun <A : EnumAccess> visitEnum(access: A): SerdeResult<String> =
                             access.variantSeed(seedOf(StringDeserialize)).flatMap { (_, variant) ->
-                                variant.tupleVariant(
-                                    2,
-                                    object : Visitor<String> {
-                                        override fun expecting(): String = "tuple payload"
-
-                                        override fun visitUnit(): SerdeResult<String> = SerdeResult.success("empty")
-
-                                        override fun <S : SeqAccess> visitSeq(access: S): SerdeResult<String> {
-                                            val a = access.nextElement(I64Deserialize).getOrElse { return SerdeResult.failure(it) }
-                                            val b = access.nextElement(I64Deserialize).getOrElse { return SerdeResult.failure(it) }
-                                            val first = (a as SeqElement.Some).value
-                                            val second = (b as SeqElement.Some).value
-                                            return SerdeResult.success("$first:$second")
-                                        }
-                                    },
-                                )
+                                variant.tupleVariant(2, TuplePayloadVisitor)
                             }
                     },
                 )
@@ -425,17 +400,7 @@ class ValueDeserializerDiagnosticParityTest {
 
                         override fun <A : EnumAccess> visitEnum(access: A): SerdeResult<Long> =
                             access.variantSeed(seedOf(StringDeserialize)).flatMap { (_, variant) ->
-                                variant.structVariant(
-                                    listOf("x"),
-                                    object : Visitor<Long> {
-                                        override fun expecting(): String = "struct payload"
-
-                                        override fun <M : MapAccess> visitMap(access: M): SerdeResult<Long> =
-                                            access.nextEntry(StringDeserialize, I64Deserialize).map { entry ->
-                                                requireNotNull(entry).second
-                                            }
-                                    },
-                                )
+                                variant.structVariant(listOf("x"), StructPayloadVisitor)
                             }
                     },
                 )
@@ -509,4 +474,36 @@ class ValueDeserializerDiagnosticParityTest {
         val err = assertNotNull(decodeKeyAsNewtypeEnum("Tag").exceptionOrNull())
         assertEquals("invalid type: unit variant, expected newtype variant", err.message)
     }
+}
+
+private object OptionForwardedVisitor : Visitor<String> {
+    override fun expecting(): String = "a variant string"
+
+    override fun visitString(v: String): SerdeResult<String> = SerdeResult.success("string:$v")
+
+    override fun <Inner : Deserializer> visitSome(deserializer: Inner): SerdeResult<String> =
+        SerdeResult.success("some")
+}
+
+private object TuplePayloadVisitor : Visitor<String> {
+    override fun expecting(): String = "tuple payload"
+
+    override fun visitUnit(): SerdeResult<String> = SerdeResult.success("empty")
+
+    override fun <S : SeqAccess> visitSeq(access: S): SerdeResult<String> {
+        val a = access.nextElement(I64Deserialize).getOrElse { return SerdeResult.failure(it) }
+        val b = access.nextElement(I64Deserialize).getOrElse { return SerdeResult.failure(it) }
+        val first = (a as SeqElement.Some).value
+        val second = (b as SeqElement.Some).value
+        return SerdeResult.success("$first:$second")
+    }
+}
+
+private object StructPayloadVisitor : Visitor<Long> {
+    override fun expecting(): String = "struct payload"
+
+    override fun <M : MapAccess> visitMap(access: M): SerdeResult<Long> =
+        access.nextEntry(StringDeserialize, I64Deserialize).map { entry ->
+            requireNotNull(entry).second
+        }
 }
