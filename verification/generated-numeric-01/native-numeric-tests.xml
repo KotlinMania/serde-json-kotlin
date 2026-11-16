@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="macosArm64Test.io.github.kotlinmania.serdejson.lexical.GeneratedNumericTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-10-25T16:09:17.514Z" hostname="EmberHarmony.local" time="0.0">
+  <properties/>
+  <testcase name="everyByteMatchesTheRecordedRustDigitOracle[macosArm64]" classname="macosArm64Test.io.github.kotlinmania.serdejson.lexical.GeneratedNumericTest" time="0.0"/>
+  <testcase name="checkedArithmeticUsesThePublishedNumTraitsContract[macosArm64]" classname="macosArm64Test.io.github.kotlinmania.serdejson.lexical.GeneratedNumericTest" time="0.0"/>
+  <testcase name="usize64ExponentBoundariesMatchRust[macosArm64]" classname="macosArm64Test.io.github.kotlinmania.serdejson.lexical.GeneratedNumericTest" time="0.0"/>
+  <testcase name="migratedBhcompCallersMatchRustBits[macosArm64]" classname="macosArm64Test.io.github.kotlinmania.serdejson.lexical.GeneratedNumericTest" time="0.0"/>
+  <testcase name="migratedDigitCallerRetainsRustUnwrapFailure[macosArm64]" classname="macosArm64Test.io.github.kotlinmania.serdejson.lexical.GeneratedNumericTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

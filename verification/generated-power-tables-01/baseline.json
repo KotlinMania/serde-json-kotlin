@@ -1,0 +1,12 @@
+{
+  "head": "c94ce02e8e2ee3a89900e57a53249b58c03791cb",
+  "files": {
+    "SmallPowers.kt": "e53cfbfdd2c6347a3c91ca35be4a9a14a927fd4550d1624eb3f734d811e649f3",
+    "LargePowers64.kt": "bef992c5571a33f3c6dfdfacb88518f64c24f56a8aa3f4531882d3309aa14b37",
+    "Math.kt": "ee807edd9b72c652626ca9490395de9ed258066252025f7ae880bf79f62c17b4",
+    "Algorithm.kt": "b0db4784eb36c2a27fa822ba7231df88ef576c7113ff26b34b6e18f16d500800",
+    "Bignum.kt": "1f9329ad72205611bd83ed3f800ad23e5ed16cfc823f4059f6b66028747151f9",
+    "Num.kt": "f084eb23138ed3a2d22b76cb57302ac1c4ee287311d415b6caefc98380832cd1"
+  },
+  "generator_sha256": "e4cc6d964a9757318e51208cf072353b0dd4f9ab3774da3b997cafacd9e79155"
+}

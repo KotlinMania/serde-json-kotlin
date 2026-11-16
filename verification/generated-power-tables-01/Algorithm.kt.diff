@@ -1,0 +1,11 @@
+--- /Volumes/stuff/Projects/kotlinmania/rust-kotlin/tmp/serde-json-table-adoption-01/baseline/Algorithm.kt	2026-09-01 04:24:26
++++ /Volumes/stuff/Projects/kotlinmania/rust-kotlin/tmp/serde-json-table-adoption-01/candidate/Algorithm.kt	2026-10-25 06:38:20
+@@ -33,7 +33,7 @@
+         val float = floatTraits.fromBits(mantissa)
+         floatTraits.pow10(float, exponent)
+     } else if (exponent >= 0 && exponent <= maxExp + shiftExp) {
+-        val smallPowers = POW10_64
++        val smallPowers = POW10_64.asSlice()
+         val shift = exponent - maxExp
+         val power = smallPowers[shift]
+ 

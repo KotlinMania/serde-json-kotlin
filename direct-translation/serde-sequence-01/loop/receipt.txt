@@ -1,0 +1,4 @@
+SELECTED serde-sequence-loop; not a complete file or visitor translation
+source_utf16=3486..3593; line=113; bindings={visitor=access, vec=values}; seed=ValueDeserialize; stateless_seed=true; try_macro=tri; Vec_receivers=[vec]
+bindings assert existing Serde APIs, equivalent collection insert operations or Vec-to-MutableList append, and borrowed deserializer identity; enclosing serdeCatching propagates loop errors; macro binding asserts Result propagation
+engines=proc-macro2-kotlin:0.1.7,syn-kotlin:0.4.0; runtime=serde-core:0.1.12

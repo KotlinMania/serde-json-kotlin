@@ -1,0 +1,32 @@
+{
+  "status": "passed",
+  "test_counts": {
+    "tests": 124,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "rust_observations_in_production": 169,
+  "raw_body_sha256": "eae9a0f663dc5a5bdd243754e18b5aa607ccb7136bdb87975bcfa4c1c4c8fbb7",
+  "installed_file_sha256": "5722098726eba98342f7bb0d99326261d4fe80237fe59f2cf77f79778a64f7f6",
+  "raw_body_unmodified": true,
+  "command": [
+    "./gradlew",
+    "-p",
+    "../serde-json-kotlin",
+    "macosArm64Test",
+    "--offline",
+    "-Pproject.repositories.mavenLocal=true",
+    "-Dmaven.repo.local=/Users/sydney/.m2/repository"
+  ],
+  "log": "/Volumes/stuff/Projects/kotlinmania/rust-kotlin/tmp/foundation-record-constants-01/port-native-adoption.log",
+  "unchanged": [
+    "Math.kt",
+    "Cached.kt",
+    "build.gradle.kts",
+    "settings.gradle.kts",
+    "gradle/libs.versions.toml"
+  ],
+  "other_platforms": "unverified",
+  "existing_multiplication_failure": "unchanged; see ../generated-power-tables-01/math-comparison.diff"
+}

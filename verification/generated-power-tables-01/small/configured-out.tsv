@@ -1,0 +1,3 @@
+name	line	column	predicate	kind
+POW5_32	7	17	fast_arithmetic="32"=false	item
+POW10_32	13	17	fast_arithmetic="32"=false	item

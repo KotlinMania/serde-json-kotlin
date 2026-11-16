@@ -1,0 +1,158 @@
+diff --git a/src/commonMain/kotlin/io/github/kotlinmania/serdejson/De.kt b/src/commonMain/kotlin/io/github/kotlinmania/serdejson/De.kt
+index 0bc9343..e0fcf2d 100644
+--- a/src/commonMain/kotlin/io/github/kotlinmania/serdejson/De.kt
++++ b/src/commonMain/kotlin/io/github/kotlinmania/serdejson/De.kt
+@@ -10,6 +10,7 @@ import io.github.kotlinmania.serdecore.de.EnumAccess
+ import io.github.kotlinmania.serdecore.de.Expected
+ import io.github.kotlinmania.serdecore.de.MapAccess
+ import io.github.kotlinmania.serdecore.de.SeqAccess
++import io.github.kotlinmania.serdecore.de.SeqElement
+ import io.github.kotlinmania.serdecore.de.Unexpected
+ import io.github.kotlinmania.serdecore.de.VariantAccess
+ import io.github.kotlinmania.serdecore.de.Visitor
+@@ -161,8 +162,14 @@ class JsonParser(
+         SerdeError.custom(JsonError.syntax(code, line, col).toString())
+ 
+     /** Error caused by a byte from peek(). */
+-    internal fun peekError(code: ErrorCode): SerdeError =
+-        SerdeError.custom(JsonError.syntax(code, line, col).toString())
++    internal fun peekError(code: ErrorCode): SerdeError {
++        val position = when {
++            pos >= input.length -> line to col
++            input[pos] == '\n' -> (line + 1) to 0
++            else -> line to (col + 1)
++        }
++        return SerdeError.custom(JsonError.syntax(code, position.first, position.second).toString())
++    }
+ 
+     // ── Identifier parsing ──
+ 
+@@ -1376,7 +1383,7 @@ class JsonDeserializer(
+      */
+     private fun <V> peekInvalidType(visitor: Visitor<V>): SerdeError {
+         val peek = parser.peekOrNull()
+-        return when (peek.toChar()) {
++        val error = when (peek.toChar()) {
+             'n' -> {
+                 parser.eatChar()
+                 parser.parseIdent("ull")
+@@ -1416,6 +1423,8 @@ class JsonDeserializer(
+             '{' -> SerdeError.invalidType(Unexpected.Map, visitor)
+             else -> parser.peekError(ErrorCode.ExpectedSomeValue)
+         }
++        val positioned = JsonError.custom(error.message)
++        return if (positioned.line() == 0) parser.error(positioned.code) else error
+     }
+ 
+     // ── Raw value deserialization ──
+@@ -1446,12 +1455,12 @@ internal class JsonSeqAccess(
+ ) : SeqAccess {
+     private var first = true
+ 
+-    override fun <T> nextElementSeed(seed: DeserializeSeed<T>): SerdeResult<T?> =
++    override fun <T> nextElementSeed(seed: DeserializeSeed<T>): SerdeResult<SeqElement<T>> =
+         serdeCatching { hasNextElement() }.flatMap { hasNext ->
+             if (hasNext) {
+-                seed.deserialize(de)
++                `seed`.deserialize(`de`).map { `__serdeValue0` -> io.github.kotlinmania.serdecore.de.SeqElement.Some(`__serdeValue0`) }
+             } else {
+-                SerdeResult.success(null)
++                io.github.kotlinmania.serde.SerdeResult.success(io.github.kotlinmania.serdecore.de.SeqElement.None)
+             }
+         }
+ 
+diff --git a/src/commonMain/kotlin/io/github/kotlinmania/serdejson/ValueDe.kt b/src/commonMain/kotlin/io/github/kotlinmania/serdejson/ValueDe.kt
+index 1d8f365..c37f5ca 100644
+--- a/src/commonMain/kotlin/io/github/kotlinmania/serdejson/ValueDe.kt
++++ b/src/commonMain/kotlin/io/github/kotlinmania/serdejson/ValueDe.kt
+@@ -11,6 +11,7 @@ import io.github.kotlinmania.serdecore.de.EnumAccess
+ import io.github.kotlinmania.serdecore.de.Expected
+ import io.github.kotlinmania.serdecore.de.MapAccess
+ import io.github.kotlinmania.serdecore.de.SeqAccess
++import io.github.kotlinmania.serdecore.de.SeqElement
+ import io.github.kotlinmania.serdecore.de.StringDeserialize
+ import io.github.kotlinmania.serdecore.de.Unexpected
+ import io.github.kotlinmania.serdecore.de.VariantAccess
+@@ -54,13 +55,18 @@ private object ValueVisitor : Visitor<Value> {
+ 
+     override fun visitUnit(): SerdeResult<Value> = SerdeResult.success(Value.Null)
+ 
+-    override fun <A : SeqAccess> visitSeq(access: A): SerdeResult<Value> {
++    override fun <A : SeqAccess> visitSeq(access: A): SerdeResult<Value> = serdeCatching {
+         val values = mutableListOf<Value>()
+         while (true) {
+-            val element = access.nextElement(ValueDeserialize).getOrElse { return SerdeResult.failure(it) } ?: break
+-            values.add(element)
++            when (val `__serdeNext0` = `access`.nextElement(`ValueDeserialize`).getOrThrow()) {
++                is io.github.kotlinmania.serdecore.de.SeqElement.Some -> {
++                    val `elem` = `__serdeNext0`.value
++                    `values`.add(`elem`)
++                }
++                io.github.kotlinmania.serdecore.de.SeqElement.None -> break
++            }
+         }
+-        return SerdeResult.success(Value.Array(values))
++        Value.Array(values)
+     }
+ 
+     override fun <A : MapAccess> visitMap(access: A): SerdeResult<Value> {
+@@ -282,13 +288,14 @@ private class ValueSeqAccess(
+     private val iter = list.iterator()
+     private var remaining = list.size
+ 
+-    override fun <T> nextElementSeed(seed: DeserializeSeed<T>): SerdeResult<T?> =
++    override fun <T> nextElementSeed(seed: DeserializeSeed<T>): SerdeResult<SeqElement<T>> =
+         if (iter.hasNext()) {
+             val value = iter.next()
+             remaining -= 1
+-            seed.deserialize(ValueDeserializer(value)).map { it }
++            val deserializer = ValueDeserializer(value)
++            `seed`.deserialize(`deserializer`).map { `__serdeValue0` -> io.github.kotlinmania.serdecore.de.SeqElement.Some(`__serdeValue0`) }
+         } else {
+-            SerdeResult.success(null)
++            io.github.kotlinmania.serde.SerdeResult.success(io.github.kotlinmania.serdecore.de.SeqElement.None)
+         }
+ 
+     override fun sizeHint(): Int = remaining
+diff --git a/src/commonTest/kotlin/io/github/kotlinmania/serdejson/FromValueParityTest.kt b/src/commonTest/kotlin/io/github/kotlinmania/serdejson/FromValueParityTest.kt
+index 0182a0c..f24bb5b 100644
+--- a/src/commonTest/kotlin/io/github/kotlinmania/serdejson/FromValueParityTest.kt
++++ b/src/commonTest/kotlin/io/github/kotlinmania/serdejson/FromValueParityTest.kt
+@@ -9,6 +9,7 @@ import io.github.kotlinmania.serdecore.de.F64Deserialize
+ import io.github.kotlinmania.serdecore.de.I64Deserialize
+ import io.github.kotlinmania.serdecore.de.MapAccess
+ import io.github.kotlinmania.serdecore.de.SeqAccess
++import io.github.kotlinmania.serdecore.de.SeqElement
+ import io.github.kotlinmania.serdecore.de.StringDeserialize
+ import io.github.kotlinmania.serdecore.de.U64Deserialize
+ import io.github.kotlinmania.serdecore.de.Visitor
+@@ -58,7 +59,7 @@ class FromValueParityTest {
+ 
+                         override fun <A : SeqAccess> visitSeq(access: A): SerdeResult<Unit> {
+                             assertEquals(2, access.sizeHint())
+-                            assertEquals(1L, access.nextElement(I64Deserialize).getOrThrow())
++                            assertEquals(SeqElement.Some(1L), access.nextElement(I64Deserialize).getOrThrow())
+                             assertEquals(1, access.sizeHint())
+                             return SerdeResult.success(Unit)
+                         }
+diff --git a/src/commonTest/kotlin/io/github/kotlinmania/serdejson/ValueDeserializationParityTest.kt b/src/commonTest/kotlin/io/github/kotlinmania/serdejson/ValueDeserializationParityTest.kt
+index e31825a..8005307 100644
+--- a/src/commonTest/kotlin/io/github/kotlinmania/serdejson/ValueDeserializationParityTest.kt
++++ b/src/commonTest/kotlin/io/github/kotlinmania/serdejson/ValueDeserializationParityTest.kt
+@@ -7,6 +7,7 @@ import io.github.kotlinmania.serdecore.de.Deserializer
+ import io.github.kotlinmania.serdecore.de.I64Deserialize
+ import io.github.kotlinmania.serdecore.de.MapAccess
+ import io.github.kotlinmania.serdecore.de.SeqAccess
++import io.github.kotlinmania.serdecore.de.SeqElement
+ import io.github.kotlinmania.serdecore.de.StringDeserialize
+ import io.github.kotlinmania.serdecore.de.U64Deserialize
+ import io.github.kotlinmania.serdecore.de.Visitor
+@@ -143,7 +144,7 @@ class ValueDeserializationParityTest {
+ 
+                 override fun <A : SeqAccess> visitSeq(access: A): SerdeResult<Unit> {
+                     assertEquals(2, access.sizeHint())
+-                    assertEquals(1L, access.nextElement(I64Deserialize).getOrThrow())
++                    assertEquals(SeqElement.Some(1L), access.nextElement(I64Deserialize).getOrThrow())
+                     assertEquals(1, access.sizeHint())
+                     return SerdeResult.success(Unit)
+                 }

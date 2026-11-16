@@ -1,0 +1,40 @@
+{
+  "commands": [
+    {
+      "command": [
+        "rustc",
+        "--edition=2021",
+        "--cfg",
+        "fast_arithmetic=\"64\"",
+        "-C",
+        "overflow-checks=on",
+        "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/verification/generated-numeric-01/BhcompOracle.rs",
+        "-o",
+        "/Volumes/stuff/Projects/kotlinmania/rust-kotlin/tmp/foundation-numeric-adoption-01/bhcomp-rust"
+      ],
+      "exit": 0
+    },
+    {
+      "command": [
+        "/Volumes/stuff/Projects/kotlinmania/rust-kotlin/tmp/foundation-numeric-adoption-01/bhcomp-rust"
+      ],
+      "exit": 0
+    }
+  ],
+  "source_hashes": {
+    "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/tmp/serde_json/src/lexical/bhcomp.rs": "26f39d52008225a6b377d7246d326940d44200e160a7b4652733e712e1a45a04",
+    "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/tmp/serde_json/src/lexical/bignum.rs": "db688e8112389998d0f91906f6857e28f9b510a8b4065ad476c8e8be2f77becf",
+    "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/tmp/serde_json/src/lexical/digit.rs": "9502805adbc3da059131d1fac0a802e17065b36cd7472606b3af24e3241d5cb8",
+    "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/tmp/serde_json/src/lexical/exponent.rs": "51f19443008e8884b15c7d5d4b1f1cfbd5673a9d1da02f1af39fcf20e315f01f",
+    "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/tmp/serde_json/src/lexical/float.rs": "fe356213c92a049f4bef2f58bc0e3a26866ca06b8c1d74d0f961c5b883852cad",
+    "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/tmp/serde_json/src/lexical/math.rs": "00519897ba54fb282102549a8c2a973af1f6534fcba1e283436b00141baccc13",
+    "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/tmp/serde_json/src/lexical/num.rs": "2d06111d28616221995f7b4d4f13625b8d902884921268b0e02e544f871a5339",
+    "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/tmp/serde_json/src/lexical/rounding.rs": "4762af3612880b17468ff2a1bb800c8e99f08330ae439699dd53d8dc5463ad13",
+    "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/tmp/serde_json/src/lexical/shift.rs": "bc1ed053dd63d45ac9c35302f18de9f00d94027f28af4ab749c9248439de832a",
+    "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/tmp/serde_json/src/lexical/small_powers.rs": "73c56b7b83310c6fefa898fb94771c65bdc251c1579ab105151da43935ea02be",
+    "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/tmp/serde_json/src/lexical/large_powers.rs": "18d697b846b44ecb61bfaaa3b881e0696f9b7bb6be582623e9d3a8a176a48d2f",
+    "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/tmp/serde_json/src/lexical/large_powers64.rs": "e7af83ce3159b5fc4669fc5a231e767d8af21bacaece52a0a48951198965b197"
+  },
+  "scope": "unchanged source caller behavior; not generated-file coverage",
+  "configuration": "pointer_width=64, fast_arithmetic=64, overflow_checks=on"
+}

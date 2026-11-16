@@ -1,0 +1,9 @@
+{
+  "head": "28c5e3a507a736631e10d88731c253ee9fe2caa1",
+  "files": {
+    "src/commonMain/kotlin/io/github/kotlinmania/serdejson/De.kt": "8254cad217ec5d977ee285fa55d684f81fe037b786c84e0c8a963a5a509d8838",
+    "src/commonMain/kotlin/io/github/kotlinmania/serdejson/ValueDe.kt": "a01d0c6968cb32f6ce7be4d763be011cb90c03855e7e66a90a4d9f9c8eb33240",
+    "src/commonTest/kotlin/io/github/kotlinmania/serdejson/FromValueParityTest.kt": "e9b422f685e3bb7cf0c6362a274bbe6c7bc69c1c69390e5913aadff04e9416e7",
+    "src/commonTest/kotlin/io/github/kotlinmania/serdejson/ValueDeserializationParityTest.kt": "a70328d452c575f52fed598681a3dcd478b29bae37d2190e4c1139a36d5a0590"
+  }
+}

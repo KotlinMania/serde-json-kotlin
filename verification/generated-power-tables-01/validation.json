@@ -1,0 +1,70 @@
+{
+  "status": "tables passed; pre-existing arithmetic mismatch preserved",
+  "generator_base_commit": "25d2087cdf9e661dd165c76e9101c49c73f85af4",
+  "generator_sha256": "e4cc6d964a9757318e51208cf072353b0dd4f9ab3774da3b997cafacd9e79155",
+  "generator_native_tests": {
+    "tests": 266,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "port_native_tests": {
+    "tests": 122,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "table_values": 652,
+  "table_lengths": 14,
+  "raw_native_matches_rust": true,
+  "candidate_matches_baseline_all_775_rows": true,
+  "existing_math_matches_rust_inputs": [
+    0,
+    1,
+    27,
+    28,
+    64,
+    512
+  ],
+  "existing_math_mismatching_input": {
+    "input_limbs": [
+      "18446744073709551615",
+      "1"
+    ],
+    "pow5_exponent": 2048,
+    "rust_second_limb": "8948726103039177410",
+    "old_and_new_port_second_limb": "8948726103039177411",
+    "introduced_by_table_adoption": false
+  },
+  "files": {
+    "small_powers.rs": {
+      "source": "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/tmp/serde_json/src/lexical/small_powers.rs",
+      "source_sha256": "73c56b7b83310c6fefa898fb94771c65bdc251c1579ab105151da43935ea02be",
+      "raw_generated_sha256": "f11b121df9eec82d0e4ac4266819ca48e43cb9d7e11361ba756fa02573f64ca9",
+      "destination": "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/src/commonMain/kotlin/io/github/kotlinmania/serdejson/lexical/SmallPowers.kt",
+      "adopted_sha256": "174fb5cf12ea32150f53a87e590b84da2eb618eae1d554e0a9203b58a63ef5e0",
+      "body_edits": "none; package declaration prepended",
+      "configuration": "fast_arithmetic=64; explicit 32=false,64=true"
+    },
+    "large_powers64.rs": {
+      "source": "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/tmp/serde_json/src/lexical/large_powers64.rs",
+      "source_sha256": "e7af83ce3159b5fc4669fc5a231e767d8af21bacaece52a0a48951198965b197",
+      "raw_generated_sha256": "2fa2016077918b39be38fe46e59dd725d191da3f61ac45d17e35734cb8a9d35e",
+      "destination": "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/src/commonMain/kotlin/io/github/kotlinmania/serdejson/lexical/LargePowers64.kt",
+      "adopted_sha256": "aa2ee0f9cce45bde11f1c346cdf6feaeb64e41ad54ce55be75222240e2088e26",
+      "body_edits": "none; package declaration prepended",
+      "configuration": "fast_arithmetic=64; explicit 32=false,64=true"
+    }
+  },
+  "limits": [
+    "macOS ARM64 Native only",
+    "fast_arithmetic=64 adopted; 32 selection remains separately verified candidate",
+    "math.rs has not been retranslated or repaired; exact existing carry error remains",
+    "No all-target/ABI/whole-library correctness claim"
+  ],
+  "rust_oracle_modules": {
+    "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/tmp/serde_json/src/lexical/math.rs": "00519897ba54fb282102549a8c2a973af1f6534fcba1e283436b00141baccc13",
+    "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/tmp/serde_json/src/lexical/num.rs": "2d06111d28616221995f7b4d4f13625b8d902884921268b0e02e544f871a5339",
+    "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/tmp/serde_json/src/lexical/bignum.rs": "db688e8112389998d0f91906f6857e28f9b510a8b4065ad476c8e8be2f77becf"
+  }
+}

@@ -1,0 +1,18 @@
+[
+  {
+    "original": "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/tmp/serde_json/src/de.rs",
+    "original_sha256": "2364aaa767bb40eeedd4aa24e3bf917be5e007a00bd3d911b61f9de74aa5f074",
+    "line": 1965,
+    "expression": "Ok(Some(tri!(seed.deserialize(&mut *self.de))))",
+    "wrapper": "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/direct-translation/serde-sequence-01/text-some.rs",
+    "reason": "Full de.rs parsing rejects attributed initializer field at line 64; this exact expression is an explicitly partial translation."
+  },
+  {
+    "original": "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/tmp/serde_json/src/de.rs",
+    "original_sha256": "2364aaa767bb40eeedd4aa24e3bf917be5e007a00bd3d911b61f9de74aa5f074",
+    "line": 1967,
+    "expression": "Ok(None)",
+    "wrapper": "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/direct-translation/serde-sequence-01/text-none.rs",
+    "reason": "Full de.rs parsing rejects attributed initializer field at line 64; this exact expression is an explicitly partial translation."
+  }
+]

@@ -1,0 +1,4 @@
+SELECTED serde-sequence-result; not a complete file or visitor translation
+source_utf16=64780..64788; line=1967; bindings={}; seed=null; stateless_seed=false; try_macro=null; Vec_receivers=[]
+bindings assert existing Serde APIs, equivalent collection insert operations or Vec-to-MutableList append, and borrowed deserializer identity; enclosing serdeCatching propagates loop errors; macro binding asserts Result propagation
+engines=proc-macro2-kotlin:0.1.7,syn-kotlin:0.4.0; runtime=serde-core:0.1.12

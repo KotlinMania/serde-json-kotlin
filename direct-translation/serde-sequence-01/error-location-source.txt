@@ -1,0 +1,1 @@
+Rust de.rs:241-251 differentiates consumed and peek positions; read.rs:421-430,573-581 computes position at min(index+1,len). Rust de.rs:316 applies fix_position to peek_invalid_type. These source-derived API integrations were missing from the hand port and are not claimed as generated code.

@@ -1,0 +1,178 @@
+{
+  "baseline": "e9c0f43",
+  "initialDirtyFiles": [],
+  "priorWork": "Existing e9c0f43 checkpoint and its 159 Kotlin tests are not authored by this step. Rand 46e4736 is preserved separately.",
+  "translator": {
+    "exitCode": 2,
+    "command": "../rust-kotlin/build/bin/macosArm64/debugExecutable/rust-kotlin.kexe translate --quiet --gradle-properties gradle.properties --package io.github.kotlinmania.serdejson --source-root tmp/serde_json/src tmp/serde_json/src/value/mod.rs build/rust-kotlin-pointer-index/ValueReview.kt",
+    "message": "rust-kotlin: crate/module root files (mod.rs) must never be emitted as Lib.kt or Mod.kt\n",
+    "generatedKotlinExists": false,
+    "provenance": "Intentional mod.rs guard preserved; direct unchanged upstream source comparison and actual Rust oracle used. No workaround or generator change.",
+    "approvalHistory": "Initial scope denial stopped the command before execution. Exact retry accepted after presenting broader user-authored scope; test-only setup and one-line production repair were subsequently accepted."
+  },
+  "redCommand": "./gradlew jvmTest --tests '*PointerIndexParityTest*' --console=plain",
+  "red": [
+    {
+      "name": "arabicAndDevanagariDigitsAreRejected[jvm]",
+      "failed": true,
+      "message": "java.lang.AssertionError: \u0660 expected null, but was:<\"zero\">"
+    },
+    {
+      "name": "leadingZeroOverflowAndMalformedIndicesAreRejected[jvm]",
+      "failed": false,
+      "message": ""
+    },
+    {
+      "name": "objectKeysAreNotArrayIndices[jvm]",
+      "failed": false,
+      "message": ""
+    },
+    {
+      "name": "negativeZeroIsRejected[jvm]",
+      "failed": true,
+      "message": "java.lang.AssertionError: -0 expected null, but was:<\"zero\">"
+    },
+    {
+      "name": "fullwidthDigitsAreRejected[jvm]",
+      "failed": true,
+      "message": "java.lang.AssertionError: \uff10 expected null, but was:<\"zero\">"
+    },
+    {
+      "name": "canonicalArrayIndicesWork[jvm]",
+      "failed": false,
+      "message": ""
+    },
+    {
+      "name": "pointerEscapesAndEmptyKeysStillWork[jvm]",
+      "failed": false,
+      "message": ""
+    }
+  ],
+  "redCoverageLimit": "JVM only before production change. Loop tests stop at their first failed token: Arabic zero, fullwidth zero and -0. Final JVM/Native and Rust suites check all listed tokens.",
+  "finalCommand": "./gradlew jvmTest macosArm64Test detekt ktlintCheck --continue --console=plain",
+  "final": {
+    "jvmTest": {
+      "tests": 166,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "failureCases": [],
+      "newSuite": [
+        {
+          "name": "PointerIndexParityTest[jvm]",
+          "tests": "7",
+          "skipped": "0",
+          "failures": "0",
+          "errors": "0",
+          "timestamp": "2026-11-02T18:57:37.356Z",
+          "hostname": "EmberHarmony.local",
+          "time": "0.028"
+        }
+      ]
+    },
+    "macosArm64Test": {
+      "tests": 166,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "failureCases": [],
+      "newSuite": [
+        {
+          "name": "macosArm64Test.io.github.kotlinmania.serdejson.PointerIndexParityTest",
+          "tests": "7",
+          "skipped": "0",
+          "failures": "0",
+          "errors": "0",
+          "timestamp": "2026-11-02T18:57:46.388Z",
+          "hostname": "EmberHarmony.local",
+          "time": "0.002"
+        }
+      ]
+    },
+    "ktlintCommonMainSourceSetCheck": 0,
+    "ktlintCommonTestSourceSetCheck": 0,
+    "ktlintJsMainSourceSetCheck": 0,
+    "ktlintJvmMainSourceSetCheck": 0,
+    "ktlintKotlinScriptCheck": 0,
+    "authoredKtlint": [],
+    "externalKtlint": [],
+    "detektFindings": 0,
+    "authoredDetekt": []
+  },
+  "rustCommand": "cargo test --offline --manifest-path verification/pointer-index-oracle/Cargo.toml --target-dir build/rust-kotlin-pointer-index/rust-target",
+  "rustOracleLog": "     Locking 11 packages to highest compatible versions\n   Compiling zmij v1.0.23\n   Compiling serde_core v1.0.228\n   Compiling serde_json v1.0.149 (/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/tmp/serde_json)\n   Compiling itoa v1.0.18\n   Compiling memchr v2.8.0\n   Compiling pointer-index-oracle v0.0.0 (/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/verification/pointer-index-oracle)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.75s\n     Running unittests src/lib.rs (build/rust-kotlin-pointer-index/rust-target/debug/deps/pointer_index_oracle-1952ccf98f671240)\n\nrunning 7 tests\ntest tests::canonical_array_indices_work ... ok\ntest tests::fullwidth_digits_are_rejected ... ok\ntest tests::negative_zero_is_rejected ... ok\ntest tests::arabic_and_devanagari_digits_are_rejected ... ok\ntest tests::pointer_escapes_and_empty_keys_still_work ... ok\ntest tests::leading_zero_overflow_and_malformed_indices_are_rejected ... ok\ntest tests::object_keys_are_not_array_indices ... ok\n\ntest result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n   Doc-tests pointer_index_oracle\n\nrunning 0 tests\n\ntest result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+  "resolvedRustPackages": [
+    {
+      "name": "itoa",
+      "version": "1.0.18",
+      "source": "registry+https://github.com/rust-lang/crates.io-index"
+    },
+    {
+      "name": "memchr",
+      "version": "2.8.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index"
+    },
+    {
+      "name": "pointer-index-oracle",
+      "version": "0.0.0",
+      "source": "local path"
+    },
+    {
+      "name": "proc-macro2",
+      "version": "1.0.107",
+      "source": "registry+https://github.com/rust-lang/crates.io-index"
+    },
+    {
+      "name": "quote",
+      "version": "1.0.47",
+      "source": "registry+https://github.com/rust-lang/crates.io-index"
+    },
+    {
+      "name": "serde",
+      "version": "1.0.228",
+      "source": "registry+https://github.com/rust-lang/crates.io-index"
+    },
+    {
+      "name": "serde_core",
+      "version": "1.0.228",
+      "source": "registry+https://github.com/rust-lang/crates.io-index"
+    },
+    {
+      "name": "serde_derive",
+      "version": "1.0.228",
+      "source": "registry+https://github.com/rust-lang/crates.io-index"
+    },
+    {
+      "name": "serde_json",
+      "version": "1.0.149",
+      "source": "local path"
+    },
+    {
+      "name": "syn",
+      "version": "2.0.119",
+      "source": "registry+https://github.com/rust-lang/crates.io-index"
+    },
+    {
+      "name": "unicode-ident",
+      "version": "1.0.27",
+      "source": "registry+https://github.com/rust-lang/crates.io-index"
+    },
+    {
+      "name": "zmij",
+      "version": "1.0.23",
+      "source": "registry+https://github.com/rust-lang/crates.io-index"
+    }
+  ],
+  "oracleLockPolicy": "Cargo.lock was generated by offline Cargo and remains ignored under existing repository policy; its hash and resolved versions are recorded, without changing project pins.",
+  "sha256": {
+    "src/commonMain/kotlin/io/github/kotlinmania/serdejson/Value.kt": "f646f3a9edc86dd83074c95ff7aaca0c89bdd23b09e0bf05df3a7e2a591c3456",
+    "src/commonTest/kotlin/io/github/kotlinmania/serdejson/PointerIndexParityTest.kt": "2ce6cddce327e39bcef29f4ebdd8179e694b2e13df69cd7744605d2192b1a842",
+    "src/commonTest/kotlin/io/github/kotlinmania/serdejson/ValueTest.kt": "a3e3f6d757732f3a460d619ca0771ac73b682fc8771982c695c9912a0c3a9f8d",
+    "tmp/serde_json/src/value/mod.rs": "6331d59ea362a74b6cd3d302d08114a63a73a384ff56fef737de29edea2f8d91",
+    "tmp/serde_json/Cargo.toml": "65dabeea0112c066ff16c6d93142c4a08c01396f4e99a27d9255d19974eaeb73",
+    "verification/pointer-index-oracle/Cargo.toml": "c7e4d187801fcbe61c64b696976ac95fb661a014ef424f3b540386b1eb127ff2",
+    "verification/pointer-index-oracle/Cargo.lock": "3959ebe6c46aededaec97f0a8f68ff9ac6ea604f2bc22e1c8ef3fc0f9aafef91",
+    "verification/pointer-index-oracle/src/lib.rs": "d8cd03ad8233a6c503cad63c84450fbf88f8d86c51d66a12f6e749269dae8944",
+    "build/rust-kotlin-pointer-index/translation.log": "dcecf99e9ab9b043157c043f940b075931e4eb8711943b5871c2c20e9efb06ee"
+  }
+}

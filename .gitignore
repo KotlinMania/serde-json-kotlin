@@ -26,6 +26,7 @@ NEXT_ACTIONS.md
 port_lint_proposed_changes.md
 ast_distance_*.txt
 deep_symbol_inventory.txt
+direct-translation/
 .cache/
 *.lock
 kotlin-js-store/*
@@ -33,10 +34,10 @@ kotlin-js-store/*
 !kotlin-js-store/yarn.lock
 !kotlin-js-store/wasm/
 !kotlin-js-store/wasm/yarn.lock
-tools/ast_distance
-tools/ast_distance_bin
 tools/ast_distance/ast_distance
 tools/ast_distance/build/
+tools/ast_distance
+tools/
 
 # JVM heap dumps
 *.hprof
@@ -51,11 +52,15 @@ __pycache__/
 
 # Android SDK
 /.android-sdk/
+**/.android-sdk/
+**/.build/
+*.o.tmp
+**/src/native/interop/cinterop/*.a
 local.properties
 
 # Swift Package Manager / Xcode workspace state.
 #
-# `swift-test-harness/` is a real SPM package that exercises the Kotlin
+# `src/swift/swift-test-harness/` is a real SPM package that exercises the Kotlin
 # Swift Export pipeline against the artifacts produced by
 # `embedSwiftExportForXcode`. Its `Package.swift`, `Tests/`, and
 # per-package `.gitignore` (which ignores its own `.build/`) are all
@@ -71,3 +76,29 @@ DerivedData/
 *.xcuserstate
 *.xcworkspace/xcuserdata/
 *.xcodeproj/xcuserdata/
+local.properties
+
+# npm install output; JS dependencies come from yarn via the Kotlin Gradle plugin
+node_modules/
+package-lock.json
+!src/js/node-ffi/dist/package-lock.json
+
+# Java build helpers are source; buildSrc/build remains generated output.
+!buildSrc/
+!buildSrc/src/
+!buildSrc/src/**
+!buildSrc/build.gradle.kts
+!buildSrc/settings.gradle.kts
+
+# Local secrets and credentials
+.env
+.env.*
+*.pem
+*.key
+secrets.properties
+
+# Template build layout and generated files.
+*.log
+*.stderr
+!**/native/node-*/package-lock.json
+!**/src/js/node-*/**/package-lock.json

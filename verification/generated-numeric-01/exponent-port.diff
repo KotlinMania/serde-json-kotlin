@@ -1,0 +1,115 @@
+--- /Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/verification/generated-numeric-01/before/src/commonMain/kotlin/io/github/kotlinmania/serdejson/lexical/Exponent.kt	2026-10-17 11:14:34
++++ /Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/src/commonMain/kotlin/io/github/kotlinmania/serdejson/lexical/generated/exponent/Exponent.kt	2026-10-25 09:06:08
+@@ -1,76 +1,42 @@
+-// port-lint: source lexical/exponent.rs
+-package io.github.kotlinmania.serdejson.lexical
++package io.github.kotlinmania.serdejson.lexical.generated.exponent
+ 
+-/**
+- * Converts an integer to [Int] clamping to [Int] range (no overflow).
+- */
+-private fun intoI32(value: Long): Int =
+-    if (value > Int.MAX_VALUE.toLong()) Int.MAX_VALUE else value.toInt()
++// Generated from Syn AST; exact original retained in input.rs.
++// Adapted from https://github.com/Alexhuszagh/rust-lexical.
+ 
+-/**
+- * Calculate the scientific notation exponent without overflow.
+- *
+- * For example, `0.1` would be `-1`, and `10` would be `1` in base 10.
+- *
+- * @param exponent       The raw exponent from the parsed float.
+- * @param integerDigits  Number of digits in the integer part.
+- * @param fractionStart  Index of the first significant digit in the fraction part.
+- */
+-internal fun scientificExponent(
+-    exponent: Int,
+-    integerDigits: Int,
+-    fractionStart: Int,
+-): Int =
+-    if (integerDigits == 0) {
+-        val fs = intoI32(fractionStart.toLong())
+-        exponent.saturationSub(fs).saturationSub(1)
+-    } else {
+-        val integerShift = intoI32((integerDigits - 1).toLong())
+-        exponent.saturationAdd(integerShift)
+-    }
++//! Utilities to calculate exponents.
++/// Convert usize into i32 without overflow.
++///
++/// This is needed to ensure when adjusting the exponent relative to
++/// the mantissa we do not overflow for comically-long exponents.
++// Rust #[inline]: optimization hint.
++private fun `into_i32`(`value`: kotlin.ULong): kotlin.Int = (if ((`value` > (kotlin.Int.MAX_VALUE).toLong().toULong())) kotlin.Int.MAX_VALUE else ((`value`).toInt()))
+ 
+-/**
+- * Calculate the mantissa exponent without overflow.
+- *
+- * Removes the number of digits that contributed to the mantissa past the dot
+- * and adds the number of truncated digits, to calculate the scaling factor
+- * for the mantissa from a raw exponent.
+- *
+- * @param exponent       The raw exponent from the parsed float.
+- * @param fractionDigits Number of digits in the fraction part.
+- * @param truncated      Number of digits truncated from the mantissa.
+- */
+-internal fun mantissaExponent(
+-    exponent: Int,
+-    fractionDigits: Int,
+-    truncated: Int,
+-): Int =
+-    if (fractionDigits > truncated) {
+-        exponent.saturationSub(intoI32((fractionDigits - truncated).toLong()))
+-    } else {
+-        exponent.saturationAdd(intoI32((truncated - fractionDigits).toLong()))
+-    }
+ 
+-/** Saturating subtraction (clamps to [Int] range, no overflow). */
+-private fun Int.saturationSub(other: Int): Int {
+-    val r = this.toLong() - other.toLong()
+-    return if (r < Int.MIN_VALUE.toLong()) {
+-        Int.MIN_VALUE
+-    } else if (r > Int.MAX_VALUE.toLong()) {
+-        Int.MAX_VALUE
+-    } else {
+-        r.toInt()
+-    }
+-}
++// EXPONENT CALCULATION
+ 
+-/** Saturating addition (clamps to [Int] range, no overflow). */
+-private fun Int.saturationAdd(other: Int): Int {
+-    val r = this.toLong() + other.toLong()
+-    return if (r < Int.MIN_VALUE.toLong()) {
+-        Int.MIN_VALUE
+-    } else if (r > Int.MAX_VALUE.toLong()) {
+-        Int.MAX_VALUE
+-    } else {
+-        r.toInt()
+-    }
++// Calculate the scientific notation exponent without overflow.
++//
++// For example, 0.1 would be -1, and 10 would be 1 in base 10.
++// Rust #[inline]: optimization hint.
++internal fun `scientific_exponent`(`exponent`: kotlin.Int, `integer_digits`: kotlin.ULong, `fraction_start`: kotlin.ULong): kotlin.Int = (if ((`integer_digits` == 0uL)) kotlin.run {
++    val `fraction_start__binding0`: kotlin.Int = `into_i32`(`fraction_start`)
++    io.github.kotlinmania.numtraits.I32Num.saturatingSub(io.github.kotlinmania.numtraits.I32Num.saturatingSub(`exponent`, `fraction_start__binding0`), 1)
++} else (kotlin.run {
++    val `integer_shift`: kotlin.Int = `into_i32`(__rtkSub(`integer_digits`, 1uL))
++    io.github.kotlinmania.numtraits.I32Num.saturatingAdd(`exponent`, `integer_shift`)
++}))
++
++
++// Calculate the mantissa exponent without overflow.
++//
++// Remove the number of digits that contributed to the mantissa past
++// the dot, and add the number of truncated digits from the mantissa,
++// to calculate the scaling factor for the mantissa from a raw exponent.
++// Rust #[inline]: optimization hint.
++internal fun `mantissa_exponent`(`exponent`: kotlin.Int, `fraction_digits`: kotlin.ULong, `truncated`: kotlin.ULong): kotlin.Int = (if ((`fraction_digits` > `truncated`)) io.github.kotlinmania.numtraits.I32Num.saturatingSub(`exponent`, `into_i32`(__rtkSub(`fraction_digits`, `truncated`))) else (io.github.kotlinmania.numtraits.I32Num.saturatingAdd(`exponent`, `into_i32`(__rtkSub(`truncated`, `fraction_digits`)))))
++
++class __rtkPanic(message: String) : kotlin.RuntimeException(message)
++private fun __rtkSub(left: ULong, right: ULong): ULong {
++    if (left < right) throw __rtkPanic("attempt to subtract with overflow")
++    return left - right
+ }

@@ -1,0 +1,91 @@
+{
+  "executable_sha256": "26893ee1d81c5d556dbfab39d8cd9e43ea09ec0410b17348564be01ef56281d3",
+  "jobs": [
+    {
+      "command": [
+        "/Volumes/stuff/Projects/kotlinmania/rust-kotlin/build/bin/nativeMacos/debugExecutable/rust-kotlin.kexe",
+        "serde-sequence-loop",
+        "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/tmp/serde_json/src/value/de.rs",
+        "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/direct-translation/serde-sequence-01/loop",
+        "--line=113",
+        "--seed=ValueDeserialize",
+        "--stateless-seed",
+        "--bind=visitor:access",
+        "--bind=vec:values",
+        "--vec=vec",
+        "--try-macro=tri"
+      ],
+      "exit": 0,
+      "stdout": "Serde sequence loop /Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/direct-translation/serde-sequence-01/loop: selected source line 113\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Volumes/stuff/Projects/kotlinmania/rust-kotlin/build/bin/nativeMacos/debugExecutable/rust-kotlin.kexe",
+        "serde-sequence-result",
+        "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/tmp/serde_json/src/de.rs",
+        "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/direct-translation/serde-sequence-01/text-some",
+        "--line=1965",
+        "--bind=seed:seed",
+        "--bind=self.de:de",
+        "--try-macro=tri"
+      ],
+      "exit": 2,
+      "stdout": "",
+      "stderr": "rust-kotlin: Syn parser at 64:13: expected identifier\n"
+    },
+    {
+      "command": [
+        "/Volumes/stuff/Projects/kotlinmania/rust-kotlin/build/bin/nativeMacos/debugExecutable/rust-kotlin.kexe",
+        "serde-sequence-result",
+        "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/direct-translation/serde-sequence-01/text-some.rs",
+        "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/direct-translation/serde-sequence-01/text-some",
+        "--line=2",
+        "--bind=seed:seed",
+        "--bind=self.de:de",
+        "--try-macro=tri"
+      ],
+      "exit": 0,
+      "stdout": "Serde sequence loop /Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/direct-translation/serde-sequence-01/text-some: selected source line 2\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Volumes/stuff/Projects/kotlinmania/rust-kotlin/build/bin/nativeMacos/debugExecutable/rust-kotlin.kexe",
+        "serde-sequence-result",
+        "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/direct-translation/serde-sequence-01/text-none.rs",
+        "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/direct-translation/serde-sequence-01/text-none",
+        "--line=2"
+      ],
+      "exit": 0,
+      "stdout": "Serde sequence loop /Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/direct-translation/serde-sequence-01/text-none: selected source line 2\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Volumes/stuff/Projects/kotlinmania/rust-kotlin/build/bin/nativeMacos/debugExecutable/rust-kotlin.kexe",
+        "serde-sequence-result",
+        "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/tmp/serde_json/src/value/de.rs",
+        "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/direct-translation/serde-sequence-01/value-some",
+        "--line=641",
+        "--bind=seed:seed",
+        "--bind=value:deserializer"
+      ],
+      "exit": 0,
+      "stdout": "Serde sequence loop /Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/direct-translation/serde-sequence-01/value-some: selected source line 641\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Volumes/stuff/Projects/kotlinmania/rust-kotlin/build/bin/nativeMacos/debugExecutable/rust-kotlin.kexe",
+        "serde-sequence-result",
+        "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/tmp/serde_json/src/value/de.rs",
+        "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/direct-translation/serde-sequence-01/value-none",
+        "--line=642"
+      ],
+      "exit": 0,
+      "stdout": "Serde sequence loop /Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/direct-translation/serde-sequence-01/value-none: selected source line 642\n",
+      "stderr": ""
+    }
+  ]
+}

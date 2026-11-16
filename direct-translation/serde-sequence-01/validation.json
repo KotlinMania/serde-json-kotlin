@@ -1,0 +1,385 @@
+{
+  "status": "passed bounded sequence repair",
+  "generator_commit": "2e92e2e4d1794c78183d7d589ce3534ff93569d9",
+  "generator_tests": {
+    "tests": 186,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "tests": {
+    "jvmTest": {
+      "tests": 119,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "macosArm64Test": {
+      "tests": 119,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "rust": "Original serde_json 1.0.149; nine array assertions, two error diagnostics, five-part state assertion; offline run succeeded",
+  "local_publication": {
+    "version": "0.2.0",
+    "result": "BUILD SUCCESSFUL in 31s; 167 tasks,163 executed,4 up-to-date",
+    "artifacts": [
+      {
+        "pom": "/Users/sydney/.m2/repository/io/github/kotlinmania/serde-json-kotlin/0.2.0/serde-json-kotlin-0.2.0.pom",
+        "sha256": "3ab0b61b4e3c057be3e85e97ffb1b9aeccd1f2bb08483e50a62efc59eb19c18d",
+        "dependencies": [
+          [
+            "kotlin-stdlib",
+            "2.4.21"
+          ],
+          [
+            "serde-core",
+            "0.1.12"
+          ],
+          [
+            "indexmap-kotlin",
+            "0.1.5"
+          ]
+        ]
+      },
+      {
+        "pom": "/Users/sydney/.m2/repository/io/github/kotlinmania/serde-json-kotlin-android/0.2.0/serde-json-kotlin-android-0.2.0.pom",
+        "sha256": "11803e4ee263ed8e3a98b88ca0344e70906b510f439e91576a8d7291b32994e4",
+        "dependencies": [
+          [
+            "kotlin-stdlib",
+            "2.4.21"
+          ],
+          [
+            "serde-core-android",
+            "0.1.12"
+          ],
+          [
+            "indexmap-kotlin-android",
+            "0.1.5"
+          ]
+        ]
+      },
+      {
+        "pom": "/Users/sydney/.m2/repository/io/github/kotlinmania/serde-json-kotlin-androidnativearm64/0.2.0/serde-json-kotlin-androidnativearm64-0.2.0.pom",
+        "sha256": "dfa0efce7fbe33d809c6a444723085995d714bae3979db58f9344ba3b92421e1",
+        "dependencies": [
+          [
+            "kotlin-stdlib",
+            "2.4.21"
+          ],
+          [
+            "serde-core-androidnativearm64",
+            "0.1.12"
+          ],
+          [
+            "indexmap-kotlin-androidnativearm64",
+            "0.1.5"
+          ]
+        ]
+      },
+      {
+        "pom": "/Users/sydney/.m2/repository/io/github/kotlinmania/serde-json-kotlin-androidnativex64/0.2.0/serde-json-kotlin-androidnativex64-0.2.0.pom",
+        "sha256": "78a9bfa552bfb50a786a8e17a1c62481747d848ed3bfbb1ee50bf8093b3db01a",
+        "dependencies": [
+          [
+            "kotlin-stdlib",
+            "2.4.21"
+          ],
+          [
+            "serde-core-androidnativex64",
+            "0.1.12"
+          ],
+          [
+            "indexmap-kotlin-androidnativex64",
+            "0.1.5"
+          ]
+        ]
+      },
+      {
+        "pom": "/Users/sydney/.m2/repository/io/github/kotlinmania/serde-json-kotlin-iosarm64/0.2.0/serde-json-kotlin-iosarm64-0.2.0.pom",
+        "sha256": "44ebdefed655012257ef633c8787d6d4530662f440ee9705055280af8251340a",
+        "dependencies": [
+          [
+            "kotlin-stdlib",
+            "2.4.21"
+          ],
+          [
+            "serde-core-iosarm64",
+            "0.1.12"
+          ],
+          [
+            "indexmap-kotlin-iosarm64",
+            "0.1.5"
+          ]
+        ]
+      },
+      {
+        "pom": "/Users/sydney/.m2/repository/io/github/kotlinmania/serde-json-kotlin-iossimulatorarm64/0.2.0/serde-json-kotlin-iossimulatorarm64-0.2.0.pom",
+        "sha256": "5f8ad2816a95886dcebabf01ca2167a979c7c6c707249bd7a36e6ef2916ffa2c",
+        "dependencies": [
+          [
+            "kotlin-stdlib",
+            "2.4.21"
+          ],
+          [
+            "serde-core-iossimulatorarm64",
+            "0.1.12"
+          ],
+          [
+            "indexmap-kotlin-iossimulatorarm64",
+            "0.1.5"
+          ]
+        ]
+      },
+      {
+        "pom": "/Users/sydney/.m2/repository/io/github/kotlinmania/serde-json-kotlin-js/0.2.0/serde-json-kotlin-js-0.2.0.pom",
+        "sha256": "2c9b8d5dacf7270fd38a5303dd6316456e092f55f04102a93655ec7e655a110d",
+        "dependencies": [
+          [
+            "kotlin-dom-api-compat",
+            "2.4.21"
+          ],
+          [
+            "kotlin-stdlib-js",
+            "2.4.21"
+          ],
+          [
+            "serde-core-js",
+            "0.1.12"
+          ],
+          [
+            "indexmap-kotlin-js",
+            "0.1.5"
+          ]
+        ]
+      },
+      {
+        "pom": "/Users/sydney/.m2/repository/io/github/kotlinmania/serde-json-kotlin-jvm/0.2.0/serde-json-kotlin-jvm-0.2.0.pom",
+        "sha256": "6670e7a6c27bb51a502829b92a447cf50584ae54d3908f524d1bad3cfb5cac0e",
+        "dependencies": [
+          [
+            "kotlin-stdlib",
+            "2.4.21"
+          ],
+          [
+            "serde-core-jvm",
+            "0.1.12"
+          ],
+          [
+            "indexmap-kotlin-jvm",
+            "0.1.5"
+          ]
+        ]
+      },
+      {
+        "pom": "/Users/sydney/.m2/repository/io/github/kotlinmania/serde-json-kotlin-linuxarm64/0.2.0/serde-json-kotlin-linuxarm64-0.2.0.pom",
+        "sha256": "f8c18736c7c107626dab6b5a554289cd2b8b262ab2d4f1657d3cd65cd7cb67a4",
+        "dependencies": [
+          [
+            "kotlin-stdlib",
+            "2.4.21"
+          ],
+          [
+            "serde-core-linuxarm64",
+            "0.1.12"
+          ],
+          [
+            "indexmap-kotlin-linuxarm64",
+            "0.1.5"
+          ]
+        ]
+      },
+      {
+        "pom": "/Users/sydney/.m2/repository/io/github/kotlinmania/serde-json-kotlin-linuxx64/0.2.0/serde-json-kotlin-linuxx64-0.2.0.pom",
+        "sha256": "e32693162e87aa8d3e03ceb9622ab00006c0ba75bb033eb521d6aaebfaed178c",
+        "dependencies": [
+          [
+            "kotlin-stdlib",
+            "2.4.21"
+          ],
+          [
+            "serde-core-linuxx64",
+            "0.1.12"
+          ],
+          [
+            "indexmap-kotlin-linuxx64",
+            "0.1.5"
+          ]
+        ]
+      },
+      {
+        "pom": "/Users/sydney/.m2/repository/io/github/kotlinmania/serde-json-kotlin-macosarm64/0.2.0/serde-json-kotlin-macosarm64-0.2.0.pom",
+        "sha256": "c66d0af6e51f63dc2211b90b27afb8c238cde9f33144a7aece93b43590b32c7a",
+        "dependencies": [
+          [
+            "kotlin-stdlib",
+            "2.4.21"
+          ],
+          [
+            "serde-core-macosarm64",
+            "0.1.12"
+          ],
+          [
+            "indexmap-kotlin-macosarm64",
+            "0.1.5"
+          ]
+        ]
+      },
+      {
+        "pom": "/Users/sydney/.m2/repository/io/github/kotlinmania/serde-json-kotlin-mingwx64/0.2.0/serde-json-kotlin-mingwx64-0.2.0.pom",
+        "sha256": "dd7b636c69a58fc8d06369e63e1888bcee694273cb9256121898fb9ed6c25e90",
+        "dependencies": [
+          [
+            "kotlin-stdlib",
+            "2.4.21"
+          ],
+          [
+            "serde-core-mingwx64",
+            "0.1.12"
+          ],
+          [
+            "indexmap-kotlin-mingwx64",
+            "0.1.5"
+          ]
+        ]
+      },
+      {
+        "pom": "/Users/sydney/.m2/repository/io/github/kotlinmania/serde-json-kotlin-tvosarm64/0.2.0/serde-json-kotlin-tvosarm64-0.2.0.pom",
+        "sha256": "ce1b7adc535f3a1963e97fc17c7f81ebf8a325519be5bf34092c91d0a27cc34c",
+        "dependencies": [
+          [
+            "kotlin-stdlib",
+            "2.4.21"
+          ],
+          [
+            "serde-core-tvosarm64",
+            "0.1.12"
+          ],
+          [
+            "indexmap-kotlin-tvosarm64",
+            "0.1.5"
+          ]
+        ]
+      },
+      {
+        "pom": "/Users/sydney/.m2/repository/io/github/kotlinmania/serde-json-kotlin-tvossimulatorarm64/0.2.0/serde-json-kotlin-tvossimulatorarm64-0.2.0.pom",
+        "sha256": "8b7fd9469c3c7f55b8a43565fbc3ca75595d8206d923d4c1c010301907f5dcca",
+        "dependencies": [
+          [
+            "kotlin-stdlib",
+            "2.4.21"
+          ],
+          [
+            "serde-core-tvossimulatorarm64",
+            "0.1.12"
+          ],
+          [
+            "indexmap-kotlin-tvossimulatorarm64",
+            "0.1.5"
+          ]
+        ]
+      },
+      {
+        "pom": "/Users/sydney/.m2/repository/io/github/kotlinmania/serde-json-kotlin-wasm-js/0.2.0/serde-json-kotlin-wasm-js-0.2.0.pom",
+        "sha256": "81a4d176058fc969ee6016beb896ecd67fbf6af5118522d87ff72dd1e3682327",
+        "dependencies": [
+          [
+            "kotlin-stdlib-wasm-js",
+            "2.4.21"
+          ],
+          [
+            "serde-core-wasm-js",
+            "0.1.12"
+          ],
+          [
+            "indexmap-kotlin-wasm-js",
+            "0.1.5"
+          ]
+        ]
+      },
+      {
+        "pom": "/Users/sydney/.m2/repository/io/github/kotlinmania/serde-json-kotlin-wasm-wasi/0.2.0/serde-json-kotlin-wasm-wasi-0.2.0.pom",
+        "sha256": "12faeb76c2046bf4bb971d5260772f6981e5cc7da33f513a07bb978414cef7c1",
+        "dependencies": [
+          [
+            "kotlin-stdlib-wasm-wasi",
+            "2.4.21"
+          ],
+          [
+            "serde-core-wasm-wasi",
+            "0.1.12"
+          ],
+          [
+            "indexmap-kotlin-wasm-wasi",
+            "0.1.5"
+          ]
+        ]
+      },
+      {
+        "pom": "/Users/sydney/.m2/repository/io/github/kotlinmania/serde-json-kotlin-watchosdevicearm64/0.2.0/serde-json-kotlin-watchosdevicearm64-0.2.0.pom",
+        "sha256": "6173739b44e80bbf61a0f219e525321be9132d989c15f5fff4d6c7e022824b38",
+        "dependencies": [
+          [
+            "kotlin-stdlib",
+            "2.4.21"
+          ],
+          [
+            "serde-core-watchosdevicearm64",
+            "0.1.12"
+          ],
+          [
+            "indexmap-kotlin-watchosdevicearm64",
+            "0.1.5"
+          ]
+        ]
+      },
+      {
+        "pom": "/Users/sydney/.m2/repository/io/github/kotlinmania/serde-json-kotlin-watchossimulatorarm64/0.2.0/serde-json-kotlin-watchossimulatorarm64-0.2.0.pom",
+        "sha256": "357b8b818341726bda40c73668d6dad09c531f7da2078f40d8aed7fb743d8aec",
+        "dependencies": [
+          [
+            "kotlin-stdlib",
+            "2.4.21"
+          ],
+          [
+            "serde-core-watchossimulatorarm64",
+            "0.1.12"
+          ],
+          [
+            "indexmap-kotlin-watchossimulatorarm64",
+            "0.1.5"
+          ]
+        ]
+      }
+    ]
+  },
+  "remaining": [
+    "Full de.rs Syn parsing fails at 64:13 on attributed initializer field. Text-reader expressions generated from exact source excerpts.",
+    "Not full-file translation; API adapters and two source-derived error location repairs separate from generated fragments.",
+    "Runtime execution checked only JVM and macOS, not every published platform.",
+    "General Unicode byte position behavior was not validated by these sequence cases."
+  ],
+  "workflow_audit": {
+    "files": [
+      "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/.github/workflows/android-native.yml",
+      "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/.github/workflows/android.yml",
+      "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/.github/workflows/ci.yml",
+      "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/.github/workflows/ios.yml",
+      "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/.github/workflows/js.yml",
+      "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/.github/workflows/jvm.yml",
+      "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/.github/workflows/linux.yml",
+      "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/.github/workflows/macos.yml",
+      "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/.github/workflows/publish.yml",
+      "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/.github/workflows/swift.yml",
+      "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/.github/workflows/tvos.yml",
+      "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/.github/workflows/wasm.yml",
+      "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/.github/workflows/watchos.yml",
+      "/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/.github/workflows/windows.yml"
+    ],
+    "triggers": "manual workflow_dispatch / workflow_call / release only; no push or pull_request observed",
+    "changes": "none; no remote actions"
+  }
+}

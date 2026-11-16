@@ -1,0 +1,4 @@
+rust_name	rust_line	rust_column	kotlin_line
+into_i32	10	3	10
+scientific_exponent	24	14	19
+mantissa_exponent	44	14	34

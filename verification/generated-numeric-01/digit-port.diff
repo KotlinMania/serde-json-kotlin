@@ -1,0 +1,72 @@
+--- /Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/verification/generated-numeric-01/before/src/commonMain/kotlin/io/github/kotlinmania/serdejson/lexical/Digit.kt	2026-10-17 11:14:34
++++ /Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/src/commonMain/kotlin/io/github/kotlinmania/serdejson/lexical/generated/digit/Digit.kt	2026-10-25 09:06:08
+@@ -1,30 +1,47 @@
+-// port-lint: source lexical/digit.rs
+-package io.github.kotlinmania.serdejson.lexical
++package io.github.kotlinmania.serdejson.lexical.generated.digit
+ 
+-/**
+- * Converts a single ASCII byte (`b'0'`..`b'9'`) to its numeric digit value,
+- * or `null` if the byte is not a decimal digit.
+- */
+-internal fun toDigit(c: Byte): UInt? =
+-    if (c in b0..b9) (c - b0).toUInt() else null
++// Generated from Syn AST; exact original retained in input.rs.
++// Adapted from https://github.com/Alexhuszagh/rust-lexical.
+ 
+-private val b0: Byte = '0'.code.toByte()
+-private val b9: Byte = '9'.code.toByte()
++//! Helpers to convert and add digits from characters.
+ 
+-/**
+- * Multiplies [value] by 10 and adds [digit], returning `null` on overflow.
+- */
+-internal fun addDigit(value: ULong, digit: UInt): ULong? {
+-    val n = value.checkedMultiply(10UL) ?: return null
+-    return n.checkedAdd(digit.toULong())
++// Convert u8 to digit.
++// Rust #[inline]: optimization hint.
++internal fun `to_digit`(`c`: kotlin.UByte): __rtkOption<kotlin.UInt> = __rtkCharToDigit((__rtkChar((`c`).toInt())), 10u)
++
++
++// Add digit to mantissa.
++// Rust #[inline]: optimization hint.
++internal fun `add_digit`(`value`: kotlin.ULong, `digit`: kotlin.UInt): __rtkOption<kotlin.ULong> = (when (val __rtkValue1: __rtkOption<kotlin.ULong> = kotlin.run { val __rtkValue0 = io.github.kotlinmania.numtraits.U64Num.checkedMul(`value`, 10uL); if (__rtkValue0 == null) __rtkOption.None else __rtkOption.Some(__rtkValue0) }) {
++    __rtkOption.None -> __rtkOption.None
++    is __rtkOption.Some -> kotlin.run {
++        val `n`: kotlin.ULong = __rtkValue1.`value`
++        kotlin.run { val __rtkValue2 = io.github.kotlinmania.numtraits.U64Num.checkedAdd(`n`, (`digit`).toULong()); if (__rtkValue2 == null) __rtkOption.None else __rtkOption.Some(__rtkValue2) }
++    }
++})
++
++// Tagged Rust Option; owned payloads require a checked fresh-value context.
++sealed class __rtkOption<out T> {
++    data object None : __rtkOption<kotlin.Nothing>()
++    data class Some<T>(val value: T) : __rtkOption<T>()
+ }
++private fun <T> __rtkUnwrapOr(value: __rtkOption<T>, fallback: T): T = when (value) {
++    __rtkOption.None -> fallback
++    is __rtkOption.Some -> value.value
++}
+ 
+-private fun ULong.checkedMultiply(other: ULong): ULong? {
+-    val result = this * other
+-    return if (other != 0UL && result / other != this) null else result
++class __rtkPanic(message: String) : kotlin.RuntimeException(message)
++
++data class __rtkChar(val codePoint: Int) {
++    init { require(codePoint in 0..0x10ffff && codePoint !in 0xd800..0xdfff) }
++    fun lenUtf8(): ULong = scalarString().encodeToByteArray(throwOnInvalidSequence = true).size.toULong()
++    fun scalarString(): String = if (codePoint < 0x10000) codePoint.toChar().toString() else
++        (0xd800 + ((codePoint - 0x10000) shr 10)).toChar().toString() +
++            (0xdc00 + ((codePoint - 0x10000) and 1023)).toChar()
+ }
+ 
+-private fun ULong.checkedAdd(other: ULong): ULong? {
+-    val result = this + other
+-    return if (result < this) null else result
++private fun __rtkCharToDigit(value: __rtkChar, radix: UInt): __rtkOption<UInt> {
++    if (radix < 2u || radix > 36u) throw __rtkPanic("to_digit: invalid radix -- radix must be in the range 2 to 36 inclusive")
++    val digit = if (value.codePoint < 128) value.codePoint.toChar().digitToIntOrNull(radix.toInt()) else null
++    return if (digit == null) __rtkOption.None else __rtkOption.Some(digit.toUInt())
+ }

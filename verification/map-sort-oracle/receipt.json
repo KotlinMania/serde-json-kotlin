@@ -1,0 +1,228 @@
+{
+  "baseline": "4cb85c6",
+  "initialDirtyFiles": [],
+  "priorWork": "Pointer repair 4cb85c6 and original 159 tests are preserved prior work; Rand remains separately at 46e4736. Dirty IndexMap checkout was read-only and not staged.",
+  "translator": {
+    "exitCode": 0,
+    "command": "../rust-kotlin/build/bin/macosArm64/debugExecutable/rust-kotlin.kexe translate --quiet --gradle-properties gradle.properties --package io.github.kotlinmania.serdejson --source-root tmp/serde_json/src tmp/serde_json/src/map.rs build/rust-kotlin-map-sort/MapReview.kt",
+    "provenance": "Generated sortKeys retains map.sortUnstableKeys at lines 300-301; consumer adapter supplies exact UTF-8 comparator through existing canonical IndexMap comparator API. No generator or IndexMap change."
+  },
+  "redCommand": "./gradlew jvmTest --tests '*MapSortParityTest*' --console=plain",
+  "red": [
+    {
+      "name": "maximumScalarFollowsBmp[jvm]",
+      "failed": true,
+      "message": "java.lang.AssertionError: expected:<[?, \udbff\udfff]> but was:<[\udbff\udfff, ?]>"
+    },
+    {
+      "name": "bmpPrecedesSupplementary[jvm]",
+      "failed": true,
+      "message": "java.lang.AssertionError: expected:<[\ue000, \ud800\udc00]> but was:<[\ud800\udc00, \ue000]>"
+    },
+    {
+      "name": "supplementaryPrefixOrder[jvm]",
+      "failed": true,
+      "message": "java.lang.AssertionError: expected:<[\ue000, \ue000a, \ud800\udc00, \ud800\udc00a]> but was:<[\ud800\udc00, \ud800\udc00a, \ue000, \ue000a]>"
+    },
+    {
+      "name": "malformedUtf16IsRejectedBeforeReordering[jvm]",
+      "failed": true,
+      "message": "java.lang.AssertionError: Expected an exception of class java.nio.charset.CharacterCodingException to be thrown, but was completed successfully."
+    },
+    {
+      "name": "valuesAndRepeatSortArePreserved[jvm]",
+      "failed": true,
+      "message": "java.lang.AssertionError: expected:<[\ue000, \ud800\udc00]> but was:<[\ud800\udc00, \ue000]>"
+    },
+    {
+      "name": "recursiveObjectsInsideArrays[jvm]",
+      "failed": true,
+      "message": "java.lang.AssertionError: expected:<[array, \ue000, \ud800\udc00]> but was:<[array, \ud800\udc00, \ue000]>"
+    },
+    {
+      "name": "noUnicodeNormalization[jvm]",
+      "failed": false,
+      "message": ""
+    },
+    {
+      "name": "asciiAndPrefixOrder[jvm]",
+      "failed": false,
+      "message": ""
+    }
+  ],
+  "redCoverageLimit": "JVM pre-repair only. Six failures: five Rust-valid ordering cases plus one separate Kotlin malformed-UTF16 guard. Failure XML renders U+FFFF as ?; hashed fixtures retain explicit Unicode escape and no expectation was rewritten.",
+  "rustCommand": "cargo test --offline --manifest-path verification/map-sort-oracle/Cargo.toml --target-dir build/rust-kotlin-map-sort/rust-target",
+  "rustFeature": "preserve_order enabled to exercise actual upstream sort_keys mutation and match existing Kotlin insertion-ordered representation",
+  "rustOracleLog": "     Locking 14 packages to highest compatible versions\n   Compiling serde_core v1.0.228\n   Compiling zmij v1.0.23\n   Compiling serde_json v1.0.149 (/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/tmp/serde_json)\n   Compiling hashbrown v0.16.1\n   Compiling equivalent v1.0.2\n   Compiling memchr v2.8.0\n   Compiling itoa v1.0.18\n   Compiling indexmap v2.13.0\n   Compiling map-sort-oracle v0.0.0 (/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/verification/map-sort-oracle)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.77s\n     Running unittests src/lib.rs (build/rust-kotlin-map-sort/rust-target/debug/deps/map_sort_oracle-2b801c69d0a3a52e)\n\nrunning 7 tests\ntest tests::no_unicode_normalization ... ok\ntest tests::values_and_repeat_sort_are_preserved ... ok\ntest tests::recursive_objects_inside_arrays ... ok\ntest tests::maximum_scalar_follows_bmp ... ok\ntest tests::supplementary_prefix_order ... ok\ntest tests::ascii_and_prefix_order ... ok\ntest tests::bmp_precedes_supplementary ... ok\n\ntest result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n   Doc-tests map_sort_oracle\n\nrunning 0 tests\n\ntest result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+  "resolvedRustPackages": [
+    {
+      "name": "equivalent",
+      "version": "1.0.2",
+      "source": "registry+https://github.com/rust-lang/crates.io-index"
+    },
+    {
+      "name": "hashbrown",
+      "version": "0.16.1",
+      "source": "registry+https://github.com/rust-lang/crates.io-index"
+    },
+    {
+      "name": "indexmap",
+      "version": "2.13.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index"
+    },
+    {
+      "name": "itoa",
+      "version": "1.0.18",
+      "source": "registry+https://github.com/rust-lang/crates.io-index"
+    },
+    {
+      "name": "map-sort-oracle",
+      "version": "0.0.0",
+      "source": "local path"
+    },
+    {
+      "name": "memchr",
+      "version": "2.8.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index"
+    },
+    {
+      "name": "proc-macro2",
+      "version": "1.0.107",
+      "source": "registry+https://github.com/rust-lang/crates.io-index"
+    },
+    {
+      "name": "quote",
+      "version": "1.0.47",
+      "source": "registry+https://github.com/rust-lang/crates.io-index"
+    },
+    {
+      "name": "serde",
+      "version": "1.0.228",
+      "source": "registry+https://github.com/rust-lang/crates.io-index"
+    },
+    {
+      "name": "serde_core",
+      "version": "1.0.228",
+      "source": "registry+https://github.com/rust-lang/crates.io-index"
+    },
+    {
+      "name": "serde_derive",
+      "version": "1.0.228",
+      "source": "registry+https://github.com/rust-lang/crates.io-index"
+    },
+    {
+      "name": "serde_json",
+      "version": "1.0.149",
+      "source": "local path"
+    },
+    {
+      "name": "syn",
+      "version": "2.0.119",
+      "source": "registry+https://github.com/rust-lang/crates.io-index"
+    },
+    {
+      "name": "unicode-ident",
+      "version": "1.0.27",
+      "source": "registry+https://github.com/rust-lang/crates.io-index"
+    },
+    {
+      "name": "zmij",
+      "version": "1.0.23",
+      "source": "registry+https://github.com/rust-lang/crates.io-index"
+    }
+  ],
+  "kotlinOnlyGuard": "Malformed UTF-16 key strictly fails UTF-8 encoding before map reordering; no direct Rust counterpart because Rust String is valid UTF-8. Not counted among seven Rust oracle cases.",
+  "finalCommand": "./gradlew jvmTest macosArm64Test detekt ktlintCheck --continue --console=plain",
+  "final": {
+    "jvmTest": {
+      "tests": 174,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "failureCases": [],
+      "newSuite": [
+        {
+          "name": "MapSortParityTest[jvm]",
+          "tests": "8",
+          "skipped": "0",
+          "failures": "0",
+          "errors": "0",
+          "timestamp": "2026-11-02T19:04:49.580Z",
+          "hostname": "EmberHarmony.local",
+          "time": "0.041"
+        }
+      ],
+      "preservedPointerSuite": [
+        {
+          "name": "PointerIndexParityTest[jvm]",
+          "tests": "7",
+          "skipped": "0",
+          "failures": "0",
+          "errors": "0",
+          "timestamp": "2026-11-02T19:04:49.723Z",
+          "hostname": "EmberHarmony.local",
+          "time": "0.001"
+        }
+      ]
+    },
+    "macosArm64Test": {
+      "tests": 174,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "failureCases": [],
+      "newSuite": [
+        {
+          "name": "macosArm64Test.io.github.kotlinmania.serdejson.MapSortParityTest",
+          "tests": "8",
+          "skipped": "0",
+          "failures": "0",
+          "errors": "0",
+          "timestamp": "2026-11-02T19:04:57.986Z",
+          "hostname": "EmberHarmony.local",
+          "time": "0.004"
+        }
+      ],
+      "preservedPointerSuite": [
+        {
+          "name": "macosArm64Test.io.github.kotlinmania.serdejson.PointerIndexParityTest",
+          "tests": "7",
+          "skipped": "0",
+          "failures": "0",
+          "errors": "0",
+          "timestamp": "2026-11-02T19:04:57.994Z",
+          "hostname": "EmberHarmony.local",
+          "time": "0.001"
+        }
+      ]
+    },
+    "ktlintCommonMainSourceSetCheck": 0,
+    "ktlintCommonTestSourceSetCheck": 0,
+    "ktlintJsMainSourceSetCheck": 0,
+    "ktlintJvmMainSourceSetCheck": 0,
+    "ktlintKotlinScriptCheck": 0,
+    "authoredKtlint": [],
+    "externalKtlint": [],
+    "detektFindings": 0,
+    "authoredDetekt": []
+  },
+  "sourceOrderControls": {
+    "U+E000 before U+10000": true,
+    "U+FFFF before U+10FFFF": true,
+    "noNormalization": true,
+    "prefixOrder": true
+  },
+  "sha256": {
+    "src/commonMain/kotlin/io/github/kotlinmania/serdejson/Map.kt": "134ac251c0266fc4d6eed7b8dcdd9590096920e628fd6ae81afee6adb908d2c0",
+    "src/commonMain/kotlin/io/github/kotlinmania/serdejson/Value.kt": "f646f3a9edc86dd83074c95ff7aaca0c89bdd23b09e0bf05df3a7e2a591c3456",
+    "src/commonTest/kotlin/io/github/kotlinmania/serdejson/MapSortParityTest.kt": "8121fd2ec77f8bd5e97dc44fc7b7921b176a198ff24a4e1bc8d90b31a7168462",
+    "src/commonTest/kotlin/io/github/kotlinmania/serdejson/PointerIndexParityTest.kt": "2ce6cddce327e39bcef29f4ebdd8179e694b2e13df69cd7744605d2192b1a842",
+    "tmp/serde_json/src/map.rs": "b5a2fd1ee865e6cfd83ef2da0a2e1057f892465ac7ede8a78a11354a60526f33",
+    "tmp/serde_json/src/value/mod.rs": "6331d59ea362a74b6cd3d302d08114a63a73a384ff56fef737de29edea2f8d91",
+    "verification/map-sort-oracle/Cargo.toml": "b23fa009bb48704cc35ccae171d4eaec30ed33d8c145a2fc640a5e9fd1b74234",
+    "verification/map-sort-oracle/Cargo.lock": "613c1fe212772f1f12187cdb7c60b52e0347ca2babc24ce7c0b09173fd0359c5",
+    "verification/map-sort-oracle/src/lib.rs": "ea9d06801041b3bad3dc600fa4f65d6f216ddb92f576f533cfec13a8ff5973f1",
+    "build/rust-kotlin-map-sort/MapReview.kt": "958adce87a1513a156d20ef60aa2a6ed000eb87c83686af232c663e54cef7953"
+  },
+  "lockPolicy": "Offline-generated Cargo.lock remains ignored under existing repository policy; actual resolved versions and hash recorded. No project pin changed."
+}

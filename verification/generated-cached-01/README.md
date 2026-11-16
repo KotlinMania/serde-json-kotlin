@@ -1,0 +1,13 @@
+# Complete generated cached.rs adoption
+
+Source: `/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/tmp/serde_json/src/lexical/cached.rs`, SHA-256 `0e127398691f8042c19cde209e7f4b0161f0f3150342430145929f711e6fdac8`.
+
+Production raw destination: `src/common/commonMain/kotlin/io/github/kotlinmania/serdejson/lexical/generated/cached/Cached.kt`. Its generated body is byte-identical to rust-kotlin's complete Native-verified output, SHA-256 `28bb7d3530f827bc1d0366ee81216e0ec13b24b5129352930ec1c181556841de`; only the package/port-lint header is added. Generator commit: 019970170167ae2399667f8cdeaf2c569b7fd889.
+
+The existing `lexical/Cached.kt` classes retain their Int/primitive-array-facing internal APIs and delegate array length and all four lookup methods to generated code. `lexical/CachedFloat80.kt` routes the cache trait through its generated implementation and supplies its explicit static accessor from the previously adopted generated cached_float80.rs table. One shared record view is initialized from those exact immutable values. No table constants, lookup body or arithmetic are handwritten. Existing lexical/Algorithm.kt consumers now reach the generated methods through these adapters.
+
+The actual complete production Gradle KLIB passes 239 canonical Rust comparisons through its generated API and 230 comparisons through its Int adapters. All representable nonnegative Int indices plus -1 mapped to usize::MAX are compared; larger unsigned indices are tested through the raw API without truncation. Both matching diff files are empty. The standalone raw comparison contains 145 expected bounds panics. These checks compare results and panic occurrence, not Rust panic text or exception ABI. All 131 Serde JSON macOS ARM64 tests pass.
+
+The generated API is an explicit usize64 profile and Kotlin lists remain Int-indexed. Primitive-array adapters retain read-only list views, so backing storage must remain immutable for the retained view's lifetime. The actual cached table binding has private immutable data. No allocation/layout, Swift ABI or other-platform runtime equivalence is claimed. No dependencies, configurations, targets, FFI or kernel sources changed; no remote action or publication occurred. The prior [u64::MAX,1]*5^2048 multiplication failure remains unchanged.
+
+Reproduce after compiling the production Native library: `./verification/generated-cached-01/check_production.sh --out build/generated-cached-01/production-new`. This is one new whole-file adoption. Reused cached_float80 output, its supporting record contracts, and adapters do not add files to the count.

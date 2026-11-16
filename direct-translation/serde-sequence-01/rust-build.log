@@ -1,0 +1,10 @@
+     Locking 11 packages to highest compatible versions
+   Compiling serde_core v1.0.228
+   Compiling zmij v1.0.23
+   Compiling serde v1.0.228
+   Compiling serde_json v1.0.149 (/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/tmp/serde_json)
+   Compiling memchr v2.8.0
+   Compiling itoa v1.0.18
+   Compiling serde-json-sequence-oracle v0.0.0 (/Volumes/stuff/Projects/kotlinmania/serde-json-kotlin/direct-translation/serde-sequence-01/rust)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 3.25s
+     Running `direct-translation/serde-sequence-01/rust-target/debug/serde-json-sequence-oracle`
