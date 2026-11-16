@@ -21,10 +21,62 @@ import io.github.kotlinmania.serdecore.de.value.intoDeserializer
 
 internal object ValueDeserialize : Deserialize<Value> {
     override fun <D : Deserializer> deserialize(deserializer: D): SerdeResult<Value> =
-        deserializer.deserializeAny(ValueVisitor)
+        when (deserializer) {
+            is ValueDeserializer -> deserializeFromValueHeap(deserializer.value)
+            is JsonDeserializer -> deserializer.deserializeValueHeap()
+            else -> deserializer.deserializeAny(ValueVisitor)
+        }
 }
 
-private object ValueVisitor : Visitor<Value> {
+private fun deserializeFromValueHeap(root: Value): SerdeResult<Value> =
+    serdeCatching { deepCopyValue(root) }
+
+private val deepCopyValue: DeepRecursiveFunction<Value, Value> =
+    DeepRecursiveFunction { current ->
+        when (current) {
+            is Value.Null -> {
+                Value.Null
+            }
+
+            is Value.Bool -> {
+                current
+            }
+
+            is Value.Number -> {
+                current.value.deserializeAny(ValueVisitor).getOrThrow()
+            }
+
+            is Value.Str -> {
+                current
+            }
+
+            is Value.Array -> {
+                Value.Array(current.value.map { elem -> callRecursive(elem) })
+            }
+
+            is Value.Object -> {
+                val iter = current.value.iterator()
+                if (!iter.hasNext()) {
+                    Value.Object(JsonMap())
+                } else {
+                    val (firstKey, firstChild) = iter.next()
+                    if (firstKey == RawValue.TOKEN) {
+                        visitMap(current.value, ValueVisitor).getOrThrow()
+                    } else {
+                        val values = JsonMap()
+                        values.insert(firstKey, callRecursive(firstChild))
+                        while (iter.hasNext()) {
+                            val (key, child) = iter.next()
+                            values.insert(key, callRecursive(child))
+                        }
+                        Value.Object(values)
+                    }
+                }
+            }
+        }
+    }
+
+internal object ValueVisitor : Visitor<Value> {
     override fun expecting(): String = "any valid JSON value"
 
     override fun visitBool(v: Boolean): SerdeResult<Value> = SerdeResult.success(Value.Bool(v))
@@ -99,7 +151,7 @@ private object ValueVisitor : Visitor<Value> {
  * A [Deserializer] that reads from a [Value].
  */
 class ValueDeserializer(
-    private val value: Value,
+    internal val value: Value,
 ) : Deserializer {
     override fun isHumanReadable(): Boolean = true
 

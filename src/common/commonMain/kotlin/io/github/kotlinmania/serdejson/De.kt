@@ -1319,13 +1319,77 @@ class JsonDeserializer(
 ) : Deserializer {
     /** Recursion depth limit, decremented on each nested container. */
     internal var remainingDepth: Int = 128
-        private set
 
-    private var recursionLimitDisabled: Boolean = false
+    internal var recursionLimitDisabled: Boolean = false
 
     /** Disables the default 128-level container recursion limit on this deserializer. */
     fun disableRecursionLimit() {
         recursionLimitDisabled = true
+    }
+
+    /** Deserializes a JSON [Value] using heap-backed recursion so deep inputs avoid thread-stack overflow. */
+    internal fun deserializeValueHeap(): SerdeResult<Value> = serdeCatching { deepDeserializeJsonValue(this) }
+
+    internal fun hasNextSeqElement(first: Boolean): Boolean {
+        val peek = parser.parseWhitespace()
+        if (peek < 0) (parser.peekError(ErrorCode.EofWhileParsingList)).raise()
+        return when {
+            peek == ']'.code -> {
+                false
+            }
+
+            first -> {
+                true
+            }
+
+            peek == ','.code -> {
+                parser.eatChar()
+                val p = parser.parseWhitespace()
+                if (p == ']'.code) (parser.peekError(ErrorCode.TrailingComma)).raise()
+                if (p < 0) (parser.peekError(ErrorCode.EofWhileParsingValue)).raise()
+                true
+            }
+
+            else -> {
+                (parser.peekError(ErrorCode.ExpectedListCommaOrEnd)).raise()
+            }
+        }
+    }
+
+    internal fun hasNextObjectKey(first: Boolean): Boolean {
+        val peek = parser.parseWhitespace()
+        if (peek < 0) (parser.peekError(ErrorCode.EofWhileParsingObject)).raise()
+        return when {
+            peek == '}'.code -> {
+                false
+            }
+
+            first -> {
+                if (peek == '"'.code) {
+                    true
+                } else {
+                    (parser.peekError(ErrorCode.KeyMustBeAString)).raise()
+                }
+            }
+
+            peek == ','.code -> {
+                parser.eatChar()
+                val p = parser.parseWhitespace()
+                if (p == '"'.code) {
+                    true
+                } else if (p == '}'.code) {
+                    (parser.peekError(ErrorCode.TrailingComma)).raise()
+                } else if (p < 0) {
+                    (parser.peekError(ErrorCode.EofWhileParsingValue)).raise()
+                } else {
+                    (parser.peekError(ErrorCode.KeyMustBeAString)).raise()
+                }
+            }
+
+            else -> {
+                (parser.peekError(ErrorCode.ExpectedObjectCommaOrEnd)).raise()
+            }
+        }
     }
 
     /** Validates that the input stream is at the end or only has trailing whitespace. */
@@ -2347,3 +2411,113 @@ fun fromSlice(json: ByteArray): JsonValueOutcome =
  */
 fun <T> fromSlice(json: ByteArray, deserialize: Deserialize<T>): SerdeResult<T> =
     deserializeFromSlice(json, deserialize)
+
+private val deepDeserializeJsonValue: DeepRecursiveFunction<JsonDeserializer, Value> =
+    DeepRecursiveFunction { de ->
+        val parser = de.parser
+        val peek = parser.parseWhitespace()
+        if (peek < 0) (parser.peekError(ErrorCode.EofWhileParsingValue)).raise()
+        when (peek.toChar()) {
+            'n' -> {
+                parser.eatChar()
+                parser.parseIdent("ull")
+                Value.Null
+            }
+
+            't' -> {
+                parser.eatChar()
+                parser.parseIdent("rue")
+                Value.Bool(true)
+            }
+
+            'f' -> {
+                parser.eatChar()
+                parser.parseIdent("alse")
+                Value.Bool(false)
+            }
+
+            '-' -> {
+                parser.eatChar()
+                parser.parseAnyNumber(false).visit(ValueVisitor).getOrThrow()
+            }
+
+            in '0'..'9' -> {
+                parser.parseAnyNumber(true).visit(ValueVisitor).getOrThrow()
+            }
+
+            '"' -> {
+                parser.eatChar()
+                Value.Str(parser.parseStr())
+            }
+
+            '[' -> {
+                if (!de.recursionLimitDisabled) {
+                    de.remainingDepth--
+                    if (de.remainingDepth == 0) {
+                        (parser.peekError(ErrorCode.RecursionLimitExceeded)).raise()
+                    }
+                }
+                try {
+                    parser.eatChar()
+                    var first = true
+                    val values = mutableListOf<Value>()
+                    while (de.hasNextSeqElement(first)) {
+                        first = false
+                        values.add(callRecursive(de))
+                    }
+                    parser.endSeq()
+                    Value.Array(values)
+                } finally {
+                    if (!de.recursionLimitDisabled) {
+                        de.remainingDepth++
+                    }
+                }
+            }
+
+            '{' -> {
+                if (!de.recursionLimitDisabled) {
+                    de.remainingDepth--
+                    if (de.remainingDepth == 0) {
+                        (parser.peekError(ErrorCode.RecursionLimitExceeded)).raise()
+                    }
+                }
+                try {
+                    parser.eatChar()
+                    if (!de.hasNextObjectKey(first = true)) {
+                        parser.endMap()
+                        Value.Object(JsonMap())
+                    } else {
+                        parser.eatChar()
+                        val firstKey = parser.parseStr()
+                        if (firstKey == RawValue.TOKEN) {
+                            parser.parseObjectColon()
+                            val raw = BoxedFromString.deserialize(de).getOrThrow()
+                            val parsed = fromStr(raw.json).toSerdeResult().getOrThrow()
+                            parser.endMap()
+                            parsed
+                        } else {
+                            val values = JsonMap()
+                            parser.parseObjectColon()
+                            values.insert(firstKey, callRecursive(de))
+                            while (de.hasNextObjectKey(first = false)) {
+                                parser.eatChar()
+                                val key = parser.parseStr()
+                                parser.parseObjectColon()
+                                values.insert(key, callRecursive(de))
+                            }
+                            parser.endMap()
+                            Value.Object(values)
+                        }
+                    }
+                } finally {
+                    if (!de.recursionLimitDisabled) {
+                        de.remainingDepth++
+                    }
+                }
+            }
+
+            else -> {
+                (parser.peekError(ErrorCode.ExpectedSomeValue)).raise()
+            }
+        }
+    }
