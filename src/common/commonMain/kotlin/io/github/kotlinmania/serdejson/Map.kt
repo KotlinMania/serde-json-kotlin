@@ -18,7 +18,7 @@ typealias MapImpl<K, V> = IndexMap<K, V>
  *
  * By default the map is backed by an [IndexMap] to preserve order.
  */
-class JsonMap(
+class JsonMap internal constructor(
     internal val map: MapImpl<String, Value>,
 ) : Iterable<Pair<String, Value>>,
     Serialize {

@@ -1,6 +1,6 @@
 import Testing
 import SerdeJson
-import IoGithubKotlinmaniaSerdeCore
+import IoGithubKotlinmaniaSerdeKotlin
 
 @Suite("Concrete JSON outcomes")
 struct SerdeJsonExportTests {
