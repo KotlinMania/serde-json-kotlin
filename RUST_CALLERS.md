@@ -16,15 +16,15 @@ For every Rust crate this repo owns (under `tmp/`), this file lists every **cros
 
 | package | module | inbound use sites | distinct caller crates | distinct caller repos | codex sites |
 |---|---|---:|---:|---:|---:|
-| `serde_json` | `serde_json` | 527 | 65 | 21 | 410 |
+| `serde_json` | `serde_json` | 547 | 71 | 27 | 410 |
 
 ## `serde_json`
 
-### Inbound symbols (18 distinct, 527 total `use` sites)
+### Inbound symbols (19 distinct, 547 total `use` sites)
 
 Sorted by codex demand, then total demand. The first symbols are the priority queue for porting `serde_json`.
 
-#### `serde_json::json` — 230 site(s) (192 codex, 38 other, 42 caller crates)
+#### `serde_json::json` — 241 site(s) (192 codex, 49 other, 44 caller crates)
 
 - ✅ `codex-kotlin/app_test_support` `auth_fixtures.rs:15` — `use serde_json::json`
 - ✅ `codex-kotlin/app_test_support` `models_cache.rs:12` — `use serde_json::json`
@@ -38,9 +38,9 @@ Sorted by codex demand, then total demand. The first symbols are the priority qu
 - ✅ `codex-kotlin/codex-api` `src/endpoint/responses_websocket.rs:678` — `use serde_json::json`
 - ✅ `codex-kotlin/codex-api` `src/sse/responses.rs:603` — `use serde_json::json`
 - ✅ `codex-kotlin/codex-api` `tests/realtime_websocket_e2e.rs:23` — `use serde_json::json`
-- _… and 218 more site(s)._
+- _… and 229 more site(s)._
 
-#### `serde_json::Value` — 230 site(s) (191 codex, 39 other, 48 caller crates)
+#### `serde_json::Value` — 237 site(s) (191 codex, 46 other, 53 caller crates)
 
 - ✅ `codex-kotlin/codex-api` `src/api_bridge.rs:15` — `use serde_json::Value`
 - ✅ `codex-kotlin/codex-api` `src/common.rs:13` — `use serde_json::Value`
@@ -54,7 +54,7 @@ Sorted by codex demand, then total demand. The first symbols are the priority qu
 - ✅ `codex-kotlin/codex-api` `src/endpoint/responses.rs:21` — `use serde_json::Value`
 - ✅ `codex-kotlin/codex-api` `src/endpoint/responses_websocket.rs:21` — `use serde_json::Value`
 - ✅ `codex-kotlin/codex-api` `src/endpoint/session.rs:14` — `use serde_json::Value`
-- _… and 218 more site(s)._
+- _… and 225 more site(s)._
 
 #### `serde_json::Map` — 20 site(s) (8 codex, 12 other, 10 caller crates)
 
@@ -136,6 +136,11 @@ Sorted by codex demand, then total demand. The first symbols are the priority qu
 
 - ✅ `codex-kotlin/codex-rmcp-client` `src/executor_process_transport.rs:40` — `use serde_json::to_vec`
 
+#### `serde_json::Error` — 2 site(s) (0 codex, 2 other, 2 caller crates)
+
+- `criterion-kotlin/criterion` `src/error.rs:3` — `use serde_json::Error as SerdeError`
+- `schemars-kotlin/schemars` `src/ser.rs:5` — `use serde_json::Error`
+
 #### `serde_json::error::Result` — 2 site(s) (0 codex, 2 other, 1 caller crates)
 
 - `rama-core-kotlin/rama-core` `src/stream/json/engine.rs:9` — `use serde_json::error::Result as JsonResult`
@@ -151,10 +156,6 @@ Sorted by codex demand, then total demand. The first symbols are the priority qu
 - `axum-kotlin/axum` `src/response/sse.rs:642` — `use serde_json::value::RawValue`
 - `sqlx-kotlin/sqlx` `tests/postgres/types.rs:396` — `use serde_json::value::RawValue as JsonRawValue`
 
-#### `serde_json::Error` — 1 site(s) (0 codex, 1 other, 1 caller crates)
-
-- `schemars-kotlin/schemars` `src/ser.rs:5` — `use serde_json::Error`
-
 #### `serde_json::Number` — 1 site(s) (0 codex, 1 other, 1 caller crates)
 
 - `schemars-kotlin/schemars` `src/json_schema_impls/serdejson.rs:6` — `use serde_json::Number`
@@ -162,3 +163,7 @@ Sorted by codex demand, then total demand. The first symbols are the priority qu
 #### `serde_json::Serializer` — 1 site(s) (0 codex, 1 other, 1 caller crates)
 
 - `tracing-subscriber-kotlin/tracing-subscriber` `src/fmt/format/json.rs:17` — `use serde_json::Serializer`
+
+#### `serde_json::value::Value` — 1 site(s) (0 codex, 1 other, 1 caller crates)
+
+- `criterion-kotlin/criterion` `tests/criterion_tests.rs:6` — `use serde_json::value::Value`
