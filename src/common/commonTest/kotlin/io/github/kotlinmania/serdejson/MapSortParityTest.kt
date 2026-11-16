@@ -74,7 +74,7 @@ class MapSortParityTest {
 
     @Test
     fun malformedUtf16IsRejectedBeforeReordering() {
-        val value = map(listOf("z", "\uD800", "a"))
+        val value = map(listOf("z", charArrayOf('\uD800').concatToString(), "a"))
         val before = keys(value)
         assertFailsWith<CharacterCodingException> { value.sortKeys() }
         assertEquals(before, keys(value))
