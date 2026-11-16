@@ -160,7 +160,7 @@ class JsonMap internal constructor(
 
     /** Sorts this map's entries in-place using Rust string ordering: unsigned UTF-8 bytes. */
     fun sortKeys() {
-        val encodedKeys = map.keys().associateWith { it.encodeToByteArray(throwOnInvalidSequence = true) }
+        val encodedKeys = map.keys().associateWith { encodeValidKeyUtf8(it) }
         map.sortKeys { a, b ->
             val left = encodedKeys.getValue(a)
             val right = encodedKeys.getValue(b)
@@ -491,4 +491,22 @@ class IntoValues internal constructor(
     override fun hashCode(): Int = list.hashCode()
 
     override fun toString(): String = list.toString()
+}
+
+private fun encodeValidKeyUtf8(value: String): ByteArray {
+    var index = 0
+    while (index < value.length) {
+        val ch = value[index]
+        if (ch.isHighSurrogate()) {
+            if (index + 1 >= value.length || !value[index + 1].isLowSurrogate()) {
+                throw CharacterCodingException()
+            }
+            index += 2
+        } else if (ch.isLowSurrogate()) {
+            throw CharacterCodingException()
+        } else {
+            index += 1
+        }
+    }
+    return value.encodeToByteArray(throwOnInvalidSequence = true)
 }
